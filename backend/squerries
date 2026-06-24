@@ -1,0 +1,60 @@
+DROP VIEW IF EXISTS tenant_dashboard;
+DROP VIEW IF EXISTS payView;
+DROP VIEW IF EXISTS chargeView;
+DROP VIEW IF EXISTS info;
+DROP VIEW IF EXISTS tview;
+DROP VIEW IF EXISTS hview;
+
+CREATE VIEW hview AS 
+SELECT houseId,houseNo 
+FROM houseList;
+
+
+CREATE VIEW tview AS 
+SELECT id, houseId, name, phone 
+FROM tenantList 
+WHERE moveout IS NULL;
+
+CREATE VIEW info AS 
+SELECT 
+    t.id AS tenantId,
+    t.name,
+    t.phone,
+    t.houseId,
+    h.houseNo
+FROM tview t
+INNER JOIN hview h 
+ON h.houseId = t.houseId;
+
+CREATE VIEW chargeView AS
+SELECT 
+    tenantId,
+    SUM(chargeAmount) AS totalCharge
+FROM chargeList
+GROUP BY tenantId;
+
+CREATE VIEW payView AS
+SELECT 
+    tenantId,
+    SUM(payAmount) AS totalpay
+FROM paymentList
+GROUP BY tenantId;
+
+CREATE VIEW tenant_dashboard AS
+SELECT 
+    i.tenantId,
+    i.name,
+    i.phone,
+    i.houseNo,
+
+    COALESCE(c.totalCharge, 0)
+    - COALESCE(p.totalpay, 0)
+    AS balance
+
+FROM info i
+
+LEFT JOIN chargeView c 
+ON i.tenantId = c.tenantId
+
+LEFT JOIN payView p 
+ON i.tenantId = p.tenantId;

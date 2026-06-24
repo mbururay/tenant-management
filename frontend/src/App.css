@@ -1,0 +1,77 @@
+body {
+  font-family: "Playfair Display", serif;
+  margin : 0;
+}
+
+
+
+#gLanding{
+    display: flex;
+    background-image: url(./TrackerLanding.jpg);
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+    
+    
+}
+
+
+#header{
+    display: flex;
+    font-size: small;
+    
+}
+
+
+#tenantView, #addTenant, #uWater ,#genInvoice{
+    margin : auto;
+}
+
+#cenText{
+    flex : 1;
+    display: flex;
+    flex-direction : column;
+    align-items: center;
+    justify-content: center;
+}
+
+#cencen{
+    display: flex;
+    flex-direction : column;
+    align-items: center;
+
+}
+#cenButton{
+    width : 100px;
+    border-radius: 20px;
+    border-width: 0px;
+    height : 30px;
+
+
+    
+}
+
+#mainTitle{
+    font-size: 50px;
+}
+
+/*Global Button Styling*/
+button{
+    transition-duration: 0.4s;
+}
+
+button:hover{
+    background-color: #005ef5;
+}
+
+button {
+    padding: 10px 15px;
+    background: #3b82f6;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}

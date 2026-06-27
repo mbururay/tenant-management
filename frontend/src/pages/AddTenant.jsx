@@ -35,12 +35,11 @@ const AddTenant = () => {
       return;
     }
 
-    // 👉 MOVE TO CONFIRM PAGE (NO DATABASE CALL HERE)
     navigate("/TenantConfirm", { state: formData });
   };
 
   return (
-    <div id="mainPage">
+    <div className="addTenantPage">
       <Heading />
 
       <h1>Add New Tenant</h1>
@@ -60,7 +59,6 @@ const AddTenant = () => {
 
           <input name="rent" type="number" placeholder="Rent" onChange={handleChange} />
           <input name="garbage" type="number" placeholder="Garbage" onChange={handleChange} />
-          
         </section>
 
         <section>

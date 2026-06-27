@@ -1,20 +1,74 @@
-#mainPage{
-    display: flex;
-    background-image: url(../TrackerLanding.jpg);
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-left: 30px;
-    padding-right: 30px;
-    
+.modifyTenantPage{
+    display:flex;
+    flex-direction:column;
+
+    min-height:100vh;
+
+    padding:30px;
+
+    background-image:url("../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
 }
 
-#buttonSet{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    height: 100%;
+.modifyTenantCard{
+    width:450px;
+
+    margin:60px auto;
+
+    padding:35px;
+
+    background:rgba(15,23,42,.92);
+
+    border-radius:12px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.25);
+}
+
+.modifyTenantTitle{
+    color:white;
+
+    text-align:center;
+
+    margin-bottom:10px;
+}
+
+.modifyTenantSubtitle{
+    color:#d1d5db;
+
+    text-align:center;
+
+    font-size:18px;
+
+    margin-bottom:35px;
+}
+
+.modifyTenantButtonSet{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+}
+
+.modifyTenantButton{
+    padding:14px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.modifyTenantButton:hover{
+    background:#1d4ed8;
 }

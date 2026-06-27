@@ -10,6 +10,8 @@ import WaterConfirm from "./pages/WaterConfirm.jsx"
 import ModifyTenant from "./pages/ModifyTenant.jsx"
 import MoveOutTenant from "./pages/MoveOutTenant.jsx"
 import MoveOutConfirm from "./pages/MoveOutConfirm.jsx"
+import InvoiceView from "./pages/InvoiceView.jsx"
+import InvoiceList from "./pages/InvoiceList.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -33,6 +35,8 @@ const App = () => {
 
       <Route path="/MoveOutTenant" element={<MoveOutTenant />}/>
       <Route path="/MoveOutConfirm" element={<MoveOutConfirm />}/>
+      <Route path="/InvoiceView/:id" element={<InvoiceView />}/>
+      <Route path="/InvoiceList" element={<InvoiceList />}/>
 
       
       

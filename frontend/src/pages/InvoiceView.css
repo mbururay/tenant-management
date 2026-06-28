@@ -154,3 +154,20 @@
     }
 
 }
+
+.summaryRow{
+    background:#f8f8f8;
+    font-weight:bold;
+}
+
+.totalRow{
+    background:#222;
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.totalRow td{
+    color:white;
+    border-top:3px solid #000;
+}

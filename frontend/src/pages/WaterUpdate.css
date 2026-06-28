@@ -1,0 +1,80 @@
+.waterPage{
+    display:flex;
+    flex-direction:column;
+    background-image:url("../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+    min-height:100vh;
+    padding:30px;
+}
+
+.waterTitle{
+    text-align:center;
+    color:white;
+    margin:25px 0;
+    font-size:36px;
+}
+
+.waterForm{
+    width:500px;
+    max-width:90%;
+    margin:auto;
+    background:rgba(15,23,42,.9);
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,.35);
+}
+
+.waterSection{
+    margin-bottom:25px;
+}
+
+.waterSection h3{
+    color:#3b82f6;
+    margin-bottom:15px;
+    border-bottom:1px solid #334155;
+    padding-bottom:8px;
+}
+
+.waterInput{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:1px solid #334155;
+    background:#1e293b;
+    color:white;
+    font-size:16px;
+}
+
+.waterInput::placeholder{
+    color:#94a3b8;
+}
+
+.waterInput:focus{
+    outline:none;
+    border-color:#3b82f6;
+}
+
+.waterButton{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:17px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.waterButton:hover{
+    background:#1d4ed8;
+}
+
+.waterButton:active{
+    transform:scale(.98);
+}

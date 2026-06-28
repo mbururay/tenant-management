@@ -189,19 +189,6 @@ app.post("/add-water", async (req, res) => {
             });
         }
 
-        // 7. split bill
-        const splitBill = bill / tenants.rows.length;
-
-        for (const tenant of tenants.rows) {
-            await pool.query(
-                `
-        INSERT INTO chargeList(tenantId, chargeType, chargeAmount)
-        VALUES ($1, 'Water', $2)
-        `,
-                [tenant.id, splitBill]
-            );
-        }
-
         res.json({
             success: true
         });
@@ -571,10 +558,15 @@ app.get("/invoice/:id", async (req, res) => {
 
     // water
     const water = await pool.query(`
-      SELECT bill
-      FROM waterReadings
-      WHERE invoiceId = $1
-      LIMIT 1
+        SELECT
+        previousReading,
+        currentReading,
+        usage,
+        rate,
+        bill
+        FROM waterReadings
+        WHERE invoiceId = $1
+        LIMIT 1;
     `, [id]);
 
     res.json({

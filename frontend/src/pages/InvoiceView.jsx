@@ -18,26 +18,26 @@ const InvoiceView = () => {
         setCharges(data.charges);
         setWater(data.water);
       })
-      .catch(err => console.error(err));
+      .catch(console.error);
   }, [id]);
 
   if (!invoice) {
     return (
       <div className="invoicePage">
         <Heading />
-        <h2>Loading invoice...</h2>
+        <h2>Loading...</h2>
       </div>
     );
   }
 
-  const totalCharges = charges.reduce(
+  const accountBalance = Number(invoice.accountbalance || 0);
+
+  const currentCharges = charges.reduce(
     (sum, c) => sum + Number(c.chargeamount),
     0
-  );
+  ) + (water ? Number(water.bill) : 0);
 
-  const waterBill = water ? Number(water.bill) : 0;
-
-  const total = totalCharges + waterBill;
+  const totalDue = currentCharges + accountBalance;
 
   return (
     <div className="invoicePage">
@@ -45,9 +45,15 @@ const InvoiceView = () => {
 
       <div className="invoiceCard">
 
-        <h1>Invoice #{id}</h1>
+        <h1>SERENE APARTMENTS</h1>
 
-        <div className="invoiceInfo">
+        <p>PO BOX 14937-03400, Nairobi</p>
+        <p>Tel: 123560796</p>
+        <p>Email: serenehomes21@gmail.com</p>
+
+        <hr />
+
+        <div className="invoiceHeader">
 
           <div>
             <strong>Tenant</strong>
@@ -55,56 +61,149 @@ const InvoiceView = () => {
           </div>
 
           <div>
-            <strong>House</strong>
+            <strong>House Number</strong>
             <p>{invoice.houseno}</p>
           </div>
 
           <div>
-            <strong>Billing Date</strong>
+            <strong>Billing Month</strong>
             <p>
               {new Date(invoice.billingdate).toLocaleDateString("en-GB", {
-                day: "numeric",
                 month: "long",
-                year: "numeric",
+                year: "numeric"
               })}
+            </p>
+          </div>
+
+          <div>
+            <strong>Date Issued</strong>
+            <p>
+              {new Date(invoice.billingdate).toLocaleDateString("en-GB")}
             </p>
           </div>
 
         </div>
 
-        <h2>Charges</h2>
-
         <table className="invoiceTable">
+
           <thead>
+
             <tr>
-              <th>Charge Type</th>
+              <th>Description</th>
+              <th>Previous</th>
+              <th>Current</th>
+              <th>Usage</th>
+              <th>Rate</th>
               <th>Amount (KES)</th>
             </tr>
+
           </thead>
 
           <tbody>
-            {charges.map((c) => (
-              <tr key={c.chargeid}>
-                <td>{c.chargetype}</td>
-                <td>KES {Number(c.chargeamount).toFixed(2)}</td>
-              </tr>
-            ))}
+
+            {/* WATER */}
 
             {water && (
               <tr>
                 <td>Water</td>
-                <td>KES {Number(water.bill).toFixed(2)}</td>
+                <td>{water.previousreading}</td>
+                <td>{water.currentreading}</td>
+                <td>{water.usage}</td>
+                <td>{water.rate}</td>
+                <td>{Number(water.bill).toFixed(2)}</td>
               </tr>
             )}
+
+            {/* OTHER CHARGES */}
+
+            {charges.map(c => (
+              <tr key={c.chargeid}>
+
+                <td>{c.chargetype}</td>
+
+                <td>-</td>
+
+                <td>-</td>
+
+                <td>-</td>
+
+                <td>-</td>
+
+                <td>{Number(c.chargeamount).toFixed(2)}</td>
+
+              </tr>
+            ))}
+
+            {/* SUMMARY */}
+
+            <tr className="summaryRow">
+              <td colSpan="5">
+                <strong>Current Charges</strong>
+              </td>
+
+              <td>
+                <strong>{currentCharges.toFixed(2)}</strong>
+              </td>
+            </tr>
+
+            <tr className="summaryRow">
+              <td colSpan="5">
+
+                <strong>
+                  {accountBalance >= 0
+                    ? "Balance Brought Forward"
+                    : "Account Credit"}
+                </strong>
+
+              </td>
+
+              <td>
+
+                <strong>
+
+                  {accountBalance >= 0
+                    ? accountBalance.toFixed(2)
+                    : `-${Math.abs(accountBalance).toFixed(2)}`}
+
+                </strong>
+
+              </td>
+            </tr>
+
+            <tr className="totalRow">
+
+              <td colSpan="5">
+                <strong>TOTAL DUE</strong>
+              </td>
+
+              <td>
+                <strong>{totalDue.toFixed(2)}</strong>
+              </td>
+
+            </tr>
+
           </tbody>
+
         </table>
 
-        <div className="invoiceTotal">
-          <span>Total Due</span>
-          <span>KES {total.toFixed(2)}</span>
-        </div>
+        <br />
+
+        <p><strong>Signature:</strong> __________________________</p>
+
+        <p><strong>Paybill:</strong> _____________________________</p>
+
+        <p><strong>Account:</strong> {invoice.houseno}</p>
+
+        <br />
+
+        <small>
+          Notice: Kindly notify management in writing before vacating the
+          premises. Failure to do so may result in charges being billed to the
+          last known tenant.
+        </small>
 
       </div>
+
     </div>
   );
 };

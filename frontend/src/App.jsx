@@ -12,6 +12,9 @@ import MoveOutTenant from "./pages/MoveOutTenant.jsx"
 import MoveOutConfirm from "./pages/MoveOutConfirm.jsx"
 import InvoiceView from "./pages/InvoiceView.jsx"
 import InvoiceList from "./pages/InvoiceList.jsx"
+import PayUpdate from "./pages/PayUpdate.jsx"
+import TenantPayUpdate from "./pages/TenantPayUpdate.jsx"
+import TenantPayConfirm from "./pages/TenantPayConfirm.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -37,6 +40,9 @@ const App = () => {
       <Route path="/MoveOutConfirm" element={<MoveOutConfirm />}/>
       <Route path="/InvoiceView/:id" element={<InvoiceView />}/>
       <Route path="/InvoiceList" element={<InvoiceList />}/>
+      <Route path="/PayUpdate" element={<PayUpdate />}/>
+      <Route path="/TenantPayUpdate/:id"element={<TenantPayUpdate />}/>
+      <Route path="/TenantPayConfirm" element={<TenantPayConfirm />}/>
 
       
       

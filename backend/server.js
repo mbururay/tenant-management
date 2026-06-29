@@ -581,6 +581,72 @@ app.get("/invoice/:id", async (req, res) => {
   }
 });
 
+app.get("/searchTenant/:phone", async (req, res) => {
+  try {
+
+    const { phone } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        t.id,
+        t.name,
+        h.houseNo
+      FROM tenantList t
+      JOIN houseList h
+        ON t.houseId = h.houseId
+      WHERE t.phone = $1
+      AND t.moveOut IS NULL
+      ORDER BY t.name
+    `, [phone]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/payment", async (req, res) => {
+  const {
+    tenantId,
+    payAmount,
+    paymentMethod,
+    confirmationCode
+  } = req.body;
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO paymentList (
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode
+      )
+      VALUES ($1, $2, $3, $4)
+      `,
+      [
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Payment recorded successfully."
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
 
 
 // postgres test route

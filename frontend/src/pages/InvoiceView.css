@@ -110,9 +110,7 @@
     border-bottom:1px solid #e5e7eb;
 }
 
-.invoiceTable tbody tr:hover{
-    background:#f9fafb;
-}
+
 
 .invoiceTable td:last-child,
 .invoiceTable th:last-child{
@@ -170,4 +168,11 @@
 .totalRow td{
     color:white;
     border-top:3px solid #000;
+}
+
+.totalRow td hover{
+    color:rgba(255, 255, 255, 0.816);
+    background:#222;
+
+    
 }

@@ -45,10 +45,10 @@ const InvoiceView = () => {
 
       <div className="invoiceCard">
 
-        <h1>SERENE APARTMENTS</h1>
+        <h1>SERENE HOMES APARTMENTS</h1>
 
-        <p>PO BOX 14937-03400, Nairobi</p>
-        <p>Tel: 123560796</p>
+        <p>PO BOX 19967-03400, Nairobi</p>
+        <p>Tel: 0745113765</p>
         <p>Email: serenehomes21@gmail.com</p>
 
         <hr />
@@ -121,13 +121,13 @@ const InvoiceView = () => {
 
                 <td>{c.chargetype}</td>
 
-                <td>-</td>
+                <td></td>
 
-                <td>-</td>
+                <td></td>
 
-                <td>-</td>
+                <td></td>
 
-                <td>-</td>
+                <td></td>
 
                 <td>{Number(c.chargeamount).toFixed(2)}</td>
 

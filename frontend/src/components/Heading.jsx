@@ -28,9 +28,16 @@ const Heading = () => {
             </Link>
           
           </div>
+
           <div id = 'genInvoice'>
             <Link id = 'nav-link' to = "/IGenerate">
               Generate Invoices
+            </Link>
+          </div>
+
+          <div id = 'payUpdate'>
+            <Link id = 'nav-link' to = "/PayUpdate">
+              Update Payment
             </Link>
           </div>
       </div>

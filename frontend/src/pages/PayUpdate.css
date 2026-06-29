@@ -1,0 +1,156 @@
+.payUpdatePage{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+/* ---------- Title ---------- */
+
+.payTitle{
+    text-align:center;
+    color:white;
+    margin:25px 0;
+    font-size:36px;
+}
+
+/* ---------- Search Form ---------- */
+
+.payForm{
+    width:500px;
+    max-width:90%;
+    margin:0 auto 35px auto;
+
+    background:rgba(15,23,42,.9);
+    padding:30px;
+    border-radius:12px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.35);
+}
+
+.paySection h3{
+    color:#3b82f6;
+    margin-bottom:15px;
+    padding-bottom:8px;
+    border-bottom:1px solid #334155;
+}
+
+.phoneInput{
+    width:100%;
+    box-sizing:border-box;
+
+    padding:12px;
+    margin-top:10px;
+
+    border-radius:8px;
+    border:1px solid #334155;
+
+    background:#1e293b;
+    color:white;
+
+    font-size:16px;
+}
+
+.phoneInput::placeholder{
+    color:#94a3b8;
+}
+
+.phoneInput:focus{
+    outline:none;
+    border-color:#3b82f6;
+}
+
+/* ---------- Button ---------- */
+
+.payButton{
+    width:100%;
+    margin-top:20px;
+
+    padding:12px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#2563eb;
+    color:white;
+
+    font-size:17px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.payButton:hover{
+    background:#1d4ed8;
+}
+
+/* ---------- Search Results ---------- */
+
+.tenantResults{
+    width:700px;
+    max-width:95%;
+    margin:20px auto;
+}
+
+.tenantResults h2{
+    text-align:center;
+    color:white;
+    margin-bottom:20px;
+}
+
+/* ---------- Tenant Cards ---------- */
+
+.tenantCard{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:15px;
+    padding:18px 22px;
+
+    background:rgba(255,255,255,.92);
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.18);
+}
+
+.tenantCard:hover{
+    transform:translateY(-2px);
+    background:white;
+    box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.tenantCard h3{
+    margin:0;
+    color:#111827;
+    font-size:22px;
+}
+
+.tenantCard p{
+    margin:0;
+    color:#475569;
+    font-size:16px;
+}
+
+/* ---------- No Results ---------- */
+
+.noResults{
+    text-align:center;
+    margin-top:30px;
+    color:white;
+    font-size:20px;
+}

@@ -1,0 +1,58 @@
+.confirmRow{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #334155;
+
+    color:white;
+
+    font-size:17px;
+
+}
+
+.confirmRow span:first-child{
+
+    font-weight:600;
+    color:#cbd5e1;
+
+}
+
+.confirmReason{
+
+    margin-top:25px;
+
+}
+
+.confirmReason h4{
+
+    color:#3b82f6;
+
+    margin-bottom:10px;
+
+}
+
+.confirmReason p{
+
+    background:#1e293b;
+
+    color:white;
+
+    padding:16px;
+
+    border-radius:8px;
+
+    line-height:1.6;
+
+    white-space:pre-wrap;
+
+}
+
+.editSection + .editSection{
+
+    margin-top:35px;
+
+}

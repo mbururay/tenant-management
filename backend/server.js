@@ -92,115 +92,6 @@ app.post("/add-tenant", async (req, res) => {
     }
 });
 
-//UPDATE WATER READINGS
-app.post("/add-water", async (req, res) => {
-    const {
-        houseNo,
-        currentReading,
-        rate
-    } = req.body;
-    const current = Number(currentReading);
-    const r = Number(rate);
-
-    if (!houseNo || isNaN(current) || isNaN(r)) {
-        return res.status(400).json({
-            error: "Invalid input"
-        });
-    }
-
-    try {
-        // 1. get houseId
-        const house = await pool.query(
-            `
-      SELECT houseId
-      FROM houseList
-      WHERE houseNo = $1
-      `,
-            [houseNo]
-        );
-
-        if (house.rows.length === 0) {
-            return res.status(404).json({
-                error: "House not found"
-            });
-        }
-
-        const houseId = house.rows[0].houseid;
-
-        // 2. get previous reading (SAFE BACKEND LOGIC)
-        const prev = await pool.query(
-            `
-      SELECT currentreading
-      FROM waterReadings
-      WHERE houseId = $1
-      ORDER BY id DESC
-      LIMIT 1
-      `,
-            [houseId]
-        );
-
-        const previousReading = prev.rows.length > 0 ?
-            Number(prev.rows[0].currentreading) :
-            0;
-
-
-        // 3. compute usage + bill
-        const usage = current - previousReading;
-        const bill = usage * r;
-
-        // 4. insert water record (IMPORTANT FOR HISTORY)
-        await pool.query(
-            `
-      INSERT INTO waterReadings(
-        houseId,
-        readingMonth,
-        previousReading,
-        currentReading,
-        usage,
-        rate,
-        bill
-      )
-      VALUES ($1, NOW(), $2, $3, $4, $5, $6)
-      `,
-            [
-                houseId,
-                previousReading,
-                current,
-                usage,
-                r,
-                bill
-            ]
-        );
-        // 5. get tenants
-        const tenants = await pool.query(
-            `
-      SELECT id
-      FROM tenantList
-      WHERE houseId = $1 AND moveout IS NULL
-      `,
-            [houseId]
-        );
-
-        // 6. safety check (IMPORTANT)
-        if (tenants.rows.length === 0) {
-            return res.json({
-                success: true,
-                message: "Water recorded but no active tenants to charge"
-            });
-        }
-
-        res.json({
-            success: true
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            error: err.message
-        });
-    }
-});
-
 
 //REMOVE TENANTS
 app.post("/remove-tenant", async (req, res) => {
@@ -497,29 +388,22 @@ app.post("/gen-invoice", async (req, res) => {
 app.get("/invoices", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT 
+      SELECT
         i.invoiceId,
         i.generatedDate,
         i.billingDate,
-        t.name,
-        h.houseNo,
+        i.totalAmount,
 
-        COALESCE(SUM(c.chargeAmount), 0)
-        + COALESCE(SUM(w.bill), 0) AS total
-
-      FROM invoiceList i
-      JOIN tenantList t ON t.id = i.tenantId
-      JOIN houseList h ON h.houseId = t.houseId
-
-      LEFT JOIN chargeList c ON c.invoiceId = i.invoiceId
-      LEFT JOIN waterReadings w ON w.invoiceId = i.invoiceId
-
-      GROUP BY 
-        i.invoiceId,
-        i.generatedDate,
-        i.billingDate,
         t.name,
         h.houseNo
+
+      FROM invoiceList i
+
+      JOIN tenantList t
+      ON t.id = i.tenantId
+
+      JOIN houseList h
+      ON h.houseId = t.houseId
 
       ORDER BY i.invoiceId DESC;
     `);
@@ -528,7 +412,9 @@ app.get("/invoices", async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 
@@ -538,16 +424,24 @@ app.get("/invoice/:id", async (req, res) => {
   try {
     // invoice header
     const invoice = await pool.query(`
-      SELECT 
-        i.invoiceId,
-        i.billingDate,
-        t.name,
-        h.houseNo
+      SELECT
+          i.invoiceId,
+          i.billingDate,
+          i.totalAmount,
+
+          t.name,
+          h.houseNo
+
       FROM invoiceList i
-      JOIN tenantList t ON t.id = i.tenantId
-      JOIN houseList h ON h.houseId = t.houseId
+
+      JOIN tenantList t
+      ON t.id = i.tenantId
+
+      JOIN houseList h
+      ON h.houseId = t.houseId
+
       WHERE i.invoiceId = $1
-    `, [id]);
+      `, [id]);
 
     // charges
     const charges = await pool.query(`
@@ -646,6 +540,559 @@ app.post("/payment", async (req, res) => {
       error: err.message
     });
   }
+});
+
+app.get("/searchTenantByName/:name", async (req, res) => {
+  const { name } = req.params;
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        t.id,
+        t.name,
+        t.phone,
+        h.houseNo
+      FROM tenantList t
+      JOIN houseList h
+      ON t.houseId = h.houseId
+      WHERE
+        LOWER(t.name) LIKE LOWER($1)
+        AND t.moveOut IS NULL
+      ORDER BY t.name;
+    `, [`%${name}%`]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
+
+app.get("/tenant/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        t.id,
+        t.name,
+        t.phone,
+        h.houseNo,
+        h.rent,
+        h.garbage
+      FROM tenantList t
+      JOIN houseList h
+      ON t.houseId = h.houseId
+      WHERE t.id = $1
+      `,
+      [id]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/edit-tenant", async (req, res) => {
+  const {
+    tenantId,
+    name,
+    phone,
+    rent,
+    garbage
+  } = req.body;
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // Update tenant information
+    await client.query(
+      `
+      UPDATE tenantList
+      SET
+        name = $1,
+        phone = $2
+      WHERE id = $3
+      `,
+      [name, phone, tenantId]
+    );
+
+    // Update house agreement
+    await client.query(
+      `
+      UPDATE houseList
+      SET
+        rent = $1,
+        garbage = $2
+      WHERE houseId = (
+        SELECT houseId
+        FROM tenantList
+        WHERE id = $3
+      )
+      `,
+      [rent, garbage, tenantId]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Tenant updated successfully."
+    });
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  } finally {
+    client.release();
+  }
+});
+
+app.get("/water-update-list", async (req, res) => {
+  try {
+
+    const result = await pool.query(`
+      SELECT
+
+          h.houseId AS "houseId",
+
+          h.houseNo AS "houseNo",
+
+          t.id AS "tenantId",
+
+          t.name AS "tenant",
+
+          COALESCE(
+              lastReading.currentReading,
+              0
+          ) AS "previousReading"
+
+      FROM tenantList t
+
+      JOIN houseList h
+      ON h.houseId = t.houseId
+
+      LEFT JOIN LATERAL (
+
+          SELECT currentReading
+
+          FROM waterReadings
+
+          WHERE houseId = h.houseId
+
+          ORDER BY id DESC
+
+          LIMIT 1
+
+      ) lastReading
+      ON TRUE
+
+      WHERE t.moveOut IS NULL
+
+      ORDER BY h.houseNo;
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+  }
+});
+
+app.post("/water-update", async(req,res)=>{
+
+    const { rate, houses } = req.body;
+
+    const client = await pool.connect();
+
+    try{
+
+        await client.query("BEGIN");
+
+        for(const house of houses){
+
+            const previous =
+                Number(house.previousReading);
+
+            const current =
+                Number(house.currentReading);
+
+            if(current < previous){
+
+                throw new Error(
+                    `Current reading for ${house.houseNo} cannot be less than previous reading.`
+                );
+
+            }
+
+            const usage =
+                current - previous;
+
+            const bill =
+                usage * Number(rate);
+
+            await client.query(
+
+                `
+                INSERT INTO waterReadings(
+
+                    houseId,
+                    readingMonth,
+                    previousReading,
+                    currentReading,
+                    usage,
+                    rate,
+                    bill
+
+                )
+
+                VALUES(
+
+                    $1,
+
+                    CURRENT_DATE,
+
+                    $2,
+
+                    $3,
+
+                    $4,
+
+                    $5,
+
+                    $6
+
+                )
+                `,
+
+                [
+
+                    house.houseId,
+
+                    previous,
+
+                    current,
+
+                    usage,
+
+                    rate,
+
+                    bill
+
+                ]
+
+            );
+
+        }
+
+        await client.query("COMMIT");
+
+        res.json({
+            success:true
+        });
+
+    }
+
+    catch(err){
+
+        await client.query("ROLLBACK");
+
+        console.error(err);
+
+        res.status(500).json({
+            error:err.message
+        });
+
+    }
+
+    finally{
+
+        client.release();
+
+    }
+
+});
+
+app.get("/searchWaterByHouse/:houseNo", async (req, res) => {
+  const { houseNo } = req.params;
+
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT
+          wr.id,
+          h.houseNo,
+          t.name AS tenant,
+          wr.readingMonth,
+          wr.previousReading,
+          wr.currentReading
+      FROM waterReadings wr
+      JOIN houseList h
+      ON wr.houseId = h.houseId
+      LEFT JOIN tenantList t
+      ON t.houseId = h.houseId
+      WHERE
+          wr.invoiceId IS NULL
+          AND LOWER(h.houseNo) LIKE LOWER($1)
+          AND t.moveOut IS NULL
+      `,
+      [`%${houseNo}%`]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).json({ error: err.message });
+
+  }
+});
+
+app.get("/waterRecord/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        houseid,
+        previousreading,
+        currentreading,
+        readingmonth
+      FROM waterReadings
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Record not found" });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put("/edit-water", async (req, res) => {
+  const { id, houseId, currentReading, rate } = req.body;
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // Get previous reading first (IMPORTANT for correctness)
+    const prevResult = await client.query(
+      `SELECT previousReading FROM waterReadings WHERE id = $1 AND houseId = $2`,
+      [id, houseId]
+    );
+
+    if (prevResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Water record not found"
+      });
+    }
+
+    const previousReading = Number(prevResult.rows[0].previousreading);
+
+    const current = Number(currentReading);
+    const r = Number(rate);
+
+    const usage = current - previousReading;
+    const bill = usage * r;
+
+    if (usage < 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Current reading cannot be less than previous reading"
+      });
+    }
+
+    await client.query(
+      `
+      UPDATE waterReadings
+      SET
+        currentReading = $1,
+        rate = $2,
+        usage = $3,
+        bill = $4
+      WHERE
+        id = $5
+        AND houseId = $6
+        AND invoiceId IS NULL
+      `,
+      [current, r, usage, bill, id, houseId]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Water record updated successfully",
+      data: { usage, bill }
+    });
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  } finally {
+    client.release();
+  }
+});
+
+app.get("/searchInvoiceByName/:name", async (req, res) => {
+
+  const { name } = req.params;
+
+  try {
+
+    const result = await pool.query(
+      `
+      SELECT
+    il.invoiceid      AS "invoiceId",
+    tl.id             AS "tenantId",
+    tl.name           AS "tenant",
+    h.houseno         AS "houseNo",
+    il.generateddate  AS "generatedDate",
+    il.billingdate    AS "billingDate",
+    il.totalamount    AS "totalAmount"
+
+    FROM invoiceList il
+
+    JOIN tenantList tl
+        ON il.tenantid = tl.id
+
+    JOIN houseList h
+        ON tl.houseid = h.houseid
+
+    WHERE LOWER(tl.name) LIKE LOWER($1)
+
+    ORDER BY il.billingdate DESC;
+      `,
+      [`%${name}%`]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+app.post("/createInvoiceCorrection", async (req, res) => {
+
+    const {
+        invoiceId,
+        tenantId,
+        amount,
+        reason,
+        correctionType
+    } = req.body;
+
+    const client = await pool.connect();
+
+    try {
+
+        await client.query("BEGIN");
+
+        await client.query(
+            `
+            INSERT INTO invoiceCorrection
+            (
+                invoiceId,
+                tenantId,
+                adjustmentAmount,
+                reason,
+                correctionType,
+                status,
+                createdAt
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                'Draft',
+                CURRENT_TIMESTAMP
+            )
+            `,
+            [
+                invoiceId,
+                tenantId,
+                amount,
+                reason,
+                correctionType
+            ]
+        );
+
+        await client.query("COMMIT");
+
+        res.json({
+            success: true,
+            message: "Invoice correction created."
+        });
+
+    }
+    catch(err){
+
+        await client.query("ROLLBACK");
+
+        console.error(err);
+
+        res.status(500).json({
+            success:false,
+            error:err.message
+        });
+
+    }
+    finally{
+
+        client.release();
+
+    }
+
 });
 
 

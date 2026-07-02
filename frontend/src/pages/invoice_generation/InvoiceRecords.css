@@ -1,0 +1,141 @@
+.recordInvoicePage{
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.recordInvoiceContent{
+    flex:1;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:30px;
+}
+
+.recordInvoiceCard{
+
+    width:600px;
+    max-width:90%;
+
+    background:rgba(15,23,42,.92);
+
+    border-radius:16px;
+
+    padding:45px 40px;
+
+    text-align:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+
+    backdrop-filter:blur(6px);
+
+}
+
+
+
+.modifyTenantTitle{
+
+    color:white;
+
+    font-size:38px;
+
+    margin-bottom:12px;
+
+    text-shadow:0 2px 8px rgba(0,0,0,.4);
+
+}
+
+.modifyTenantSubtitle{
+
+    color:#cbd5e1;
+
+    font-size:20px;
+
+    font-weight:400;
+
+    margin-bottom:40px;
+
+}
+
+.modifyTenantButtonSet{
+
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+
+}
+
+.modifyTenantButton{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:20px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:all .25s ease;
+
+}
+
+.modifyTenantButton:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 8px 18px rgba(37,99,235,.35);
+
+}
+
+.modifyTenantButton:active{
+
+    transform:translateY(0);
+
+}
+
+@media(max-width:700px){
+
+    .recordInvoiceCard{
+
+        padding:30px 24px;
+
+    }
+
+    .modifyTenantTitle{
+
+        font-size:30px;
+
+    }
+
+    .modifyTenantSubtitle{
+
+        font-size:18px;
+
+    }
+
+    .modifyTenantButton{
+
+        font-size:18px;
+
+        padding:16px;
+
+    }
+
+}

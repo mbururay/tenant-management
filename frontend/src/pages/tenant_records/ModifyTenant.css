@@ -1,0 +1,182 @@
+.editTenantPage{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.editTenantTitle{
+    text-align:center;
+    color:white;
+
+    margin:25px 0 30px;
+
+    font-size:38px;
+    font-weight:bold;
+}
+
+/* ---------- Form ---------- */
+
+.editTenantForm{
+    width:700px;
+    max-width:95%;
+
+    margin:0 auto;
+
+    background:rgba(15,23,42,.92);
+
+    border-radius:12px;
+
+    padding:35px;
+
+    box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+
+/* ---------- Sections ---------- */
+
+.editSection{
+    margin-bottom:35px;
+}
+
+.editSection h3{
+    color:#3b82f6;
+
+    margin-bottom:20px;
+
+    padding-bottom:10px;
+
+    border-bottom:1px solid #334155;
+}
+
+.editSection label{
+    display:block;
+
+    margin-top:18px;
+    margin-bottom:8px;
+
+    color:white;
+
+    font-weight:600;
+}
+
+/* ---------- Inputs ---------- */
+
+.editInput{
+    width:100%;
+    box-sizing:border-box;
+
+    padding:12px 14px;
+
+    border-radius:8px;
+    border:1px solid #334155;
+
+    background:#1e293b;
+
+    color:white;
+
+    font-size:16px;
+
+    transition:.2s;
+}
+
+.editInput:focus{
+    outline:none;
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 6px rgba(59,130,246,.35);
+}
+
+.editInput::placeholder{
+    color:#94a3b8;
+}
+
+/* ---------- Read Only ---------- */
+
+.houseDisplay{
+    background:#0f172a;
+    color:#cbd5e1;
+    cursor:not-allowed;
+}
+
+/* ---------- Buttons ---------- */
+
+.buttonRow{
+    display:flex;
+    justify-content:flex-end;
+    gap:20px;
+
+    margin-top:20px;
+}
+
+.cancelButton{
+    background:#64748b;
+
+    color:white;
+
+    border:none;
+    border-radius:8px;
+
+    padding:12px 28px;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.cancelButton:hover{
+    background:#475569;
+}
+
+.continueButton{
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+    border-radius:8px;
+
+    padding:12px 28px;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.continueButton:hover{
+    background:#1d4ed8;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width:768px){
+
+    .editTenantForm{
+        width:95%;
+        padding:25px;
+    }
+
+    .buttonRow{
+        flex-direction:column;
+    }
+
+    .cancelButton,
+    .continueButton{
+        width:100%;
+    }
+
+}

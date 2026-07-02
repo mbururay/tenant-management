@@ -16,21 +16,28 @@ const Heading = () => {
           </div>
 
           <div id = 'addTenant'>
-            <Link id = 'nav-link' to = "/ModifyTenant">
-              Modify Tenant
+            <Link id = 'nav-link' to = "/TenantRecords">
+              Tenant Records
             </Link>
             
           </div>
 
           <div id = 'uWater'>
-            <Link id = 'nav-link' to = "/WaterUpdate">
-              Update Water Records
+            <Link id = 'nav-link' to = "/WaterRecords">
+              Water Records
             </Link>
           
           </div>
+
           <div id = 'genInvoice'>
-            <Link id = 'nav-link' to = "/IGenerate">
-              Generate Invoices
+            <Link id = 'nav-link' to = "/InvoiceRecords">
+              Invoice Records
+            </Link>
+          </div>
+
+          <div id = 'payUpdate'>
+            <Link id = 'nav-link' to = "/PayUpdate">
+              Payment Records
             </Link>
           </div>
       </div>

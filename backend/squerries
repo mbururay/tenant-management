@@ -29,8 +29,8 @@ ON h.houseId = t.houseId;
 CREATE VIEW chargeView AS
 SELECT 
     tenantId,
-    SUM(chargeAmount) AS totalCharge
-FROM chargeList
+    SUM(totalAmount) AS totalCharge
+FROM invoiceList
 GROUP BY tenantId;
 
 CREATE VIEW payView AS

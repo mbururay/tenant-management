@@ -1,0 +1,86 @@
+.confirmPage {
+  min-height: 100vh;
+  padding: 30px;
+  background-image: url("../../TrackerLanding.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.confirmTitle {
+  text-align: center;
+  color: white;
+  font-size: 36px;
+  margin: 25px 0;
+}
+
+.confirmCard {
+  width: 800px;
+  max-width: 95%;
+  margin: 0 auto;
+  background: rgba(15, 23, 42, 0.92);
+  padding: 30px;
+  border-radius: 14px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.confirmCard h2 {
+  margin-bottom: 10px;
+}
+
+.confirmGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin: 25px 0;
+}
+
+.confirmGrid div {
+  background: rgba(255,255,255,0.08);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.confirmGrid h3 {
+  color: #3b82f6;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.billHighlight {
+  color: #22c55e;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancelButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #334155;
+  color: white;
+  cursor: pointer;
+}
+
+.confirmButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirmButton:hover {
+  background: #1d4ed8;
+}

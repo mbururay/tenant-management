@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import "./WaterConfirm.css";
+import "./MoveOutConfirm.css";
 
 const MoveOutConfirm = () => {
   const { state } = useLocation();

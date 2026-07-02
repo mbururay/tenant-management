@@ -1,0 +1,63 @@
+.addTenantPage{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+
+    min-height:100vh;
+
+    padding:30px;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.addTenantPage h1{
+    color:white;
+    margin-bottom:20px;
+}
+
+.addTenantPage .formCard{
+    max-width:700px;
+}
+
+.addTenantPage section{
+    margin-bottom:25px;
+}
+
+.addTenantPage h3{
+    color:white;
+    margin-bottom:10px;
+}
+
+.addTenantPage input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+
+    border-radius:6px;
+    border:1px solid #333;
+
+    background:#1e293b;
+    color:white;
+
+    box-sizing:border-box;
+}
+
+.addTenantPage button{
+    padding:10px 15px;
+
+    background:#3b82f6;
+    color:white;
+
+    border:none;
+    border-radius:6px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.addTenantPage button:hover{
+    background:#2563eb;
+}

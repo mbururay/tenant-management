@@ -1,15 +1,31 @@
 import "./App.css"
 
 
-import TenantView from './pages/TenantView.jsx'
-import AddTenant from './pages/AddTenant.jsx'
-import WaterUpdate from './pages/WaterUpdate.jsx'
-import IGenerate from './pages/IGenerate.jsx'
-import TenantConfirm from './pages/TenantConfirm.jsx'
-import WaterConfirm from "./pages/WaterConfirm.jsx"
-import ModifyTenant from "./pages/ModifyTenant.jsx"
-import MoveOutTenant from "./pages/MoveOutTenant.jsx"
-import MoveOutConfirm from "./pages/MoveOutConfirm.jsx"
+import TenantView from './pages/tenant_view/TenantView.jsx'
+import AddTenant from './pages/tenant_records/AddTenant.jsx'
+import WaterUpdate from './pages/water_records/WaterUpdate.jsx'
+import IGenerate from './pages/invoice_generation/IGenerate.jsx'
+import TenantConfirm from './pages/tenant_records/TenantConfirm.jsx'
+import WaterConfirm from "./pages/water_records/WaterConfirm.jsx"
+import ModifyTenant from "./pages/tenant_records/ModifyTenant.jsx"
+import MoveOutTenant from "./pages/tenant_records/MoveOutTenant.jsx"
+import MoveOutConfirm from "./pages/tenant_records/MoveOutConfirm.jsx"
+import InvoiceView from "./pages/invoice_generation/InvoiceView.jsx"
+import InvoiceList from "./pages/invoice_generation/InvoiceList.jsx"
+import PayUpdate from "./pages/payment_records/PayUpdate.jsx"
+import TenantPayUpdate from "./pages/payment_records/TenantPayUpdate.jsx"
+import TenantPayConfirm from "./pages/payment_records/TenantPayConfirm.jsx"
+import TenantRecords from "./pages/tenant_records/TenantRecords.jsx"
+import SearchTenant from "./pages/tenant_records/SearchTenant.jsx"
+import ModifyTenantConfirm from "./pages/tenant_records/ModifyTenantConfirm.jsx"
+import WaterRecords from "./pages/water_records/WaterRecords.jsx"
+import SearchWater from "./pages/water_records/SearchWater.jsx"
+import WaterModify from "./pages/water_records/WaterModify.jsx"
+import WaterModifyConfirm from "./pages/water_records/WaterModifyConfirm.jsx"
+import InvoiceRecords from "./pages/invoice_generation/InvoiceRecords.jsx"
+import ICorrect from "./pages/invoice_generation/ICorrect.jsx"
+import InvoiceSearch from "./pages/invoice_generation/InvoiceSearch.jsx"
+import ICorrectConfirm from "./pages/invoice_generation/ICorrectConfirm.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -29,10 +45,26 @@ const App = () => {
       <Route path="/IGenerate" element={<IGenerate />}/>
       <Route path="/TenantConfirm" element={<TenantConfirm />}/>
       <Route path="/WaterConfirm" element={<WaterConfirm />}/>
-      <Route path="/ModifyTenant" element={<ModifyTenant />}/>
+      <Route path="TenantRecords" element={<TenantRecords />}/>
 
       <Route path="/MoveOutTenant" element={<MoveOutTenant />}/>
       <Route path="/MoveOutConfirm" element={<MoveOutConfirm />}/>
+      <Route path="/InvoiceView/:id" element={<InvoiceView />}/>
+      <Route path="/InvoiceList" element={<InvoiceList />}/>
+      <Route path="/PayUpdate" element={<PayUpdate />}/>
+      <Route path="/TenantPayUpdate/:id"element={<TenantPayUpdate />}/>
+      <Route path="/TenantPayConfirm" element={<TenantPayConfirm />}/>
+      <Route path="/SearchTenant" element={<SearchTenant />}/>
+      <Route path="/ModifyTenant/:id" element={<ModifyTenant />}/>
+      <Route path="/ModifyTenantConfirm" element={<ModifyTenantConfirm />}/>
+      <Route path="/WaterRecords" element={<WaterRecords />}/>
+      <Route path="SearchWater" element={<SearchWater />}/>
+      <Route path="WaterModify/:id" element={<WaterModify />}/>
+      <Route path="WaterModifyConfirm" element={<WaterModifyConfirm />}/>
+      <Route path="InvoiceRecords" element={<InvoiceRecords />}/>
+      <Route path="InvoiceSearch" element={<InvoiceSearch />}/>
+      <Route path="/ICorrect/:invoiceId" element={<ICorrect />}/>
+      <Route path="ICorrectConfirm" element={<ICorrectConfirm />}/>
 
       
       

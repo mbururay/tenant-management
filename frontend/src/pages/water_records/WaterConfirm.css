@@ -1,0 +1,228 @@
+.waterConfirmPage{
+    display:flex;
+    flex-direction:column;
+
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+/* ---------- Card ---------- */
+
+.waterConfirmCard{
+
+    width:95%;
+    max-width:1200px;
+
+    margin:30px auto;
+
+    background:rgba(255,255,255,.96);
+
+    border-radius:14px;
+
+    padding:35px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.28);
+
+}
+
+/* ---------- Heading ---------- */
+
+.waterConfirmCard h1{
+
+    margin-top:0;
+    margin-bottom:10px;
+
+    text-align:center;
+
+    color:#111827;
+
+    font-size:34px;
+
+}
+
+.waterConfirmCard p{
+
+    text-align:center;
+
+    font-size:18px;
+
+    color:#374151;
+
+    margin-bottom:30px;
+
+}
+
+/* ---------- Table ---------- */
+
+.confirmTable{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    overflow:hidden;
+
+    border-radius:10px;
+
+}
+
+.confirmTable thead{
+
+    background:#2563eb;
+
+}
+
+.confirmTable th{
+
+    color:white;
+
+    padding:16px;
+
+    text-align:center;
+
+    font-size:17px;
+
+}
+
+.confirmTable td{
+
+    padding:14px;
+
+    text-align:center;
+
+    color:#111827;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.confirmTable tbody tr:nth-child(even){
+
+    background:#f8fafc;
+
+}
+
+.confirmTable tbody tr:hover{
+
+    background:#eef5ff;
+
+}
+
+.confirmTable td:last-child{
+
+    color:#15803d;
+
+    font-weight:bold;
+
+}
+
+/* ---------- Buttons ---------- */
+
+.buttonRow{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:35px;
+
+}
+
+.cancelButton{
+
+    background:#dc2626;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:14px 30px;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.cancelButton:hover{
+
+    background:#b91c1c;
+
+    transform:translateY(-2px);
+
+}
+
+.confirmButton{
+
+    background:#16a34a;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:14px 40px;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.confirmButton:hover{
+
+    background:#15803d;
+
+    transform:translateY(-2px);
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media(max-width:900px){
+
+    .waterConfirmCard{
+
+        overflow-x:auto;
+
+    }
+
+    .confirmTable{
+
+        min-width:850px;
+
+    }
+
+    .buttonRow{
+
+        flex-direction:column;
+
+        gap:15px;
+
+    }
+
+    .cancelButton,
+    .confirmButton{
+
+        width:100%;
+
+    }
+
+}

@@ -1,6 +1,6 @@
 #mainPage{
     display: flex;
-    background-image: url(../TrackerLanding.jpg);
+    background-image: url(../../TrackerLanding.jpg);
     height: 100vh;
     background-size: cover;
     background-position: center;

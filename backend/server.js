@@ -28,6 +28,47 @@ app.get("/tenant-dashboard", async (req, res) => {
     }
 });
 
+//Tenant Pivot
+app.get("/house-pivot", async (req, res) => {
+    try {
+        const result = await pool.query(`
+      SELECT
+
+        DATE_TRUNC('month', p.payDate) AS month,
+
+        h.houseNo,
+
+        SUM(p.payAmount) AS total
+
+        FROM paymentList p
+
+        JOIN tenantList t
+        ON p.tenantId = t.id
+
+        JOIN houseList h
+        ON t.houseId = h.houseId
+
+        GROUP BY
+
+            DATE_TRUNC('month', p.payDate),
+            h.houseNo
+
+        ORDER BY
+
+            DATE_TRUNC('month', p.payDate),
+            h.houseNo;
+    `);
+
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+
 
 
 //ADD TENANT

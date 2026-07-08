@@ -1,0 +1,200 @@
+#tenantDashboardPage{
+
+    display:flex;
+    flex-direction:column;
+
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+#tenantDashboard{
+
+    width:95%;
+    max-width:1600px;
+
+    margin:40px auto;
+
+}
+
+#tenantDashboard h1{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+    color:white;
+
+    font-size:38px;
+
+    font-weight:700;
+
+    text-shadow:0 2px 8px rgba(0,0,0,.35);
+
+}
+
+#tenantDashboardTable{
+
+    overflow-x:auto;
+
+    background:white;
+
+    border-radius:16px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+    padding:20px;
+
+}
+
+#tenantDashboardTable table{
+
+    width:100%;
+
+    min-width:900px;
+
+    border-collapse:collapse;
+
+}
+
+#tenantDashboardTable th,
+#tenantDashboardTable td{
+
+    padding:15px 18px;
+
+    text-align:center;
+
+    border:1px solid #d1d5db;
+
+    white-space:nowrap;
+
+}
+
+#tenantDashboardTable thead th{
+
+    background:#1d4ed8;
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:2;
+
+}
+
+#tenantDashboardTable tbody tr:nth-child(even){
+
+    background:#f8fafc;
+
+}
+
+#tenantDashboardTable tbody tr:hover{
+
+    background:#dbeafe;
+
+}
+
+/* Normal table text */
+
+#tenantDashboardTable td{
+
+    color:#000;
+
+    font-size:15px;
+
+}
+
+/* Month column */
+
+#tenantDashboardTable td:first-child{
+
+    font-weight:700;
+
+    color:#000;
+
+    background:#f1f5f9;
+
+}
+
+/* Monthly total column */
+
+#tenantDashboardTable td:last-child{
+
+    font-weight:700;
+
+    color:#000;
+
+    background:#eff6ff;
+
+}
+
+/* Bottom totals row */
+
+#tenantDashboardTable tbody tr:last-child{
+
+    background:#e5e7eb;
+
+}
+
+#tenantDashboardTable tbody tr:last-child th{
+
+    color:#000;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    border-color:#cbd5e1;
+
+}
+
+#tenantDashboardTable tbody tr:last-child th:first-child{
+
+    background:#d1d5db;
+
+}
+
+/* Responsive */
+
+@media (max-width:1000px){
+
+    #tenantDashboard{
+
+        width:98%;
+
+    }
+
+    #tenantDashboard h1{
+
+        font-size:30px;
+
+    }
+
+    #tenantDashboardTable{
+
+        padding:12px;
+
+    }
+
+    #tenantDashboardTable th,
+    #tenantDashboardTable td{
+
+        padding:12px;
+
+        font-size:14px;
+
+    }
+
+}

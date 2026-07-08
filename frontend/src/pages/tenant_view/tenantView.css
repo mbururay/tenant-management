@@ -1,34 +1,169 @@
-#mainPage{
-    display: flex;
-    background-image: url(../../TrackerLanding.jpg);
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    flex-direction: column;
-    justify-content: flex-start;
-    
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  
+.tenantViewPage{
+
+    display:flex;
+    flex-direction:column;
+
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
 }
 
-th, td {
-  border: 1px solid #000000;
-  padding: 10px;
-  
+.tenantViewContainer{
+
+    width:95%;
+    max-width:1400px;
+
+    margin:35px auto;
+
 }
 
-th {
-  background: #f4f4f4;
-  
-}
-td{
-    text-decoration: white;
+.tenantViewTitle{
+
+    text-align:center;
+
+    margin-bottom:28px;
+
+    color:white;
+
+    font-size:38px;
+
+    font-weight:700;
+
+    text-shadow:0 2px 8px rgba(0,0,0,.35);
+
 }
 
-table tbody tr {
-  color: rgb(0, 0, 0);
+.tenantViewTableContainer{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    overflow-x:auto;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.22);
+
+}
+
+.tenantViewTable{
+
+    width:100%;
+
+    min-width:750px;
+
+    border-collapse:collapse;
+
+}
+
+/* ---------- HEADER ---------- */
+
+.tenantViewTable thead th{
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:16px;
+
+    text-align:left;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+/* ---------- CELLS ---------- */
+
+.tenantViewTable td{
+
+    padding:15px 16px;
+
+    color:#111827;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+/* ---------- ROW STRIPES ---------- */
+
+.tenantViewTable tbody tr:nth-child(even){
+
+    background:#f8fafc;
+
+}
+
+/* ---------- HOVER ---------- */
+
+.tenantViewTable tbody tr:hover{
+
+    background:#dbeafe;
+
+    transition:background .2s ease;
+
+}
+
+/* ---------- LAST ROW ---------- */
+
+.tenantViewTable tbody tr:last-child td{
+
+    border-bottom:none;
+
+}
+
+/* ---------- BALANCE COLUMN ---------- */
+
+.tenantViewTable td:last-child{
+
+    text-align:right;
+
+    font-weight:700;
+
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media(max-width:900px){
+
+    .tenantViewContainer{
+
+        width:98%;
+
+    }
+
+    .tenantViewTitle{
+
+        font-size:30px;
+
+    }
+
+    .tenantViewTableContainer{
+
+        padding:12px;
+
+    }
+
+    .tenantViewTable{
+
+        min-width:650px;
+
+    }
+
+    .tenantViewTable th,
+    .tenantViewTable td{
+
+        padding:12px;
+
+        font-size:14px;
+
+    }
+
 }

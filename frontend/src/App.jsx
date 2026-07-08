@@ -26,11 +26,15 @@ import InvoiceRecords from "./pages/invoice_generation/InvoiceRecords.jsx"
 import ICorrect from "./pages/invoice_generation/ICorrect.jsx"
 import InvoiceSearch from "./pages/invoice_generation/InvoiceSearch.jsx"
 import ICorrectConfirm from "./pages/invoice_generation/ICorrectConfirm.jsx"
+import TenantDashboard from "./pages/tenant_view/TenantDashboard.jsx"
+import BillSelect from "./pages/landlord_bills/billSelect.jsx"
+
 
 
 import { Routes, Route } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import Heading from "./components/Heading.jsx"
+import TenantTables from "./pages/tenant_view/TenantTables.jsx"
 
 
 
@@ -65,6 +69,10 @@ const App = () => {
       <Route path="InvoiceSearch" element={<InvoiceSearch />}/>
       <Route path="/ICorrect/:invoiceId" element={<ICorrect />}/>
       <Route path="ICorrectConfirm" element={<ICorrectConfirm />}/>
+      <Route path="TenantDashboard" element={<TenantDashboard />}/>
+      <Route path="TenantTables" element={<TenantTables />}/>
+      <Route path="BillSelect" element={<BillSelect />}/>
+
 
       
       

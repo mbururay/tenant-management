@@ -4,61 +4,93 @@ import "./tenantView.css";
 import { useEffect, useState } from "react";
 
 const TenantView = () => {
+
   const [tenants, setTenants] = useState([]);
 
   useEffect(() => {
+
     fetch("http://localhost:3001/tenant-dashboard")
       .then(res => res.json())
       .then(data => setTenants(data));
+
   }, []);
 
   return (
-    <div id="mainPage">
+
+    <div className="tenantViewPage">
+
       <Heading />
-      <h1>Tenant Dashboard</h1>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone(s)</th>
-            <th>House</th>
-            <th>Balance</th>
-          </tr>
-        </thead>
+      <div className="tenantViewContainer">
 
-        <tbody>
-          {tenants.map((t) => (
-            <tr key={t.tenantid}>
-              <td>{t.name}</td>
+        <h1 className="tenantViewTitle">
+          Tenant Dashboard
+        </h1>
 
-              {/* SAFE PHONE DISPLAY */}
-              <td>
-                {Array.isArray(t.phone)
-                  ? t.phone.join(", ")
-                  : t.phone}
-              </td>
+        <div className="tenantViewTableContainer">
 
-              <td>{t.houseno}</td>
+          <table className="tenantViewTable">
 
-              <td
-                style={{
-                  color: t.balance > 0 ? "red" : "green"
-                }}
-              >
-                {t.balance}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            <thead>
+
+              <tr>
+
+                <th>Name</th>
+                <th>Phone(s)</th>
+                <th>House</th>
+                <th>Balance</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {tenants.map((t) => (
+
+                <tr key={t.tenantid}>
+
+                  <td>{t.name}</td>
+
+                  <td>
+                    {Array.isArray(t.phone)
+                      ? t.phone.join(", ")
+                      : t.phone}
+                  </td>
+
+                  <td>{t.houseno}</td>
+
+                  <td
+                    style={{
+                      color: Number(t.balance) > 0 ? "#dc2626" : "#16a34a",
+                      fontWeight: "600"
+                    }}
+                  >
+                    {Number(t.balance).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
     </div>
+
   );
+
 };
 
 export default TenantView;
-
-
 
 
 

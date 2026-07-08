@@ -10,8 +10,8 @@ const Heading = () => {
   return(
     <div id = 'header'>
         <div id = 'tenantView'>
-            <Link id = 'nav-link' to = "/TenantView">
-              Tenant View
+            <Link id = 'nav-link' to = "/TenantTables">
+              Tenant tables
             </Link>
           </div>
 
@@ -38,6 +38,12 @@ const Heading = () => {
           <div id = 'payUpdate'>
             <Link id = 'nav-link' to = "/PayUpdate">
               Payment Records
+            </Link>
+          </div>
+
+          <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/BillSelect">
+              Landlord Bills
             </Link>
           </div>
       </div>

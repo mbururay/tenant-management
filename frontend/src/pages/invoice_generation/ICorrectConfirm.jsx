@@ -33,6 +33,9 @@ const ICorrectConfirm = () => {
 
     const { invoice, correction } = state;
 
+    console.log("invoice object:", invoice);
+    console.log("correction object:", correction);
+
     const handleConfirm = async () => {
 
         try {
@@ -44,7 +47,13 @@ const ICorrectConfirm = () => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(correction)
+                    body: JSON.stringify({
+                        invoiceId: invoice.invoiceId,
+                        tenantId: invoice.tenantId,
+                        amount: correction.amount,
+                        reason: correction.reason,
+                        correctionType: correction.correctionType
+                    })
                 }
             );
 
@@ -56,7 +65,7 @@ const ICorrectConfirm = () => {
 
             alert("Invoice correction created successfully.");
 
-            navigate("/InvoiceRecords");
+            navigate(`/InvoiceCorrectionPrint/${data.correctionId}`);
 
         } catch (err) {
 

@@ -16,7 +16,7 @@ const InvoiceSearch = () => {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Please enter a house number.");
+      alert("Please enter a name.");
       return;
     }
 

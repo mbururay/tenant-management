@@ -544,6 +544,7 @@ app.get("/invoice/:id", async (req, res) => {
     const invoice = await pool.query(`
       SELECT
           i.invoiceId,
+          i.tenantId,
           i.billingDate,
           i.totalAmount,
 
@@ -559,27 +560,33 @@ app.get("/invoice/:id", async (req, res) => {
       ON h.houseId = t.houseId
 
       WHERE i.invoiceId = $1
-      `, [id]);
+    `, [id]);
+
 
     // charges
     const charges = await pool.query(`
-      SELECT chargeId, chargeType, chargeAmount
+      SELECT 
+          chargeId, 
+          chargeType, 
+          chargeAmount
       FROM chargeList
       WHERE invoiceId = $1
     `, [id]);
 
+
     // water
     const water = await pool.query(`
-        SELECT
-        previousReading,
-        currentReading,
-        usage,
-        rate,
-        bill
-        FROM waterReadings
-        WHERE invoiceId = $1
-        LIMIT 1;
+      SELECT
+          previousReading,
+          currentReading,
+          usage,
+          rate,
+          bill
+      FROM waterReadings
+      WHERE invoiceId = $1
+      LIMIT 1;
     `, [id]);
+
 
     res.json({
       invoice: invoice.rows[0],
@@ -587,11 +594,16 @@ app.get("/invoice/:id", async (req, res) => {
       water: water.rows[0] || null
     });
 
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
+
 
 app.get("/invoice-pdf/:month", async (req, res) => {
     try {
@@ -1273,13 +1285,16 @@ app.post("/createInvoiceCorrection", async (req, res) => {
         correctionType
     } = req.body;
 
+
     const client = await pool.connect();
+
 
     try {
 
         await client.query("BEGIN");
 
-        await client.query(
+
+        const result = await client.query(
             `
             INSERT INTO invoiceCorrection
             (
@@ -1301,6 +1316,7 @@ app.post("/createInvoiceCorrection", async (req, res) => {
                 'Draft',
                 CURRENT_TIMESTAMP
             )
+            RETURNING correctionId
             `,
             [
                 invoiceId,
@@ -1311,12 +1327,16 @@ app.post("/createInvoiceCorrection", async (req, res) => {
             ]
         );
 
+
         await client.query("COMMIT");
+
 
         res.json({
             success: true,
-            message: "Invoice correction created."
+            message: "Invoice correction created.",
+            correctionId: result.rows[0].correctionid
         });
+
 
     }
     catch(err){
@@ -1334,6 +1354,59 @@ app.post("/createInvoiceCorrection", async (req, res) => {
     finally{
 
         client.release();
+
+    }
+
+});
+
+app.get("/invoice-correction/:id", async (req,res)=>{
+
+    const {id} = req.params;
+
+    try{
+
+        const correction = await pool.query(`
+            SELECT
+                ic.correctionId,
+                ic.adjustmentAmount,
+                ic.reason,
+                ic.correctionType,
+                ic.status,
+                ic.createdAt,
+
+                i.invoiceId,
+                i.billingDate,
+                i.totalAmount,
+
+                t.name,
+                h.houseNo
+
+            FROM invoiceCorrection ic
+
+            JOIN invoiceList i
+            ON i.invoiceId = ic.invoiceId
+
+            JOIN tenantList t
+            ON t.id = ic.tenantId
+
+            JOIN houseList h
+            ON h.houseId = t.houseId
+
+            WHERE ic.correctionId = $1
+
+        `,[id]);
+
+
+        res.json(correction.rows[0]);
+
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:err.message
+        });
 
     }
 

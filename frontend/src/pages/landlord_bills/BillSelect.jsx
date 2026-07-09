@@ -37,12 +37,7 @@ const BillSelect = () => {
             Display Landlord Bills
           </button>
 
-          <button
-                className="modifyWaterButton"
-                onClick={() => navigate("/TenantDashboard")}
-            >
-            Modify Landlord Bills
-          </button>
+         
 
 
 

@@ -21,6 +21,10 @@ const InvoiceView = () => {
       .catch(console.error);
   }, [id]);
 
+  const printInvoice = () => {
+    window.print();
+  };
+
 
 
   
@@ -44,7 +48,7 @@ const InvoiceView = () => {
   const totalDue = currentCharges + accountBalance;
 
   return (
-    <div className="invoicePage">
+    <div className="invoicePage invoiceViewPage">
       <Heading />
 
       <div className="invoiceCard">
@@ -203,7 +207,15 @@ const InvoiceView = () => {
           last known tenant.
         </small>
 
+
       </div>
+
+
+      <button onClick={printInvoice}>
+          Print Invoice
+      </button>
+
+      
 
     </div>
   );

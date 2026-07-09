@@ -38,6 +38,13 @@ const InvoiceRecords = () => {
               Create Invoice Correction
             </button>
 
+            <button
+              className="modifyTenantButton"
+              onClick={() => navigate("/InvoiceList")}
+            >
+              View Invoice Records
+            </button>
+
           </div>
 
         </div>

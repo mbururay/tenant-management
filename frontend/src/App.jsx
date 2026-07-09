@@ -34,6 +34,8 @@ import DisplayBills from "./pages/landlord_bills/DisplayBills.jsx"
 import DisplayBillMonth from "./pages/landlord_bills/DisplayBillMonth.jsx"
 import ModifyBill from "./pages/landlord_bills/ModifyBill.jsx"
 import ModifyBillConfirm from "./pages/landlord_bills/ModifyBillConfirm.jsx"
+import InvoiceMonth from "./pages/invoice_generation/InvoiceMonth.jsx"
+import InvoicePrint from "./pages/invoice_generation/InvoicePrint.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -84,6 +86,8 @@ const App = () => {
       <Route path="DisplayBillMonth/:month" element={<DisplayBillMonth />}/>
       <Route path="ModifyBill/:month" element={<ModifyBill />}/>
       <Route path="ModifyBillConfirm" element={<ModifyBillConfirm />}/>
+      <Route path="/invoiceMonth/:month" element={<InvoiceMonth />}/>
+      <Route path="/InvoicePrint/:month" element={<InvoicePrint />}/>
 
 
       

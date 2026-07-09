@@ -11,7 +11,7 @@
     background-position:center;
 }
 
-.invoiceCard{
+.invoiceViewPage .invoiceCard {
     width:900px;
     max-width:100%;
 
@@ -26,7 +26,7 @@
     box-shadow:0 5px 18px rgba(0,0,0,.25);
 }
 
-.invoiceCard h1{
+.invoiceViewPage .invoiceCard h1{
     text-align:center;
 
     color:#111827;
@@ -34,7 +34,7 @@
     margin-bottom:35px;
 }
 
-.invoiceCard h2{
+.invoiceViewPage .invoiceCard h2{
     color:#111827;
 
     margin-top:30px;
@@ -80,7 +80,7 @@
     font-weight:600;
 }
 
-.invoiceTable{
+.invoiceViewPage .invoiceTable {
     width:100%;
 
     border-collapse:collapse;
@@ -175,4 +175,68 @@
     background:#222;
 
     
+}
+
+@media print {
+
+    .heading,
+    header,
+    nav {
+
+        display:none !important;
+
+    }
+
+    .invoicePage {
+
+        background:white !important;
+
+        padding:0 !important;
+
+        margin:0 !important;
+
+    }
+
+    .invoiceViewPage .invoiceCard {
+
+        visibility:visible;
+
+        position:absolute;
+
+        left:0;
+
+        top:0;
+
+        width:100%;
+
+        padding-left:25px !important;
+
+        padding-right:25px !important;
+
+        padding-top:10px !important;
+
+        padding-bottom:10px !important;
+
+        margin:0 !important;
+
+        box-shadow:none !important;
+
+        border:none !important;
+
+        background:white !important;
+
+        transform:scale(0.95);
+
+        transform-origin:top left;
+
+    }
+
+.invoiceViewPage .invoiceTable {
+
+        width:100%;
+
+        table-layout:fixed;
+
+    }
+
 }

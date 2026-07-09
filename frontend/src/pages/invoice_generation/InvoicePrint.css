@@ -1,0 +1,104 @@
+.invoicePage {
+    background: white;
+    padding: 0;
+    margin: 0;
+}
+
+.invoiceCard {
+    width: 100%;
+    max-width: none;
+
+    margin: 0;
+    padding: 20px;
+
+    background: white;
+
+    box-sizing: border-box;
+
+    page-break-after: always;
+}
+
+.invoiceCard:last-child {
+    page-break-after: auto;
+}
+
+.invoiceCard h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.invoiceCard p {
+    margin: 4px 0;
+}
+
+.invoiceHeader {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 15px;
+
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.invoiceHeader strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.invoiceTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.invoiceTable th,
+.invoiceTable td {
+    border: 1px solid #000;
+    padding: 8px;
+    font-size: 12px;
+}
+
+.invoiceTable th {
+    background: #f1f1f1;
+}
+
+.summaryRow {
+    font-weight: bold;
+}
+
+.totalRow {
+    font-weight: bold;
+}
+
+.totalRow td {
+    border-top: 2px solid black;
+}
+
+.printButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    padding: 10px 20px;
+}
+
+@media print {
+
+    .printButton {
+        display: none;
+    }
+
+    .invoicePage {
+        margin: 0;
+        padding: 0;
+    }
+
+    .invoiceCard {
+        page-break-after: always;
+    }
+
+    .invoiceCard:last-child {
+        page-break-after: auto;
+    }
+}

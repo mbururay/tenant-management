@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import pool from "./db.js";
+import PDFDocument from "pdfkit";
+import puppeteer from "puppeteer";
 
 const app = express();
 
@@ -459,6 +461,81 @@ app.get("/invoices", async (req, res) => {
   }
 });
 
+app.get("/invoice-months", async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                TO_CHAR(billingDate,'YYYY-MM') AS month,
+                COUNT(*) AS invoiceCount,
+                SUM(totalAmount) AS totalBilled
+            FROM invoiceList
+            GROUP BY TO_CHAR(billingDate,'YYYY-MM')
+            ORDER BY month DESC
+            `
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.get("/invoice-month/:month", async (req, res) => {
+
+    const { month } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                i.invoiceid,
+                i.billingdate,
+                i.totalamount,
+                t.name,
+                t.houseid
+            FROM invoiceList i
+
+            JOIN tenantList t
+            ON i.tenantid = t.id
+
+            WHERE TO_CHAR(
+                i.billingdate,
+                'YYYY-MM'
+            ) = $1
+
+            ORDER BY t.houseid
+            `,
+            [month]
+        );
+
+
+        res.json(result.rows);
+
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
 app.get("/invoice/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -513,6 +590,132 @@ app.get("/invoice/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/invoice-pdf/:month", async (req, res) => {
+    try {
+        const { month } = req.params;
+
+        const browser = await puppeteer.launch({
+            headless: true
+        });
+
+        const page = await browser.newPage();
+
+        // Open the React invoice page
+        await page.goto(
+            `http://localhost:5173/InvoicePrint/${encodeURIComponent(month)}`,
+            {
+                waitUntil: "networkidle0"
+            }
+        );
+
+        await page.screenshot({
+            path: "debug.png",
+            fullPage: true
+        });
+
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            margin: {
+                top: "20px",
+                right: "20px",
+                bottom: "20px",
+                left: "20px"
+            }
+        });
+
+        await browser.close();
+
+        res.setHeader(
+            "Content-Disposition",
+            `inline; filename=invoice-${month}.pdf`
+        );
+
+        res.setHeader(
+            "Content-Type",
+            "application/pdf"
+        );
+
+        res.send(pdfBuffer);
+
+    } catch (error) {
+          console.error(error);
+
+          res.status(500).json({
+              success: false,
+              message: error.message
+          });
+      }
+});
+
+app.get("/month-invoices/:month", async (req, res) => {
+  const { month } = req.params;
+
+  try {
+
+    const invoices = await pool.query(
+      `
+      SELECT
+          i.invoiceId,
+          i.billingDate,
+          i.totalAmount,
+          t.name,
+          h.houseNo
+      FROM invoiceList i
+      JOIN tenantList t
+          ON t.id = i.tenantId
+      JOIN houseList h
+          ON h.houseId = t.houseId
+      WHERE TO_CHAR(i.billingDate, 'YYYY-MM') ILIKE $1
+      `,
+      [month]
+    );
+
+    const results = [];
+
+    for (const invoice of invoices.rows) {
+
+      const charges = await pool.query(
+        `
+        SELECT chargeId, chargeType, chargeAmount
+        FROM chargeList
+        WHERE invoiceId = $1
+        `,
+        [invoice.invoiceid]
+      );
+
+      const water = await pool.query(
+        `
+        SELECT
+            previousReading,
+            currentReading,
+            usage,
+            rate,
+            bill
+        FROM waterReadings
+        WHERE invoiceId = $1
+        LIMIT 1
+        `,
+        [invoice.invoiceid]
+      );
+
+      results.push({
+        invoice,
+        charges: charges.rows,
+        water: water.rows[0] || null
+      });
+    }
+
+    res.json(results);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: err.message
+    });
   }
 });
 

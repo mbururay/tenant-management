@@ -1,0 +1,267 @@
+.confirmPage{
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+
+    padding:40px;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+.confirmCard{
+
+    width:900px;
+    max-width:95%;
+
+    background:rgba(15,23,42,.95);
+
+    border-radius:18px;
+
+    padding:35px;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.35);
+
+    color:white;
+
+}
+
+.confirmCard h2{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+    font-size:34px;
+
+    color:white;
+
+}
+
+.confirmRow{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    font-size:18px;
+
+    margin:18px 0;
+
+}
+
+.confirmRow span:first-child{
+
+    font-weight:600;
+
+    color:#cbd5e1;
+
+}
+
+.confirmRow span:last-child{
+
+    font-weight:700;
+
+    color:white;
+
+}
+
+.confirmCard hr{
+
+    border:none;
+
+    border-top:1px solid rgba(255,255,255,.15);
+
+    margin:25px 0;
+
+}
+
+.changeCard{
+
+    background:#1e293b;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:16px;
+
+    transition:.25s;
+
+}
+
+.changeCard:hover{
+
+    background:#334155;
+
+}
+
+.changeCard h3{
+
+    margin-bottom:14px;
+
+    color:#60a5fa;
+
+    font-size:20px;
+
+}
+
+.changeValues{
+
+    display:flex;
+    justify-content:space-between;
+    gap:25px;
+
+}
+
+.oldValue,
+.newValue{
+
+    flex:1;
+
+    background:#0f172a;
+
+    padding:14px;
+
+    border-radius:10px;
+
+}
+
+.oldValue small,
+.newValue small{
+
+    display:block;
+
+    color:#94a3b8;
+
+    margin-bottom:6px;
+
+    font-size:13px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+}
+
+.oldValue p,
+.newValue p{
+
+    margin:0;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    color:white;
+
+}
+
+.buttonRow{
+
+    display:flex;
+    justify-content:flex-end;
+
+    gap:16px;
+
+    margin-top:30px;
+
+}
+
+.editBtn{
+
+    padding:14px 28px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#475569;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.editBtn:hover{
+
+    background:#64748b;
+
+}
+
+.confirmBtn{
+
+    padding:14px 28px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.confirmBtn:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
+
+@media(max-width:768px){
+
+    .confirmCard{
+
+        padding:25px;
+
+    }
+
+    .confirmCard h2{
+
+        font-size:28px;
+
+    }
+
+    .changeValues{
+
+        flex-direction:column;
+
+    }
+
+    .buttonRow{
+
+        flex-direction:column;
+
+    }
+
+    .editBtn,
+    .confirmBtn{
+
+        width:100%;
+
+    }
+
+}

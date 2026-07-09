@@ -1136,6 +1136,201 @@ app.post("/createInvoiceCorrection", async (req, res) => {
 
 });
 
+app.post("/create-bills", async (req, res) => {
+
+    const { billingMonth, bills } = req.body;
+
+    if (!billingMonth || !bills || bills.length === 0) {
+
+        return res.status(400).json({
+            error: "Missing bill data"
+        });
+
+    }
+
+    const client = await pool.connect();
+
+    try {
+
+        await client.query("BEGIN");
+
+        for (const bill of bills) {
+
+            await client.query(
+                `
+                INSERT INTO billList
+                (
+                    billDate,
+                    category,
+                    description,
+                    amount
+                )
+                VALUES
+                (
+                    $1,
+                    $2,
+                    $3,
+                    $4
+                )
+                `,
+                [
+                    `${billingMonth}-01`,
+                    bill.category,
+                    bill.description,
+                    bill.amount
+                ]
+            );
+
+        }
+
+        await client.query("COMMIT");
+
+        res.status(201).json({
+            success: true,
+            message: "Bills created successfully."
+        });
+
+    } catch (err) {
+
+        await client.query("ROLLBACK");
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    } finally {
+
+        client.release();
+
+    }
+
+});
+
+app.get("/bill-pivot", async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                TO_CHAR(billDate, 'YYYY-MM') AS month,
+                category,
+                SUM(amount) AS amount
+            FROM billList
+            GROUP BY
+                TO_CHAR(billDate, 'YYYY-MM'),
+                category
+            ORDER BY month
+            `
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+
+
+app.get("/bill-month/:month", async (req, res) => {
+
+    const { month } = req.params;
+
+    console.log("Month received:", month);
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                billid,
+                category,
+                description,
+                amount
+            FROM billList
+            `
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.error("QUERY ERROR:", err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.put("/modify-bills", async (req, res) => {
+
+    const { bills } = req.body;
+
+    const client = await pool.connect();
+
+    try {
+
+        await client.query("BEGIN");
+
+        for (const bill of bills) {
+
+            await client.query(
+                `
+                UPDATE billList
+                SET
+                    category = $1,
+                    description = $2,
+                    amount = $3
+                WHERE billid = $4
+                `,
+                [
+                    bill.category,
+                    bill.description,
+                    bill.amount,
+                    bill.billid
+                ]
+            );
+
+        }
+
+        await client.query("COMMIT");
+
+        res.json({
+            success: true,
+            message: "Bills updated successfully"
+        });
+
+    } catch (err) {
+
+        await client.query("ROLLBACK");
+
+        console.error(err);
+
+        res.status(500).json({
+            success: false,
+            error: err.message
+        });
+
+    } finally {
+
+        client.release();
+
+    }
+
+});
 
 // postgres test route
 app.get("/serene_homes", async (req, res) => {

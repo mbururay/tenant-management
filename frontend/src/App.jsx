@@ -28,13 +28,19 @@ import InvoiceSearch from "./pages/invoice_generation/InvoiceSearch.jsx"
 import ICorrectConfirm from "./pages/invoice_generation/ICorrectConfirm.jsx"
 import TenantDashboard from "./pages/tenant_view/TenantDashboard.jsx"
 import BillSelect from "./pages/landlord_bills/billSelect.jsx"
-
+import EnterBills from "./pages/landlord_bills/EnterBill.jsx"
+import EnterBillConfirm from "./pages/landlord_bills/EnterBillConfirm.jsx"
+import DisplayBills from "./pages/landlord_bills/DisplayBills.jsx"
+import DisplayBillMonth from "./pages/landlord_bills/DisplayBillMonth.jsx"
+import ModifyBill from "./pages/landlord_bills/ModifyBill.jsx"
+import ModifyBillConfirm from "./pages/landlord_bills/ModifyBillConfirm.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import Heading from "./components/Heading.jsx"
 import TenantTables from "./pages/tenant_view/TenantTables.jsx"
+
 
 
 
@@ -72,6 +78,12 @@ const App = () => {
       <Route path="TenantDashboard" element={<TenantDashboard />}/>
       <Route path="TenantTables" element={<TenantTables />}/>
       <Route path="BillSelect" element={<BillSelect />}/>
+      <Route path="EnterBills" element={<EnterBills />}/>
+      <Route path="EnterBillConfirm" element={<EnterBillConfirm />}/>
+      <Route path="DisplayBills" element={<DisplayBills />}/>
+      <Route path="DisplayBillMonth/:month" element={<DisplayBillMonth />}/>
+      <Route path="ModifyBill/:month" element={<ModifyBill />}/>
+      <Route path="ModifyBillConfirm" element={<ModifyBillConfirm />}/>
 
 
       

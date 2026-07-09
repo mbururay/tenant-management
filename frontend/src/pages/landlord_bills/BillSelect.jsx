@@ -13,7 +13,7 @@ const BillSelect = () => {
       <div className="modifyWaterCard">
 
         <h1 className="modifyWaterTitle">
-          LandLord Bills
+          Landlord Bills
         </h1>
 
         <h2 className="modifyWaterSubtitle">
@@ -24,7 +24,7 @@ const BillSelect = () => {
 
             <button
                 className="updateWaterButton"
-                onClick={() => navigate("/TenantView")}
+                onClick={() => navigate("/EnterBills")}
             >
             Enter Landlord Bills
             
@@ -32,7 +32,7 @@ const BillSelect = () => {
 
           <button
                 className="modifyWaterButton"
-                onClick={() => navigate("/TenantDashboard")}
+                onClick={() => navigate("/DisplayBills")}
             >
             Display Landlord Bills
           </button>

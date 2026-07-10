@@ -1,51 +1,55 @@
 import { useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
-import "../water_records/WaterRecords.css";
-
+import "./BillSelect.css";
 
 const BillSelect = () => {
-  const navigate = useNavigate();
 
-  return (
-    <div className="modifyWaterPage">
-      <Heading />
+    const navigate = useNavigate();
 
-      <div className="modifyWaterCard">
+    return (
 
-        <h1 className="modifyWaterTitle">
-          Landlord Bills
-        </h1>
+        <div className="billSelectPage">
 
-        <h2 className="modifyWaterSubtitle">
-          Select your desired action
-        </h2>
+            <Heading />
 
-        <div className="modifyWaterButtonSet">
+            <div className="billSelectContent">
 
-            <button
-                className="updateWaterButton"
-                onClick={() => navigate("/EnterBills")}
-            >
-            Enter Landlord Bills
-            
-            </button>
+                <div className="billSelectCard">
 
-          <button
-                className="modifyWaterButton"
-                onClick={() => navigate("/DisplayBills")}
-            >
-            Display Landlord Bills
-          </button>
+                    <h1 className="billSelectTitle">
+                        Landlord Bills
+                    </h1>
 
-         
+                    <h2 className="billSelectSubtitle">
+                        Select your desired action
+                    </h2>
 
+                    <div className="billSelectButtonSet">
 
+                        <button
+                            className="billSelectButton"
+                            onClick={() => navigate("/EnterBills")}
+                        >
+                            Enter Landlord Bills
+                        </button>
+
+                        <button
+                            className="billSelectButton"
+                            onClick={() => navigate("/DisplayBills")}
+                        >
+                            Display Landlord Bills
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-      </div>
-    </div>
-  );
+    );
+
 };
 
 export default BillSelect;

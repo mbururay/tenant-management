@@ -1,72 +1,49 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./InvoiceCorrectionPrint.css";
-import { useNavigate } from "react-router-dom";
+import "./PaymentCorrectionPrint.css";
 
-const InvoiceCorrectionPrint = () => {
+const PaymentCorrectionPrint = () => {
 
     const { id } = useParams();
 
     const [correction, setCorrection] = useState(null);
 
-    const navigate = useNavigate();
-
-
     useEffect(() => {
 
-        fetch(`http://localhost:3001/invoice-correction/${id}`)
+        fetch(
+            `http://localhost:3001/payment-correction/${id}`
+        )
             .then(res => res.json())
-            .then(data => {
-                setCorrection(data);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+            .then(data => setCorrection(data))
+            .catch(console.error);
 
     }, [id]);
 
+    const printPage = () => {
+        window.print();
+    };
 
     if (!correction) {
 
         return (
+
             <div className="correctionPage">
                 <h2>Loading...</h2>
             </div>
+
         );
 
     }
-
-
-    const originalAmount =
-        Number(correction.totalamount || 0);
-
-
-    const adjustment =
-        Number(correction.adjustmentamount || 0);
-
-
-    const correctedAmount =
-        originalAmount + adjustment;
-
-    const printCorrection = () => {
-        window.print();
-        navigate(-3);
-    };
-
-
 
     return (
 
         <div className="correctionPage">
 
-
             <div className="correctionCard">
-
 
                 <h1>
                     SERENE HOMES APARTMENTS
                 </h1>
-
 
                 <p>
                     PO BOX 19967-03400, Nairobi
@@ -80,157 +57,87 @@ const InvoiceCorrectionPrint = () => {
                     Email: serenehomes21@gmail.com
                 </p>
 
-
                 <hr />
 
-
                 <h2>
-                    INVOICE CORRECTION NOTICE
+                    PAYMENT CORRECTION NOTICE
                 </h2>
-
-
 
                 <div className="correctionHeader">
 
-
                     <div>
-                        <strong>
-                            Correction No
-                        </strong>
-
+                        <strong>Correction No</strong>
                         <p>
                             #{correction.correctionid}
                         </p>
                     </div>
 
-
-
                     <div>
-                        <strong>
-                            Original Invoice
-                        </strong>
-
+                        <strong>Payment No</strong>
                         <p>
-                            #{correction.invoiceid}
+                            #{correction.paymentid}
                         </p>
                     </div>
 
-
-
                     <div>
-                        <strong>
-                            Tenant
-                        </strong>
-
+                        <strong>Tenant</strong>
                         <p>
                             {correction.name}
                         </p>
                     </div>
 
-
-
                     <div>
-                        <strong>
-                            House
-                        </strong>
-
+                        <strong>House</strong>
                         <p>
                             {correction.houseno}
                         </p>
                     </div>
 
-
                 </div>
 
-
-
                 <table className="correctionTable">
-
 
                     <thead>
 
                         <tr>
 
                             <th>
-                                Description
+                                Field
                             </th>
 
                             <th>
-                                Amount (KES)
+                                Old Value
+                            </th>
+
+                            <th>
+                                New Value
                             </th>
 
                         </tr>
 
                     </thead>
 
-
                     <tbody>
 
-
                         <tr>
 
                             <td>
-                                Original Invoice Amount
+                                {correction.fieldname}
                             </td>
 
                             <td>
-                                {originalAmount.toFixed(2)}
+                                {correction.oldvalue}
+                            </td>
+
+                            <td>
+                                {correction.newvalue}
                             </td>
 
                         </tr>
-
-
-
-                        <tr>
-
-                            <td>
-                                {correction.correctiontype}
-                            </td>
-
-
-                            <td
-                                className={
-                                    adjustment < 0
-                                    ? "credit"
-                                    : "debit"
-                                }
-                            >
-
-                                {
-                                    adjustment > 0
-                                    ? "+"
-                                    : ""
-                                }
-
-                                {adjustment.toFixed(2)}
-
-                            </td>
-
-                        </tr>
-
-
-
-                        <tr className="totalRow">
-
-                            <td>
-                                Corrected Invoice Amount
-                            </td>
-
-
-                            <td>
-                                {correctedAmount.toFixed(2)}
-                            </td>
-
-
-                        </tr>
-
 
                     </tbody>
 
-
                 </table>
-
-
 
                 <div className="reasonBox">
 
@@ -238,58 +145,50 @@ const InvoiceCorrectionPrint = () => {
                         Reason For Correction
                     </h3>
 
-
                     <p>
                         {correction.reason}
                     </p>
 
-
                 </div>
-
-
 
                 <div className="approvalSection">
 
-
                     <p>
+
                         <strong>
-                            Status:
+                            Created:
                         </strong>
 
                         {" "}
 
-                        {correction.status}
-                    </p>
+                        {new Date(
+                            correction.createdat
+                        ).toLocaleDateString()}
 
+                    </p>
 
                     <br />
 
-
                     <p>
                         Approved By:
-                        ___________________________
+                        ________________________
                     </p>
-
 
                     <p>
-                        Date:
-                        ___________________________
+                        Signature:
+                        ________________________
                     </p>
 
-
                 </div>
-
-
 
             </div>
 
             <button
-            className="printButton"
-            onClick={printCorrection}
+                className="printButton"
+                onClick={printPage}
             >
-                Print Invoice Correction
+                Print Correction
             </button>
-
 
         </div>
 
@@ -297,5 +196,4 @@ const InvoiceCorrectionPrint = () => {
 
 };
 
-
-export default InvoiceCorrectionPrint;
+export default PaymentCorrectionPrint;

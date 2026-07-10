@@ -1,4 +1,4 @@
-.waterRecordsPage{
+.tenantTablesPage{
     min-height:100vh;
 
     display:flex;
@@ -10,7 +10,7 @@
 }
 
 
-.waterRecordsContent{
+.tenantTablesContent{
 
     flex:1;
 
@@ -23,7 +23,7 @@
 }
 
 
-.waterRecordsCard{
+.tenantTablesCard{
 
     width:600px;
     max-width:90%;
@@ -43,7 +43,7 @@
 }
 
 
-.waterRecordsTitle{
+.tenantTablesTitle{
 
     color:white;
 
@@ -56,7 +56,7 @@
 }
 
 
-.waterRecordsSubtitle{
+.tenantTablesSubtitle{
 
     color:#cbd5e1;
 
@@ -69,10 +69,9 @@
 }
 
 
-.waterRecordsButtonSet{
+.tenantTablesButtonSet{
 
     display:flex;
-
     flex-direction:column;
 
     gap:22px;
@@ -80,7 +79,7 @@
 }
 
 
-.waterRecordsButton{
+.tenantTablesButton{
 
     width:100%;
 
@@ -105,7 +104,7 @@
 }
 
 
-.waterRecordsButton:hover{
+.tenantTablesButton:hover{
 
     background:#1d4ed8;
 
@@ -116,7 +115,7 @@
 }
 
 
-.waterRecordsButton:active{
+.tenantTablesButton:active{
 
     transform:translateY(0);
 
@@ -125,28 +124,28 @@
 
 @media(max-width:700px){
 
-    .waterRecordsCard{
+    .tenantTablesCard{
 
         padding:30px 24px;
 
     }
 
 
-    .waterRecordsTitle{
+    .tenantTablesTitle{
 
         font-size:30px;
 
     }
 
 
-    .waterRecordsSubtitle{
+    .tenantTablesSubtitle{
 
         font-size:18px;
 
     }
 
 
-    .waterRecordsButton{
+    .tenantTablesButton{
 
         font-size:18px;
 

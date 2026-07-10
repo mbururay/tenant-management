@@ -1,4 +1,4 @@
-.waterRecordsPage{
+.billSelectPage{
     min-height:100vh;
 
     display:flex;
@@ -9,9 +9,7 @@
     background-position:center;
 }
 
-
-.waterRecordsContent{
-
+.billSelectContent{
     flex:1;
 
     display:flex;
@@ -19,11 +17,9 @@
     align-items:center;
 
     padding:30px;
-
 }
 
-
-.waterRecordsCard{
+.billSelectCard{
 
     width:600px;
     max-width:90%;
@@ -42,8 +38,7 @@
 
 }
 
-
-.waterRecordsTitle{
+.billSelectTitle{
 
     color:white;
 
@@ -55,8 +50,7 @@
 
 }
 
-
-.waterRecordsSubtitle{
+.billSelectSubtitle{
 
     color:#cbd5e1;
 
@@ -68,26 +62,22 @@
 
 }
 
-
-.waterRecordsButtonSet{
+.billSelectButtonSet{
 
     display:flex;
-
     flex-direction:column;
 
     gap:22px;
 
 }
 
-
-.waterRecordsButton{
+.billSelectButton{
 
     width:100%;
 
     padding:18px;
 
     border:none;
-
     border-radius:10px;
 
     background:#2563eb;
@@ -95,7 +85,6 @@
     color:white;
 
     font-size:20px;
-
     font-weight:600;
 
     cursor:pointer;
@@ -104,8 +93,7 @@
 
 }
 
-
-.waterRecordsButton:hover{
+.billSelectButton:hover{
 
     background:#1d4ed8;
 
@@ -115,38 +103,33 @@
 
 }
 
-
-.waterRecordsButton:active{
+.billSelectButton:active{
 
     transform:translateY(0);
 
 }
 
-
 @media(max-width:700px){
 
-    .waterRecordsCard{
+    .billSelectCard{
 
         padding:30px 24px;
 
     }
 
-
-    .waterRecordsTitle{
+    .billSelectTitle{
 
         font-size:30px;
 
     }
 
-
-    .waterRecordsSubtitle{
+    .billSelectSubtitle{
 
         font-size:18px;
 
     }
 
-
-    .waterRecordsButton{
+    .billSelectButton{
 
         font-size:18px;
 

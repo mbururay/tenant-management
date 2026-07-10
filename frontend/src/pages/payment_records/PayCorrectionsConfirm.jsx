@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
-import "./ICorrectConfirm.css";
+import "../invoice_generation/ICorrectConfirm.css";
 
-const ICorrectConfirm = () => {
+const PayCorrectionsConfirm = () => {
 
     const navigate = useNavigate();
     const { state } = useLocation();
@@ -22,7 +22,7 @@ const ICorrectConfirm = () => {
                         marginTop: "100px"
                     }}
                 >
-                    No correction to review.
+                    No payment correction to review.
                 </h2>
 
             </div>
@@ -31,25 +31,32 @@ const ICorrectConfirm = () => {
 
     }
 
-    const { invoice, correction } = state;
+    const { payment, correction } = state;
+
+    console.log("payment object:", payment);
+    console.log("correction object:", correction);
+    console.log(payment);
+    console.log(correction);
 
     const handleConfirm = async () => {
 
         try {
 
             const res = await fetch(
-                "http://localhost:3001/createInvoiceCorrection",
+                "http://localhost:3001/createPaymentCorrection",
                 {
                     method: "POST",
+
                     headers: {
                         "Content-Type": "application/json"
                     },
+
                     body: JSON.stringify({
-                        invoiceId: invoice.invoiceId,
-                        tenantId: invoice.tenantId,
-                        amount: correction.amount,
-                        reason: correction.reason,
-                        correctionType: correction.correctionType
+                        paymentId: payment.paymentId,
+                        fieldName: correction.fieldName,
+                        oldValue: correction.oldValue,
+                        newValue: correction.newValue,
+                        reason: correction.reason
                     })
                 }
             );
@@ -57,24 +64,20 @@ const ICorrectConfirm = () => {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(
-                    data.error ||
-                    "Failed to create invoice correction."
-                );
+                throw new Error(data.error);
             }
 
-            alert(
-                "Invoice correction created successfully."
-            );
+            alert("Payment correction created successfully.");
 
             navigate(
-                `/InvoiceCorrectionPrint/${data.correctionId}`
+                `/PaymentCorrectionPrint/${data.correctionId}`
             );
 
         }
         catch (err) {
 
             console.error(err);
+
             alert(err.message);
 
         }
@@ -88,76 +91,79 @@ const ICorrectConfirm = () => {
             <Heading />
 
             <h1 className="editTenantTitle">
-                Confirm Invoice Correction
+                Confirm Payment Correction
             </h1>
 
             <div className="editTenantForm">
 
                 <section className="editSection">
 
-                    <h3>Invoice</h3>
+                    <h3>Payment Details</h3>
 
                     <div className="confirmRow">
-                        <span>Invoice</span>
-                        <span>#{invoice.invoiceId}</span>
+                        <span>Payment ID</span>
+                        <span>#{payment.paymentId}</span>
                     </div>
 
                     <div className="confirmRow">
                         <span>Tenant</span>
-                        <span>{invoice.tenant}</span>
+                        <span>{payment.tenant}</span>
                     </div>
 
                     <div className="confirmRow">
-                        <span>House</span>
-                        <span>{invoice.houseNo}</span>
-                    </div>
+                        <span>Amount</span>
 
-                    <div className="confirmRow">
-                        <span>Total</span>
                         <span>
                             KES{" "}
                             {Number(
-                                invoice.totalAmount
-                            ).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}
+                                payment.paymentAmount
+                            ).toLocaleString(
+                                undefined,
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            )}
                         </span>
+
+                    </div>
+
+                    <div className="confirmRow">
+                        <span>Payment Method</span>
+                        <span>{payment.paymentMethod}</span>
+                    </div>
+
+                    <div className="confirmRow">
+                        <span>Confirmation Code</span>
+                        <span>{payment.confirmationCode}</span>
                     </div>
 
                 </section>
 
                 <section className="editSection">
 
-                    <h3>Correction</h3>
+                    <h3>Correction Details</h3>
 
                     <div className="confirmRow">
-                        <span>Type</span>
-                        <span>
-                            {correction.correctionType}
-                        </span>
+                        <span>Field Being Corrected</span>
+                        <span>{correction.fieldName}</span>
                     </div>
 
                     <div className="confirmRow">
-                        <span>Adjustment</span>
+                        <span>Current Value</span>
+                        <span>{correction.oldValue}</span>
+                    </div>
+
+                    <div className="confirmRow">
+                        <span>New Value</span>
 
                         <span
                             style={{
-                                color:
-                                    correction.amount < 0
-                                        ? "#dc2626"
-                                        : "#15803d",
+                                color: "#15803d",
                                 fontWeight: "bold"
                             }}
                         >
-                            {correction.amount > 0 ? "+" : ""}
-
-                            {Number(
-                                correction.amount
-                            ).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}
+                            {correction.newValue}
                         </span>
 
                     </div>
@@ -166,9 +172,7 @@ const ICorrectConfirm = () => {
 
                         <h4>Reason</h4>
 
-                        <p>
-                            {correction.reason}
-                        </p>
+                        <p>{correction.reason}</p>
 
                     </div>
 
@@ -177,7 +181,6 @@ const ICorrectConfirm = () => {
                 <div className="buttonRow">
 
                     <button
-                        type="button"
                         className="cancelButton"
                         onClick={() => navigate(-1)}
                     >
@@ -185,7 +188,6 @@ const ICorrectConfirm = () => {
                     </button>
 
                     <button
-                        type="button"
                         className="continueButton"
                         onClick={handleConfirm}
                     >
@@ -202,4 +204,4 @@ const ICorrectConfirm = () => {
 
 };
 
-export default ICorrectConfirm;
+export default PayCorrectionsConfirm;

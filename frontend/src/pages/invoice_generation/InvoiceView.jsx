@@ -1,10 +1,13 @@
 import Heading from "../../components/Heading";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import "./InvoiceView.css";
 
 const InvoiceView = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
 
   const [invoice, setInvoice] = useState(null);
   const [charges, setCharges] = useState([]);
@@ -23,6 +26,7 @@ const InvoiceView = () => {
 
   const printInvoice = () => {
     window.print();
+    navigate(-1);
   };
 
 

@@ -1,0 +1,52 @@
+.correctionPage {
+    background: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.correctionCard {
+    width: 900px;
+    max-width: 100%;
+    margin: auto;
+    padding: 30px;
+    background: white;
+    border: 1px solid #000;
+}
+
+.correctionCard,
+.correctionCard * {
+    color: black;
+}
+
+.correctionTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.correctionTable th,
+.correctionTable td {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.printButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+}
+
+@media print {
+
+    .printButton {
+        display: none;
+    }
+
+    .correctionCard {
+        border: none;
+        width: 100%;
+        margin: 0;
+    }
+
+}

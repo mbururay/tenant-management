@@ -4,44 +4,62 @@ import "./WaterRecords.css";
 
 
 const WaterRecords = () => {
+
   const navigate = useNavigate();
 
   return (
-    <div className="modifyWaterPage">
+
+    <div className="waterRecordsPage">
+
       <Heading />
 
-      <div className="modifyWaterCard">
+      <div className="waterRecordsContent">
 
-        <h1 className="modifyWaterTitle">
-          Water Records
-        </h1>
+        <div className="waterRecordsCard">
 
-        <h2 className="modifyWaterSubtitle">
-          Select your desired action
-        </h2>
+          <h1 className="waterRecordsTitle">
+            Water Records
+          </h1>
 
-        <div className="modifyWaterButtonSet">
+
+          <p className="waterRecordsSubtitle">
+            Select your desired action
+          </p>
+
+
+          <div className="waterRecordsButtonSet">
+
 
             <button
-                className="updateWaterButton"
-                onClick={() => navigate("/WaterUpdate")}
+              className="waterRecordsButton"
+              onClick={() => navigate("/WaterUpdate")}
             >
-            Update Water Records
+              Update Water Records
             </button>
 
-          <button
-                className="modifyWaterButton"
-                onClick={() => navigate("/SearchWater")}
+
+            <button
+              className="waterRecordsButton"
+              onClick={() => navigate("/SearchWater")}
             >
-            Modify Water Records
-          </button>
+              Modify Water Records
+            </button>
+
+
+          </div>
 
 
         </div>
 
+
       </div>
+
+
     </div>
+
   );
+
 };
+
 
 export default WaterRecords;

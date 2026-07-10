@@ -1,47 +1,68 @@
 import { useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
-import "../water_records/WaterRecords.css";
+import "./TenantTables.css";
 
 
 const TenantTables = () => {
-  const navigate = useNavigate();
 
-  return (
-    <div className="modifyWaterPage">
-      <Heading />
+    const navigate = useNavigate();
 
-      <div className="modifyWaterCard">
+    return (
 
-        <h1 className="modifyWaterTitle">
-          Tenant Tables
-        </h1>
+        <div className="tenantTablesPage">
 
-        <h2 className="modifyWaterSubtitle">
-          Select your desired action
-        </h2>
+            <Heading />
 
-        <div className="modifyWaterButtonSet">
 
-            <button
-                className="updateWaterButton"
-                onClick={() => navigate("/TenantView")}
-            >
-            Tenant View
-            </button>
+            <div className="tenantTablesContent">
 
-          <button
-                className="modifyWaterButton"
-                onClick={() => navigate("/TenantDashboard")}
-            >
-            House Pivot Table
-          </button>
+
+                <div className="tenantTablesCard">
+
+
+                    <h1 className="tenantTablesTitle">
+                        Tenant Tables
+                    </h1>
+
+
+                    <p className="tenantTablesSubtitle">
+                        Select your desired action
+                    </p>
+
+
+                    <div className="tenantTablesButtonSet">
+
+
+                        <button
+                            className="tenantTablesButton"
+                            onClick={() => navigate("/TenantView")}
+                        >
+                            Tenant View
+                        </button>
+
+
+                        <button
+                            className="tenantTablesButton"
+                            onClick={() => navigate("/TenantDashboard")}
+                        >
+                            House Pivot Table
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
 
 
         </div>
 
-      </div>
-    </div>
-  );
+    );
+
 };
+
 
 export default TenantTables;

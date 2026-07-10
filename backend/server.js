@@ -766,28 +766,30 @@ app.post("/payment", async (req, res) => {
   } = req.body;
 
   try {
-    await pool.query(
-      `
-      INSERT INTO paymentList (
-        tenantId,
-        payAmount,
-        paymentMethod,
-        confirmationCode
-      )
-      VALUES ($1, $2, $3, $4)
-      `,
-      [
-        tenantId,
-        payAmount,
-        paymentMethod,
-        confirmationCode
-      ]
-    );
+    const result = await pool.query(
+  `
+  INSERT INTO paymentList (
+    tenantId,
+    payAmount,
+    paymentMethod,
+    confirmationCode
+  )
+  VALUES ($1, $2, $3, $4)
+  RETURNING payId
+  `,
+  [
+    tenantId,
+    payAmount,
+    paymentMethod,
+    confirmationCode
+  ]
+);
 
-    res.json({
-      success: true,
-      message: "Payment recorded successfully."
-    });
+res.json({
+  success: true,
+  message: "Payment recorded successfully.",
+  paymentId: result.rows[0].payid
+});
 
   } catch (err) {
     console.error(err);
@@ -1607,6 +1609,293 @@ app.put("/modify-bills", async (req, res) => {
     }
 
 });
+
+app.get("/payment/:paymentId", async (req, res) => {
+
+    const { paymentId } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                p.payId             AS paymentId,
+                p.payAmount         AS paymentAmount,
+                p.paymentMethod     AS paymentMethod,
+                p.confirmationCode  AS confirmationCode,
+                p.payDate           AS paymentDate,
+
+                t.name              AS tenant
+
+            FROM paymentList p
+
+            JOIN tenantList t
+            ON t.id = p.tenantId
+
+            WHERE p.payId = $1
+            `,
+            [paymentId]
+        );
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Payment not found"
+            });
+
+        }
+
+        res.json({
+            payment: result.rows[0]
+        });
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.get("/payment-correction/:id", async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                pc.correctionId,
+                pc.paymentId,
+                pc.fieldName,
+                pc.oldValue,
+                pc.newValue,
+                pc.reason,
+                pc.createdAt,
+
+                p.payamount,
+                p.paymentmethod,
+                p.confirmationcode,
+                p.paydate,
+
+                t.name,
+                h.houseNo
+
+            FROM paymentCorrections pc
+
+            JOIN paymentList p
+            ON p.payid = pc.paymentId
+
+            JOIN tenantList t
+            ON t.id = p.tenantid
+
+            LEFT JOIN houseList h
+            ON h.houseId = t.houseid
+
+            WHERE pc.correctionId = $1
+            `,
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Correction not found"
+            });
+
+        }
+
+        res.json(result.rows[0]);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+
+
+app.get("/searchPaymentByName/:name", async (req, res) => {
+
+    const { name } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                p.payid,
+                p.paydate,
+                p.payamount,
+                p.paymentmethod,
+                p.confirmationcode,
+
+                t.id,
+                t.name
+
+            FROM paymentList p
+
+            JOIN tenantList t
+            ON t.id = p.tenantid
+
+            WHERE t.name ILIKE $1
+
+            ORDER BY p.paydate DESC
+            `,
+            [`%${name}%`]
+        );
+
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.post(
+    "/createPaymentCorrection",
+    async (req, res) => {
+
+        const {
+            paymentId,
+            fieldName,
+            oldValue,
+            newValue,
+            reason
+        } = req.body;
+
+        try {
+
+            const result = await pool.query(
+                `
+                INSERT INTO paymentCorrections
+                (
+                    paymentId,
+                    fieldName,
+                    oldValue,
+                    newValue,
+                    reason,
+                    createdAt
+                )
+                VALUES
+                (
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    CURRENT_TIMESTAMP
+                )
+                RETURNING correctionId
+                `,
+                [
+                    paymentId,
+                    fieldName,
+                    oldValue,
+                    newValue,
+                    reason
+                ]
+            );
+
+            res.status(201).json({
+
+                message:
+                    "Payment correction created",
+
+                correctionId:
+                    result.rows[0].correctionid
+
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+            res.status(500).json({
+
+                error:
+                    "Failed to create payment correction"
+
+            });
+
+        }
+
+    }
+);
+
+app.get("/receipt/:paymentId", async (req, res) => {
+
+    const { paymentId } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                p.payId,
+                p.payAmount,
+                p.paymentMethod,
+                p.confirmationCode,
+                p.payDate,
+
+                t.name,
+                h.houseNo
+
+            FROM paymentList p
+
+            JOIN tenantList t
+            ON t.id = p.tenantId
+
+            LEFT JOIN houseList h
+            ON h.houseId = t.houseId
+
+            WHERE p.payId = $1
+            `,
+            [paymentId]
+        );
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Receipt not found"
+            });
+
+        }
+
+        res.json(result.rows[0]);
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
 
 // postgres test route
 app.get("/serene_homes", async (req, res) => {

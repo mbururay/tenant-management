@@ -37,6 +37,12 @@ import ModifyBillConfirm from "./pages/landlord_bills/ModifyBillConfirm.jsx"
 import InvoiceMonth from "./pages/invoice_generation/InvoiceMonth.jsx"
 import InvoicePrint from "./pages/invoice_generation/InvoicePrint.jsx"
 import InvoiceCorrectionPrint from "./pages/invoice_generation/InvoiceCorrectionPrint.jsx"
+import PaymentRecords from "./pages/payment_records/PaymentRecords.jsx"
+import PayCorrections from "./pages/payment_records/PayCorrections.jsx"
+import PayCorrectionsConfirm from "./pages/payment_records/PayCorrectionsConfirm.jsx"
+import PaySearch from "./pages/payment_records/PaySearch.jsx"
+import PaymentCorrectionPrint from "./pages/payment_records/PaymentCorrectionPrint.jsx"
+import ReceiptPrint from "./pages/payment_records/ReceiptPrint.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -90,6 +96,12 @@ const App = () => {
       <Route path="/invoiceMonth/:month" element={<InvoiceMonth />}/>
       <Route path="/InvoicePrint/:month" element={<InvoicePrint />}/>
       <Route path="/InvoiceCorrectionPrint/:id" element={<InvoiceCorrectionPrint/>}/>
+      <Route path="PaymentRecords" element ={<PaymentRecords />}/>
+      <Route path="PayCorrectionsConfirm" element = {<PayCorrectionsConfirm />}/>
+      <Route path="PaySearch" element = {<PaySearch />}/>
+      <Route path="/PayCorrections/:paymentId" element={<PayCorrections />}/>
+      <Route path="/PaymentCorrectionPrint/:id" element={<PaymentCorrectionPrint />}/>
+      <Route path="/ReceiptPrint/:paymentId" element={<ReceiptPrint />}/>
 
 
       

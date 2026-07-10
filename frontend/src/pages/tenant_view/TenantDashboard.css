@@ -1,12 +1,8 @@
 #tenantDashboardPage{
+min-height:100vh;
 
     display:flex;
     flex-direction:column;
-
-    min-height:100vh;
-
-    padding:30px;
-    padding-top:0;
 
     background-image:url("../../TrackerLanding.jpg");
     background-size:cover;

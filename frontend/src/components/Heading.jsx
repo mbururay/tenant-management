@@ -36,7 +36,7 @@ const Heading = () => {
           </div>
 
           <div id = 'payUpdate'>
-            <Link id = 'nav-link' to = "/PayUpdate">
+            <Link id = 'nav-link' to = "/PaymentRecords">
               Payment Records
             </Link>
           </div>

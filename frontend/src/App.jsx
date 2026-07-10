@@ -43,6 +43,7 @@ import PayCorrectionsConfirm from "./pages/payment_records/PayCorrectionsConfirm
 import PaySearch from "./pages/payment_records/PaySearch.jsx"
 import PaymentCorrectionPrint from "./pages/payment_records/PaymentCorrectionPrint.jsx"
 import ReceiptPrint from "./pages/payment_records/ReceiptPrint.jsx"
+import PaymentView from "./pages/payment_records/PaymentView.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
@@ -102,6 +103,7 @@ const App = () => {
       <Route path="/PayCorrections/:paymentId" element={<PayCorrections />}/>
       <Route path="/PaymentCorrectionPrint/:id" element={<PaymentCorrectionPrint />}/>
       <Route path="/ReceiptPrint/:paymentId" element={<ReceiptPrint />}/>
+      <Route path="PaymentView" element={<PaymentView />}/>
 
 
       

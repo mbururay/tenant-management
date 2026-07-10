@@ -42,7 +42,7 @@ const PaymentRecords = () => {
 
             <button
               className="modifyTenantButton"
-              onClick={() => navigate("/InvoiceSearch")}
+              onClick={() => navigate("/PaymentView")}
 
             >
             View Payment Records

@@ -1896,6 +1896,130 @@ app.get("/receipt/:paymentId", async (req, res) => {
 
 });
 
+app.get("/payments", async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+
+                p.payId,
+                p.payDate,
+                p.payAmount,
+                p.paymentMethod,
+                p.confirmationCode,
+
+                t.name AS tenant,
+
+                h.houseNo
+
+            FROM paymentList p
+
+            JOIN tenantList t
+            ON t.id = p.tenantId
+
+            LEFT JOIN houseList h
+            ON h.houseId = t.houseId
+
+            ORDER BY
+                p.payDate DESC,
+                p.payId DESC
+            `
+        );
+
+        res.json(result.rows);
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.post("/register", async (req,res)=>{
+
+    const { username, password } = req.body;
+
+    const hash =
+    await bcrypt.hash(password,10);
+
+    await pool.query(
+        `
+        INSERT INTO users
+        (username,passwordHash)
+        VALUES ($1,$2)
+        `,
+        [username,hash]
+    );
+
+    res.json({
+        success:true
+    });
+
+});
+
+app.post("/login", async (req,res)=>{
+
+    const { username,password } = req.body;
+
+    const result =
+    await pool.query(
+        `
+        SELECT *
+        FROM users
+        WHERE username=$1
+        `,
+        [username]
+    );
+
+    if(result.rows.length===0){
+
+        return res.status(401).json({
+            error:"Invalid credentials"
+        });
+
+    }
+
+    const user = result.rows[0];
+
+    const valid =
+    await bcrypt.compare(
+        password,
+        user.passwordhash
+    );
+
+    if(!valid){
+
+        return res.status(401).json({
+            error:"Invalid credentials"
+        });
+
+    }
+
+    const token =
+    jwt.sign(
+        {
+            userId:user.userid
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn:"8h"
+        }
+    );
+
+    res.json({
+        token
+    });
+
+});
+
 
 // postgres test route
 app.get("/serene_homes", async (req, res) => {

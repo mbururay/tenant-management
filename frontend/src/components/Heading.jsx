@@ -9,6 +9,12 @@ import "./Heading.css"
 const Heading = () => {
   return(
     <div id = 'header'>
+        <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/">
+              Home
+            </Link>
+        </div>
+
         <div id = 'tenantView'>
             <Link id = 'nav-link' to = "/TenantTables">
               Tenant tables
@@ -46,6 +52,13 @@ const Heading = () => {
               Landlord Bills
             </Link>
           </div>
+
+          <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/Login">
+              Logout
+            </Link>
+          </div>
+
       </div>
   )
 }

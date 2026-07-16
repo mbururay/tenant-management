@@ -3,6 +3,15 @@ import cors from "cors";
 import pool from "./db.js";
 import PDFDocument from "pdfkit";
 import puppeteer from "puppeteer";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import resend from "./resendClient.js";
+import TestEmails from "./emails/TestEmails.js";
+import crypto from "crypto";
+
+
+dotenv.config();
 
 const app = express();
 
@@ -1965,52 +1974,52 @@ app.post("/register", async (req,res)=>{
 
 });
 
-app.post("/login", async (req,res)=>{
+app.post("/login", async (req, res) => {
 
-    const { username,password } = req.body;
+    console.log("Login route hit");
 
-    const result =
-    await pool.query(
+    const { username, password } = req.body;
+
+    const result = await pool.query(
         `
         SELECT *
         FROM users
-        WHERE username=$1
+        WHERE username = $1
         `,
         [username]
     );
 
-    if(result.rows.length===0){
+    if (result.rows.length === 0) {
 
         return res.status(401).json({
-            error:"Invalid credentials"
+            error: "Invalid credentials"
         });
 
     }
 
     const user = result.rows[0];
 
-    const valid =
-    await bcrypt.compare(
+    const valid = await bcrypt.compare(
         password,
         user.passwordhash
     );
 
-    if(!valid){
+    if (!valid) {
 
         return res.status(401).json({
-            error:"Invalid credentials"
+            error: "Invalid credentials"
         });
 
     }
 
-    const token =
-    jwt.sign(
+    const token = jwt.sign(
         {
-            userId:user.userid
+            id: user.userid,
+            username: user.username
         },
         process.env.JWT_SECRET,
         {
-            expiresIn:"8h"
+            expiresIn: "1d"
         }
     );
 
@@ -2019,6 +2028,321 @@ app.post("/login", async (req,res)=>{
     });
 
 });
+
+app.get("/test-email", async (req, res) => {
+
+    try {
+
+        await resend.emails.send({
+
+            from: "onboarding@resend.dev",
+
+            to: "your_email@gmail.com",
+
+            subject: "Test Email",
+
+            react: TestEmails({})
+
+        });
+
+        res.json({
+            message: "Email sent"
+        });
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json(err);
+
+    }
+
+});
+
+app.post("/forgot-password", async (req, res) => {
+
+    const { username } = req.body;
+
+    try {
+
+        const userResult = await pool.query(
+            `
+            SELECT
+                userid,
+                email
+            FROM users
+            WHERE username = $1
+            `,
+            [username]
+        );
+
+        if (userResult.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "User not found"
+            });
+
+        }
+
+        const user = userResult.rows[0];
+
+        const token =
+            crypto.randomBytes(32)
+            .toString("hex");
+
+        await pool.query(
+            `
+            INSERT INTO password_reset_tokens
+            (
+                userid,
+                token,
+                expiresat
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                NOW() + INTERVAL '15 minutes'
+            )
+            `,
+            [
+                user.userid,
+                token
+            ]
+        );
+
+        const resetLink =
+            `http://localhost:5173/ResetPassword/${token}`;
+
+        
+        await resend.emails.send({
+            from: "onboarding@resend.dev",
+            to: user.email,
+            subject: "Reset Password",
+            html: `
+                <h2>Password Reset</h2>
+                <p>Click below:</p>
+                <a href="${resetLink}">
+                    Reset Password
+                </a>
+            `
+        });
+        
+
+        res.json({
+
+            message:
+                "Password reset email sent.",
+
+            resetLink
+
+        });
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+
+app.post("/reset-password", async (req, res) => {
+
+    const { token, password } = req.body;
+
+    try {
+
+        const tokenResult = await pool.query(
+            `
+            SELECT
+                userid,
+                expiresat
+            FROM password_reset_tokens
+            WHERE token = $1
+            `,
+            [token]
+        );
+
+        if (tokenResult.rows.length === 0) {
+
+            return res.status(400).json({
+                error: "Invalid reset token"
+            });
+
+        }
+
+        const resetRecord =
+            tokenResult.rows[0];
+
+        if (
+            new Date(resetRecord.expiresat)
+            <
+            new Date()
+        ) {
+
+            return res.status(400).json({
+                error: "Reset token has expired"
+            });
+
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(
+                password,
+                10
+            );
+
+        await pool.query(
+            `
+            UPDATE users
+            SET passwordHash = $1
+            WHERE userId = $2
+            `,
+            [
+                hashedPassword,
+                resetRecord.userid
+            ]
+        );
+
+        await pool.query(
+            `
+            DELETE FROM password_reset_tokens
+            WHERE token = $1
+            `,
+            [token]
+        );
+
+        res.json({
+
+            message:
+                "Password reset successfully"
+
+        });
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.get("/dashboard-summary", async (req, res) => {
+
+    try {
+
+        const occupiedResult =
+            await pool.query(
+                `
+                SELECT COUNT(*) AS occupied
+                FROM tenantList
+                WHERE moveout IS NULL
+                `
+            );
+
+        const vacantResult =
+            await pool.query(
+                `
+                SELECT COUNT(*) AS vacant
+                FROM houseList
+                WHERE houseid NOT IN (
+                    SELECT houseid
+                    FROM tenantList
+                    WHERE moveout IS NULL
+                )
+                `
+            );
+
+        const paymentsResult =
+            await pool.query(
+                `
+                SELECT
+                    COALESCE(
+                        SUM(payamount),
+                        0
+                    ) AS payments
+                FROM paymentList
+                WHERE DATE_TRUNC(
+                    'month',
+                    paydate
+                )
+                =
+                DATE_TRUNC(
+                    'month',
+                    CURRENT_DATE
+                )
+                `
+            );
+        const arrearsResult =
+            await pool.query(
+                `
+                SELECT
+                    COALESCE(
+                        (
+                            SELECT SUM(totalamount)
+                            FROM invoiceList
+                        ),
+                        0
+                    )
+                    -
+                    COALESCE(
+                        (
+                            SELECT SUM(payamount)
+                            FROM paymentList
+                        ),
+                        0
+                    )
+                    AS arrears
+                `
+            );
+
+        res.json({
+
+            occupiedUnits:
+                Number(
+                    occupiedResult.rows[0].occupied
+                ),
+
+            vacantUnits:
+                Number(
+                    vacantResult.rows[0].vacant
+                ),
+
+            paymentsReceived:
+                Number(
+                    paymentsResult.rows[0].payments
+                ),
+
+            outstandingArrears: Number(arrearsResult.rows[0].arrears)
+
+        });
+
+    }
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+
 
 
 // postgres test route

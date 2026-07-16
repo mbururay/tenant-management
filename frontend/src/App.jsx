@@ -44,12 +44,17 @@ import PaySearch from "./pages/payment_records/PaySearch.jsx"
 import PaymentCorrectionPrint from "./pages/payment_records/PaymentCorrectionPrint.jsx"
 import ReceiptPrint from "./pages/payment_records/ReceiptPrint.jsx"
 import PaymentView from "./pages/payment_records/PaymentView.jsx"
+import Login from "./pages/auth/Login.jsx"
+import Register from "./pages/auth/Register.jsx"
+import ForgetPassword from "./pages/auth/ForgetPassword.jsx"
+import ResetPassword from "./pages/auth/ResetPassword.jsx"
+import DashboardSummary from "./pages/landing/DashboardSummary.jsx"
 
 
 import { Routes, Route } from "react-router-dom"
-import { useNavigate } from "react-router-dom"
-import Heading from "./components/Heading.jsx"
+
 import TenantTables from "./pages/tenant_view/TenantTables.jsx"
+import Dashboard from "./pages/landing/Dashboard.jsx"
 
 
 
@@ -58,7 +63,7 @@ const App = () => {
   return (
     <div>
     <Routes>
-      <Route path="/" element={<Landing />} />
+      
       <Route path="/TenantView" element={<TenantView />}/>
       <Route path="/AddTenant" element={<AddTenant />}/>
       <Route path="/WaterUpdate" element={<WaterUpdate />}/>
@@ -104,6 +109,14 @@ const App = () => {
       <Route path="/PaymentCorrectionPrint/:id" element={<PaymentCorrectionPrint />}/>
       <Route path="/ReceiptPrint/:paymentId" element={<ReceiptPrint />}/>
       <Route path="PaymentView" element={<PaymentView />}/>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />}/>
+      <Route path="/" element={<Dashboard />}/>
+      <Route path="/DashboardSummary" element={<DashboardSummary />}/>
+
+      <Route path="/ForgetPassword" element={<ForgetPassword />}/>
+      <Route path="ResetPassword/:token" element={<ResetPassword />}/>
+
 
 
       
@@ -116,50 +129,6 @@ const App = () => {
   )
 }
 
-
-
-//Header Section
-
-
-
-//Landing Section
-const Landing = () => {
-  return(
-    <div id = 'gLanding'>
-      <Heading/>
-      <CenText />
-          
-    </div>
-
-    
-  )
-    
-}
-
-
-
-const CenText = () => {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    console.log("button clicked");
-    navigate("/TenantView");
-  };
-  return(
-    <div id  = 'cenText'>
-      
-      <div id = 'cencen'>
-        <h1 id = 'mainTitle'>
-          Serene Homes Accounting
-        </h1>
-        <button type = 'button' id = 'cenButton' onClick={handleClick}>
-          Click me
-        </button>
-      </div>
-      
-    </div>
-  )
-}
 
 
 

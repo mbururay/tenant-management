@@ -1,0 +1,122 @@
+#mainPage{
+
+    min-height:100vh;
+
+    padding:30px;
+
+    background-image:url("../../TrackerLanding.jpg");
+
+    background-size:cover;
+
+    background-position:center;
+}
+
+#mainPage h1{
+
+    text-align:center;
+
+    color:white;
+
+    margin-top:40px;
+
+    margin-bottom:25px;
+
+    font-size:36px;
+}
+
+.formCard{
+
+    max-width:650px;
+
+    margin:0 auto;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:35px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,.25);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+}
+
+.formCard section{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+}
+
+.formCard h3{
+
+    margin:0;
+
+    color:#111827;
+
+    font-size:20px;
+
+    border-bottom:2px solid #e5e7eb;
+
+    padding-bottom:10px;
+}
+
+.formCard input{
+
+    padding:14px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    outline:none;
+
+    transition:.2s;
+}
+
+.formCard input:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,.15);
+}
+
+.formCard button{
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#dc2626;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.formCard button:hover{
+
+    background:#b91c1c;
+
+    transform:translateY(-2px);
+}

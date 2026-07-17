@@ -7,8 +7,10 @@ const InvoicePrint = () => {
 
   const [invoices, setInvoices] = useState([]);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
 useEffect(() => {
-  fetch(`http://localhost:3001/month-invoices/${month}`)
+  fetch(`${API_URL}/month-invoices/${month}`)
     .then(res => res.json())
     .then(data => {
       console.log("DATA:", data);
@@ -17,7 +19,7 @@ useEffect(() => {
     .catch(err => {
       console.error("FETCH ERROR:", err);
     });
-}, [month]);
+}, [month,API_URL]);
 
   if (invoices.length === 0) {
     return (

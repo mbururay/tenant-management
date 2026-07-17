@@ -1,11 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./ICorrectConfirm.css";
+import { authHeaders } from "../../api";
 
 const ICorrectConfirm = () => {
 
     const navigate = useNavigate();
     const { state } = useLocation();
+    const API_URL = import.meta.env.VITE_API_URL;
+    
 
     if (!state) {
 
@@ -38,22 +41,22 @@ const ICorrectConfirm = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/createInvoiceCorrection",
+                `${API_URL}/createInvoiceCorrection`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+
+                    headers: authHeaders(),
+
                     body: JSON.stringify({
                         invoiceId: invoice.invoiceId,
                         tenantId: invoice.tenantId,
                         amount: correction.amount,
                         reason: correction.reason,
-                        correctionType: correction.correctionType
+                        correctionType:
+                            correction.correctionType
                     })
                 }
             );
-
             const data = await res.json();
 
             if (!res.ok) {

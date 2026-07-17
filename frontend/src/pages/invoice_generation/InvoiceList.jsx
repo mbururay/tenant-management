@@ -9,10 +9,12 @@ const InvoiceList = () => {
 
     const navigate = useNavigate();
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
         fetch(
-            "http://localhost:3001/invoice-months"
+            `${API_URL}/invoice-months`
         )
             .then(res => res.json())
             .then(data => {
@@ -20,7 +22,7 @@ const InvoiceList = () => {
             })
             .catch(err => console.error(err));
 
-    }, []);
+    }, [API_URL]);
 
     const formatMonth = (monthString) => {
 
@@ -124,7 +126,7 @@ const InvoiceList = () => {
                                 className="downloadPdfBtn"
                                 onClick={() =>
                                     window.open(
-                                        `http://localhost:3001/invoice-pdf/${month.month}`
+                                        `${API_URL}/invoice-pdf/${month.month}`
                                     )
                                 }
                             >

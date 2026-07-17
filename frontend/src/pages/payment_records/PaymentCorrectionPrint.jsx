@@ -8,16 +8,18 @@ const PaymentCorrectionPrint = () => {
 
     const [correction, setCorrection] = useState(null);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
         fetch(
-            `http://localhost:3001/payment-correction/${id}`
+            `${API_URL}/payment-correction/${id}`
         )
             .then(res => res.json())
             .then(data => setCorrection(data))
             .catch(console.error);
 
-    }, [id]);
+    }, [id,API_URL]);
 
     const printPage = () => {
         window.print();

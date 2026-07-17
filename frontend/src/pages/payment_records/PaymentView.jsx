@@ -6,15 +6,16 @@ const PaymentView = () => {
 
     const [payments, setPayments] = useState([]);
     const [search, setSearch] = useState("");
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
 
-        fetch("http://localhost:3001/payments")
+        fetch(`${API_URL}/payments`)
             .then(res => res.json())
             .then(data => setPayments(data))
             .catch(console.error);
 
-    }, []);
+    }, [API_URL]);
 
     const filteredPayments = payments.filter(payment => {
 

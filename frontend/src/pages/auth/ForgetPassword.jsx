@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+const API_URL = import.meta.env.VITE_API_URL;
 import "./ForgetPassword.css";
 
 
@@ -24,7 +24,7 @@ const ForgetPassword = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/forgot-password",
+                `${API_URL}/forgot-password`,
                 {
                     method: "POST",
 

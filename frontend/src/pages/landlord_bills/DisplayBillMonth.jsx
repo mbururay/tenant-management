@@ -12,10 +12,12 @@ const DisplayBillMonth = () => {
 
     const [bills, setBills] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
         fetch(
-            `http://localhost:3001/bill-month/${month}`
+            `${API_URL}/bill-month/${month}`
         )
             .then(res => res.json())
             .then(data => {
@@ -27,7 +29,7 @@ const DisplayBillMonth = () => {
             })
             .catch(err => console.error(err));
 
-    }, [month]);
+    }, [month,API_URL]);
 
     console.log("Current bills state:", bills);
 

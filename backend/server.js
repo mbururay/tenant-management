@@ -9,11 +9,15 @@ import dotenv from "dotenv";
 import resend from "./resendClient.js";
 import TestEmails from "./emails/TestEmails.js";
 import crypto from "crypto";
+import auth from "./middleware/auth.js";
+
 
 
 dotenv.config();
 
 const app = express();
+const FRONTEND_URL =
+    process.env.FRONTEND_URL;
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +25,15 @@ app.use(express.json());
 // test route
 app.get("/", (req, res) => {
     res.send("server alive");
+});
+
+app.get("/test-auth", auth, (req, res) => {
+
+    res.json({
+        message: "Authenticated",
+        user: req.user
+    });
+
 });
 
 // main dashboard
@@ -83,7 +96,7 @@ app.get("/house-pivot", async (req, res) => {
 
 
 //ADD TENANT
-app.post("/add-tenant", async (req, res) => {
+app.post("/add-tenant",auth,async (req, res) => {
     try {
         console.log(req.body);
 
@@ -146,7 +159,7 @@ app.post("/add-tenant", async (req, res) => {
 
 
 //REMOVE TENANTS
-app.post("/remove-tenant", async (req, res) => {
+app.post("/remove-tenant",auth, async (req, res) => {
     try {
         const {
             houseNo,
@@ -231,10 +244,10 @@ app.get("/invoice-info", async (req, res) => {
   }
 });
 
-app.post("/gen-invoice", async (req, res) => {
+app.post("/gen-invoice", auth,async (req, res) => {
   try {
 
-    // Bill NEXT month
+    // Bill month
     const billingDate = new Date();
     billingDate.setMonth(billingDate.getMonth() + 1);
     billingDate.setDate(1);
@@ -259,9 +272,6 @@ app.post("/gen-invoice", async (req, res) => {
       const tenantId = t.id;
       const houseId = t.houseid;
 
-      //--------------------------------------------------
-      // CREATE MONTHLY RENT
-      //--------------------------------------------------
 
       const rentExists = await pool.query(`
         SELECT 1
@@ -285,9 +295,6 @@ app.post("/gen-invoice", async (req, res) => {
 
       }
 
-      //--------------------------------------------------
-      // CREATE MONTHLY GARBAGE
-      //--------------------------------------------------
 
       const garbageExists = await pool.query(`
         SELECT 1
@@ -311,9 +318,6 @@ app.post("/gen-invoice", async (req, res) => {
 
       }
 
-      //--------------------------------------------------
-      // GET UNINVOICED CHARGES
-      //--------------------------------------------------
 
       const charges = await pool.query(`
         SELECT
@@ -324,9 +328,6 @@ app.post("/gen-invoice", async (req, res) => {
         AND invoiceId IS NULL
       `,[tenantId]);
 
-      //--------------------------------------------------
-      // GET LATEST WATER
-      //--------------------------------------------------
 
       const water = await pool.query(`
         SELECT
@@ -342,10 +343,6 @@ app.post("/gen-invoice", async (req, res) => {
       if(charges.rows.length === 0 && water.rows.length === 0){
         continue;
       }
-
-      //--------------------------------------------------
-      // CREATE INVOICE
-      //--------------------------------------------------
 
       const invoice = await pool.query(`
         INSERT INTO invoiceList(
@@ -363,9 +360,7 @@ app.post("/gen-invoice", async (req, res) => {
 
       const invoiceId = invoice.rows[0].invoiceid;
 
-      //--------------------------------------------------
-      // TOTAL CHARGES
-      //--------------------------------------------------
+
 
       const chargeTotal = await pool.query(`
         SELECT
@@ -385,9 +380,6 @@ app.post("/gen-invoice", async (req, res) => {
 
       const total = totalCharges + waterBill;
 
-      //--------------------------------------------------
-      // ATTACH CHARGES
-      //--------------------------------------------------
 
       await pool.query(`
         UPDATE chargeList
@@ -396,9 +388,6 @@ app.post("/gen-invoice", async (req, res) => {
         AND invoiceId IS NULL
       `,[invoiceId,tenantId]);
 
-      //--------------------------------------------------
-      // ATTACH WATER
-      //--------------------------------------------------
 
       await pool.query(`
         UPDATE waterReadings
@@ -407,9 +396,6 @@ app.post("/gen-invoice", async (req, res) => {
         AND invoiceId IS NULL
       `,[invoiceId,houseId]);
 
-      //--------------------------------------------------
-      // STORE TOTAL
-      //--------------------------------------------------
 
       await pool.query(`
         UPDATE invoiceList
@@ -626,7 +612,7 @@ app.get("/invoice-pdf/:month", async (req, res) => {
 
         // Open the React invoice page
         await page.goto(
-            `http://localhost:5173/InvoicePrint/${encodeURIComponent(month)}`,
+            `${process.env.FRONTEND_URL}/InvoicePrint/${encodeURIComponent(month)}`,
             {
                 waitUntil: "networkidle0"
             }
@@ -766,7 +752,7 @@ app.get("/searchTenant/:phone", async (req, res) => {
   }
 });
 
-app.post("/payment", async (req, res) => {
+app.post("/payment",auth, async (req, res) => {
   const {
     tenantId,
     payAmount,
@@ -838,7 +824,7 @@ app.get("/searchTenantByName/:name", async (req, res) => {
   }
 });
 
-app.get("/tenant/:id", async (req, res) => {
+app.get("/tenant/:id",auth, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -867,7 +853,7 @@ app.get("/tenant/:id", async (req, res) => {
   }
 });
 
-app.put("/edit-tenant", async (req, res) => {
+app.put("/edit-tenant",auth, async (req, res) => {
   const {
     tenantId,
     name,
@@ -985,7 +971,7 @@ app.get("/water-update-list", async (req, res) => {
   }
 });
 
-app.post("/water-update", async(req,res)=>{
+app.post("/water-update",auth, async(req,res)=>{
 
     const { rate, houses } = req.body;
 
@@ -1166,7 +1152,7 @@ app.get("/waterRecord/:id", async (req, res) => {
   }
 });
 
-app.put("/edit-water", async (req, res) => {
+app.put("/edit-water",auth, async (req, res) => {
   const { id, houseId, currentReading, rate } = req.body;
 
   const client = await pool.connect();
@@ -1286,7 +1272,7 @@ app.get("/searchInvoiceByName/:name", async (req, res) => {
 
 });
 
-app.post("/createInvoiceCorrection", async (req, res) => {
+app.post("/createInvoiceCorrection",auth, async (req, res) => {
 
     const {
         invoiceId,
@@ -1423,7 +1409,7 @@ app.get("/invoice-correction/:id", async (req,res)=>{
 
 });
 
-app.post("/create-bills", async (req, res) => {
+app.post("/create-bills", auth,async (req, res) => {
 
     const { billingMonth, bills } = req.body;
 
@@ -1562,7 +1548,7 @@ app.get("/bill-month/:month", async (req, res) => {
 
 });
 
-app.put("/modify-bills", async (req, res) => {
+app.put("/modify-bills",auth, async (req, res) => {
 
     const { bills } = req.body;
 
@@ -1781,7 +1767,7 @@ app.get("/searchPaymentByName/:name", async (req, res) => {
 });
 
 app.post(
-    "/createPaymentCorrection",
+    "/createPaymentCorrection",auth,
     async (req, res) => {
 
         const {
@@ -2113,7 +2099,7 @@ app.post("/forgot-password", async (req, res) => {
         );
 
         const resetLink =
-            `http://localhost:5173/ResetPassword/${token}`;
+            `${process.env.FRONTEND_URL}/ResetPassword/${token}`;
 
         
         await resend.emails.send({

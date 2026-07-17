@@ -6,6 +6,8 @@ import "./ResetPassword.css";
 const ResetPassword = () => {
     const navigate = useNavigate();
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const { token } = useParams();
 
     const [newPassword, setNewPassword] = useState("");
@@ -37,7 +39,7 @@ const ResetPassword = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/reset-password",
+                `${API_URL}/reset-password`,
                 {
                     method: "POST",
 

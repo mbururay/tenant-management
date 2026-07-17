@@ -8,9 +8,11 @@ const DisplayBills = () => {
 
     const [bills, setBills] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
-        fetch("http://localhost:3001/bill-pivot")
+        fetch(`${API_URL}/bill-pivot`)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -18,7 +20,7 @@ const DisplayBills = () => {
             })
             .catch(err => console.error(err));
 
-    }, []);
+    }, [API_URL]);
 
     const categories = [
         "Water",

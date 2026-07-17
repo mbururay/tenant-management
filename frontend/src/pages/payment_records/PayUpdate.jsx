@@ -9,6 +9,7 @@ const PayUpdate = () => {
   const [phone, setPhone] = useState("");
   const [tenants, setTenants] = useState([]);
   const [searched, setSearched] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const PayUpdate = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/searchTenant/${phone}`
+        `${API_URL}/searchTenant/${phone}`
       );
 
       const data = await res.json();

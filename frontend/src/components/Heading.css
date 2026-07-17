@@ -26,3 +26,42 @@
     color:black;
     cursor:pointer;
 }
+
+@media (max-width:768px){
+
+    #header{
+
+        flex-wrap:wrap;
+
+        gap:10px;
+
+        padding:15px;
+
+    }
+
+    #header > div{
+
+        flex:none;
+
+        width:48%;
+
+    }
+
+    #header a{
+
+        display:inline-block;
+
+        width:100%;
+
+        text-align:center;
+
+        font-size:14px;
+
+        padding:10px;
+
+
+        border-radius:10px;
+
+    }
+
+}

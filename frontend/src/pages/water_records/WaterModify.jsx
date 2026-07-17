@@ -17,9 +17,11 @@ const WaterModify = () => {
     currentReading: ""
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // LOAD DATA
   useEffect(() => {
-    fetch(`http://localhost:3001/waterRecord/${id}`)
+    fetch(`${API_URL}/waterRecord/${id}`)
       .then(res => res.json())
       .then(data => {
 
@@ -38,7 +40,7 @@ const WaterModify = () => {
         console.error(err);
         alert("Unable to load water record.");
       });
-  }, [id]);
+  }, [id,API_URL]);
 
   // FIXED INPUT HANDLER
   const handleChange = (e) => {

@@ -9,6 +9,7 @@ const SearchTenant = () => {
   const [name, setName] = useState("");
   const [tenants, setTenants] = useState([]);
   const [searched, setSearched] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const SearchTenant = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/searchTenantByName/${encodeURIComponent(name)}`
+        `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
       );
 
       const data = await res.json();

@@ -14,11 +14,13 @@ const ModifyBill = () => {
 
     const [formData, setFormData] =
         useState([]);
+    
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
 
         fetch(
-            `http://localhost:3001/bill-month/${month}`
+            `${API_URL}/bill-month/${month}`
         )
             .then(res => res.json())
             .then(data => {
@@ -42,7 +44,7 @@ const ModifyBill = () => {
 
             });
 
-    }, [month]);
+    }, [month,API_URL]);
 
     const handleChange = (
         index,

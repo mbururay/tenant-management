@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "./TenantPayConfirm.css";
+import { authHeaders } from "../../api";
 
 const TenantPayConfirm = () => {
   const { state } = useLocation();
@@ -17,17 +18,17 @@ const TenantPayConfirm = () => {
     );
   }
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
 const submitToBackend = async (printReceipt = false) => {
 
     try {
 
         const res = await fetch(
-            "http://localhost:3001/payment",
+            `${API_URL}/payment`,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: authHeaders(),
                 body: JSON.stringify(state)
             }
         );

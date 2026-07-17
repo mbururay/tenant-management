@@ -12,9 +12,10 @@ const InvoiceView = () => {
   const [invoice, setInvoice] = useState(null);
   const [charges, setCharges] = useState([]);
   const [water, setWater] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`http://localhost:3001/invoice/${id}`)
+    fetch(`${API_URL}/invoice/${id}`)
       .then(res => res.json())
       .then(data => {
         setInvoice(data.invoice);
@@ -22,7 +23,7 @@ const InvoiceView = () => {
         setWater(data.water);
       })
       .catch(console.error);
-  }, [id]);
+  }, [id,API_URL]);
 
   const printInvoice = () => {
     window.print();

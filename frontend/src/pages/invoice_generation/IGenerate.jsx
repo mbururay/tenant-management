@@ -3,27 +3,30 @@ import { useNavigate } from "react-router-dom";
 import "./IGenerate.css";
 import { useEffect, useState } from "react";
 
+
 const IGenerate = () => {
   const [billingMonth, setBillingMonth] = useState("");
   const [tenantCount, setTenantCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
+
 
   useEffect(() => {
-    fetch("http://localhost:3001/invoice-info")
+    fetch(`${API_URL}/invoice-info`)
       .then(res => res.json())
       .then(data => {
         setBillingMonth(data.billingMonth);
         setTenantCount(data.tenantCount);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [API_URL]);
 
   const genClick = async () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/gen-invoice", {
+      const res = await fetch(`${API_URL}/gen-invoice`, {
         method: "POST",
       });
 

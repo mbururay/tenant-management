@@ -113,3 +113,69 @@
     line-height:1.5;
 
 }
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+    .dashboardPage{
+
+        padding:0 15px 30px 15px;
+
+    }
+
+    .dashboardHero{
+
+        margin-bottom:30px;
+
+    }
+
+    .dashboardHero h1{
+
+        font-size:2rem;
+
+        line-height:1.2;
+
+    }
+
+    .dashboardHero p{
+
+        font-size:0.95rem;
+
+    }
+
+    .dashboardGrid{
+
+        gap:15px;
+
+    }
+
+    .dashboardCard{
+
+        padding:20px;
+
+        border-radius:15px;
+
+    }
+
+    .dashboardCard h2{
+
+        font-size:2.2rem;
+
+        margin-bottom:10px;
+
+    }
+
+    .dashboardCard h3{
+
+        font-size:1.1rem;
+
+    }
+
+    .dashboardCard p{
+
+        font-size:0.9rem;
+
+    }
+
+}

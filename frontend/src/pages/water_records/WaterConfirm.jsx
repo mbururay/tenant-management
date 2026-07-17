@@ -1,11 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./WaterConfirm.css";
+import { authHeaders } from "../../api";
 
 const WaterConfirm = () => {
 
     const { state } = useLocation();
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     if (!state) {
         return (
@@ -23,12 +25,10 @@ const WaterConfirm = () => {
     const submitToBackend = async () => {
 
         const res = await fetch(
-            "http://localhost:3001/water-update",
+            `${API_URL}/water-update`,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type":"application/json"
-                },
+                headers: authHeaders(),
                 body: JSON.stringify(state)
             }
         );

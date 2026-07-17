@@ -23,8 +23,10 @@ const MoveOutConfirm = () => {
   const submitToBackend = async () => {
     setLoading(true);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
     try {
-      await fetch("http://localhost:3001/remove-tenant", {
+      await fetch(`${API_URL}/remove-tenant`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(state)

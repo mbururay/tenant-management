@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "../tenant_records/ModifyTenantConfirm.css";
+import { authHeaders } from "../../api";
 
 const ModifyBillConfirm = () => {
 
@@ -35,17 +36,17 @@ const ModifyBillConfirm = () => {
         updated
     } = state;
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const submitChanges = async () => {
 
         try {
 
             const res = await fetch(
-                "http://localhost:3001/modify-bills",
+                `${API_URL}/modify-bills`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         bills: updated
                     })

@@ -6,9 +6,11 @@ const TenantDashboard = () => {
 
     const [payments, setPayments] = useState([]);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
-        fetch("http://localhost:3001/house-pivot")
+        fetch(`${API_URL}/house-pivot`)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -16,7 +18,7 @@ const TenantDashboard = () => {
             })
             .catch(err => console.error(err));
 
-    }, []);
+    }, [API_URL]);
 
     // Get all unique houses
     const houses = [...new Set(payments.map(p => p.houseno))];

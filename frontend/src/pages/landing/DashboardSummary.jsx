@@ -10,10 +10,12 @@ const DashboardSummary = () => {
         outstandingArrears: 0
     });
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
         fetch(
-            "http://localhost:3001/dashboard-summary"
+            `${API_URL}/dashboard-summary`
         )
             .then(res => res.json())
             .then(data => {
@@ -27,7 +29,7 @@ const DashboardSummary = () => {
 
             });
 
-    }, []);
+    }, [API_URL]);
 
     return (
 

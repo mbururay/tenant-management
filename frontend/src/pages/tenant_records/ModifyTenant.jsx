@@ -18,9 +18,11 @@ const ModifyTenant = () => {
     garbage: ""
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Load tenant details
   useEffect(() => {
-    fetch(`http://localhost:3001/tenant/${id}`)
+    fetch(`${API_URL}/tenant/${id}`)
       .then((res) => res.json())
       .then((data) => {
         const tenant = {
@@ -39,7 +41,7 @@ const ModifyTenant = () => {
         console.error(err);
         alert("Unable to load tenant.");
       });
-  }, [id]);
+  }, [id,API_URL]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({

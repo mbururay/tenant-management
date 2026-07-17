@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "./EnterBillConfirm.css";
+import { authHeaders } from "../../api";
 
 const EnterBillConfirm = () => {
 
@@ -31,17 +32,17 @@ const EnterBillConfirm = () => {
         totalAmount
     } = state;
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const submitBills = async () => {
 
         try {
 
             const res = await fetch(
-                "http://localhost:3001/create-bills",
+                `${API_URL}/create-bills`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         billingMonth,
                         bills

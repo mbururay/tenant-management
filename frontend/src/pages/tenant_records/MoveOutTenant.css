@@ -2,12 +2,11 @@
 
     min-height:100vh;
 
-    padding:30px;
+    display:flex;
+    flex-direction:column;
 
     background-image:url("../../TrackerLanding.jpg");
-
     background-size:cover;
-
     background-position:center;
 }
 

@@ -13,6 +13,8 @@ const PaySearch = () => {
 
     const [searched, setSearched] = useState(false);
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
@@ -27,7 +29,7 @@ const PaySearch = () => {
         try {
 
             const res = await fetch(
-                `http://localhost:3001/searchPaymentByName/${encodeURIComponent(name)}`
+                `${API_URL}/searchPaymentByName/${encodeURIComponent(name)}`
             );
 
             const data = await res.json();

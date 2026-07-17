@@ -16,33 +16,59 @@ const ICorrection = () => {
         reason: ""
     });
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     
 
-    useEffect(() => {
+useEffect(() => {
 
-        fetch(`http://localhost:3001/invoice/${invoiceId}`)
-            .then(res => res.json())
-            .then(data => {
+    const fetchInvoice = async () => {
 
-                setInvoice({
+        try {
+            console.log(API_URL);
 
-                    invoiceId: data.invoice.invoiceid,
-                    tenantId: data.invoice.tenantid, // if returned
+            const res = await fetch(
+                `${API_URL}/invoice/${invoiceId}`
+            );
 
-                    tenant: data.invoice.name,
-                    houseNo: data.invoice.houseno,
+            if (!res.ok) {
 
-                    billingDate: data.invoice.billingdate,
-                    totalAmount: data.invoice.totalamount,
+                throw new Error(
+                    "Failed to load invoice"
+                );
 
-                    charges: data.charges,
-                    water: data.water
+            }
 
-                });
+            const data = await res.json();
 
-            })
+            setInvoice({
 
-    }, [invoiceId]);
+                invoiceId: data.invoice.invoiceid,
+                tenantId: data.invoice.tenantid,
+
+                tenant: data.invoice.name,
+                houseNo: data.invoice.houseno,
+
+                billingDate: data.invoice.billingdate,
+                totalAmount: data.invoice.totalamount,
+
+                charges: data.charges,
+                water: data.water
+
+            });
+
+        }
+        catch (err) {
+
+            console.error(err);
+
+        }
+
+    };
+
+    fetchInvoice();
+
+}, [invoiceId,API_URL]);
 
     const handleChange = (e) => {
 

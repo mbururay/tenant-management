@@ -1,9 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "./ModifyTenantConfirm.css";
+import { authHeaders } from "../../api";
 
 const ModifyTenantConfirm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   if (!state) {
     return (
@@ -21,11 +23,9 @@ const ModifyTenantConfirm = () => {
 
   const submitChanges = async () => {
     try {
-      const res = await fetch("http://localhost:3001/edit-tenant", {
+      const res = await fetch(`${API_URL}/edit-tenant`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: authHeaders(),
         body: JSON.stringify(updated)
       });
 

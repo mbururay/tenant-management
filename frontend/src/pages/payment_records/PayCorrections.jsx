@@ -17,9 +17,11 @@ const PayCorrections = () => {
         reason: ""
     });
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
         useEffect(() => {
 
-        fetch(`http://localhost:3001/payment/${paymentId}`)
+        fetch(`${API_URL}/payment/${paymentId}`)
             .then(res => res.json())
             .then(data => {
 
@@ -42,7 +44,7 @@ const PayCorrections = () => {
             })
             .catch(console.error);
 
-    }, [paymentId]);
+    }, [paymentId,API_URL]);
 
 
     const handleChange = (e) => {

@@ -7,13 +7,15 @@ const TenantView = () => {
 
   const [tenants, setTenants] = useState([]);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
 
-    fetch("http://localhost:3001/tenant-dashboard")
+    fetch(`${API_URL}/tenant-dashboard`)
       .then(res => res.json())
       .then(data => setTenants(data));
 
-  }, []);
+  }, [API_URL]);
 
   return (
 

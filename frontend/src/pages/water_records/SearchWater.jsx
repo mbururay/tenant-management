@@ -9,6 +9,7 @@ const SearchWater = () => {
   const [houseNo, setHouseNo] = useState("");
   const [houses, setHouses] = useState([]);
   const [searched, setSearched] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const SearchWater = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/searchWaterByHouse/${encodeURIComponent(houseNo)}`
+        `${API_URL}/searchWaterByHouse/${encodeURIComponent(houseNo)}`
       );
 
       const data = await res.json();

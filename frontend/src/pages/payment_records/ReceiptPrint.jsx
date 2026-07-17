@@ -11,16 +11,18 @@ const ReceiptPrint = () => {
 
     const navigate = useNavigate();
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     useEffect(() => {
 
-        fetch(`http://localhost:3001/receipt/${paymentId}`)
+        fetch(`${API_URL}/receipt/${paymentId}`)
             .then(res => res.json())
             .then(data => {
                 setReceipt(data);
             })
             .catch(console.error);
 
-    }, [paymentId]);
+    }, [paymentId,API_URL]);
 
     const handlePrint = () => {
         window.print();

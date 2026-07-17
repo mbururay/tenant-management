@@ -10,11 +10,14 @@ const InvoiceCorrectionPrint = () => {
     const [correction, setCorrection] = useState(null);
 
     const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    
 
 
     useEffect(() => {
 
-        fetch(`http://localhost:3001/invoice-correction/${id}`)
+        fetch(`${API_URL}/invoice-correction/${id}`)
             .then(res => res.json())
             .then(data => {
                 setCorrection(data);
@@ -23,7 +26,7 @@ const InvoiceCorrectionPrint = () => {
                 console.error(err);
             });
 
-    }, [id]);
+    }, [id,API_URL]);
 
 
     if (!correction) {

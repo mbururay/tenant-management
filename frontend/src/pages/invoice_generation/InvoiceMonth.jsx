@@ -10,6 +10,8 @@ const InvoiceMonth = () => {
 
     const navigate = useNavigate();
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
 
     const [invoices, setInvoices] = useState([]);
 
@@ -18,7 +20,7 @@ const InvoiceMonth = () => {
 
 
         fetch(
-            `http://localhost:3001/invoice-month/${month}`
+            `${API_URL}/invoice-month/${month}`
         )
 
         .then(res => res.json())
@@ -50,7 +52,7 @@ const InvoiceMonth = () => {
         });
 
 
-    }, [month]);
+    }, [month,API_URL]);
 
 
 

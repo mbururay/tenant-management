@@ -1,0 +1,198 @@
+#paymentViewPage{
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+#paymentView{
+
+    width:95%;
+    max-width:1600px;
+
+    margin:40px auto;
+
+}
+
+#paymentView h1{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+    color:white;
+
+    font-size:38px;
+
+    font-weight:700;
+
+    text-shadow:0 2px 8px rgba(0,0,0,.35);
+
+}
+
+.paymentSearchBar{
+
+    display:flex;
+
+    justify-content:center;
+
+    margin-bottom:25px;
+
+}
+
+.paymentSearchBar input{
+
+    width:500px;
+    max-width:100%;
+
+    padding:14px 18px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    outline:none;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+
+}
+
+#paymentViewTable{
+
+    overflow-x:auto;
+
+    background:white;
+
+    border-radius:16px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+    padding:20px;
+
+}
+
+#paymentViewTable table{
+
+    width:100%;
+
+    min-width:1000px;
+
+    border-collapse:collapse;
+
+}
+
+#paymentViewTable th,
+#paymentViewTable td{
+
+    padding:15px 18px;
+
+    text-align:center;
+
+    border:1px solid #d1d5db;
+
+    white-space:nowrap;
+
+}
+
+#paymentViewTable thead th{
+
+    background:#1d4ed8;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:2;
+
+}
+
+#paymentViewTable tbody tr:nth-child(even){
+
+    background:#f8fafc;
+
+}
+
+#paymentViewTable tbody tr:hover{
+
+    background:#dbeafe;
+
+}
+
+#paymentViewTable td{
+
+    color:#000;
+
+    font-size:15px;
+
+}
+
+#paymentViewTable td:nth-child(5){
+
+    font-weight:700;
+
+    color:#15803d;
+
+}
+
+.noResults{
+
+    text-align:center;
+
+    padding:25px;
+
+    font-weight:600;
+
+    color:#6b7280;
+
+}
+
+@media(max-width:1000px){
+
+    #paymentView{
+
+        width:98%;
+
+    }
+
+    #paymentView h1{
+
+        font-size:30px;
+
+    }
+
+    #paymentViewTable{
+
+        padding:12px;
+
+    }
+
+    #paymentViewTable th,
+    #paymentViewTable td{
+
+        padding:12px;
+
+        font-size:14px;
+
+    }
+
+    .paymentSearchBar input{
+
+        width:100%;
+
+    }
+
+}

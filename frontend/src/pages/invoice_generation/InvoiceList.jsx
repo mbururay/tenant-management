@@ -4,79 +4,190 @@ import { useNavigate } from "react-router-dom";
 import "./InvoiceList.css";
 
 const InvoiceList = () => {
-  const [invoices, setInvoices] = useState([]);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch("http://localhost:3001/invoices")
-      .then(res => res.json())
-      .then(data => setInvoices(data))
-      .catch(err => console.error(err));
-  }, []);
+    const [months, setMonths] = useState([]);
 
-  return (
-    <div className="invoiceListPage">
-      <Heading />
+    const navigate = useNavigate();
 
-      <h1 className="invoiceListTitle">
-        All Invoices
-      </h1>
+    const API_URL = import.meta.env.VITE_API_URL;
 
-      <table className="invoiceListTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tenant</th>
-            <th>House</th>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>View</th>
-          </tr>
-        </thead>
+    useEffect(() => {
 
-        <tbody>
-          {invoices.map((inv) => (
-            <tr key={inv.invoiceid}>
-              <td>{inv.invoiceid}</td>
-              <td>{inv.name}</td>
-              <td>{inv.houseno}</td>
-              <td>{new Date(inv.billingdate).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })}</td>
+        fetch(
+            `${API_URL}/invoice-months`
+        )
+            .then(res => res.json())
+            .then(data => {
+                setMonths(data);
+            })
+            .catch(err => console.error(err));
 
-              <td>
-                KES {Number(inv.totalamount || 0).toFixed(2)}
-              </td>
+    }, [API_URL]);
 
-              <td>
-                <span
-                  className={`invoiceStatus ${
-                    inv.paid ? "paid" : "unpaid"
-                  }`}
-                >
-                  {inv.paid ? "PAID" : "UNPAID"}
-                </span>
-              </td>
+    const formatMonth = (monthString) => {
 
-              <td>
-                <button
-                  className="invoiceOpenButton"
-                  onClick={() =>
-                    navigate(`/invoiceView/${inv.invoiceid}`)
-                  }
-                >
-                  Open
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+        const [year, month] =
+            monthString.split("-");
+
+        return new Date(
+            Number(year),
+            Number(month) - 1
+        ).toLocaleDateString(
+            "en-GB",
+            {
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+    };
+
+    return (
+
+        <div className="invoiceListPage">
+
+            <Heading />
+
+            <h1 className="invoiceListTitle">
+
+                Invoice Dashboard
+
+            </h1>
+
+            <div className="invoiceMonthGrid">
+
+                {months.map(month => (
+
+                    <div
+                        key={month.month}
+                        className="invoiceMonthCard"
+                    >
+
+                        <h2>
+
+                            {formatMonth(
+                                month.month
+                            )}
+
+                        </h2>
+
+                        <div className="monthStats">
+
+                            <p>
+
+                                <strong>
+                                    Invoices:
+                                </strong>{" "}
+
+                                {
+                                    month.invoicecount
+                                }
+
+                            </p>
+
+                            <p>
+
+                                <strong>
+                                    Total Billed:
+                                </strong>{" "}
+
+                                KES{" "}
+
+                                {Number(
+                                    month.totalbilled
+                                ).toLocaleString(
+                                    undefined,
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
+
+                            </p>
+
+                        </div>
+
+                        <div className="monthButtons">
+
+                            <button
+                                className="invoiceOpenButton"
+                                onClick={() =>
+                                    navigate(
+                                        `/invoiceMonth/${month.month}`
+                                    )
+                                }
+                            >
+
+                                View Invoices
+
+                            </button>
+
+                            <button
+                                className="downloadPdfBtn"
+                                onClick={async () => {
+
+                                    try {
+
+                                        const token =
+                                            localStorage.getItem(
+                                                "token"
+                                            );
+
+                                        const res =
+                                            await fetch(
+                                                `${API_URL}/invoice-pdf/${month.month}`,
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            `Bearer ${token}`
+                                                    }
+                                                }
+                                            );
+
+                                        const blob =
+                                            await res.blob();
+
+                                        const url =
+                                            window.URL.createObjectURL(
+                                                blob
+                                            );
+
+                                        window.open(
+                                            url,
+                                            "_blank"
+                                        );
+
+                                    }
+                                    catch (err) {
+
+                                        console.error(err);
+
+                                        alert(
+                                            "Unable to generate PDF"
+                                        );
+
+                                    }
+
+                                }}
+                            
+                            >
+
+                                Download PDF
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+        </div>
+
+    );
+
 };
 
 export default InvoiceList;

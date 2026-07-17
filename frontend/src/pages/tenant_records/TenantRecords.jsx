@@ -1,52 +1,76 @@
 import { useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
-import "./TenantConfirm.css";
+import "./TenantRecords.css";
+
 
 const TenantRecords = () => {
-  const navigate = useNavigate();
 
-  return (
-    <div className="modifyTenantPage">
-      <Heading />
+    const navigate = useNavigate();
 
-      <div className="modifyTenantCard">
+    return (
 
-        <h1 className="modifyTenantTitle">
-          Tenant Records
-        </h1>
+        <div className="tenantRecordsPage">
 
-        <h2 className="modifyTenantSubtitle">
-          Select your desired action
-        </h2>
+            <Heading />
 
-        <div className="modifyTenantButtonSet">
 
-          <button
-            className="modifyTenantButton"
-            onClick={() => navigate("/AddTenant")}
-          >
-            Add Tenant
-          </button>
+            <div className="tenantRecordsContent">
 
-          <button
-            className="modifyTenantButton"
-            onClick={() => navigate("/SearchTenant")}
-          >
-            Modify Tenant Records
-          </button>
 
-          <button
-            className="modifyTenantButton"
-            onClick={() => navigate("/MoveOutTenant")}
-          >
-            Remove Tenant
-          </button>
+                <div className="tenantRecordsCard">
+
+
+                    <h1 className="tenantRecordsTitle">
+                        Tenant Records
+                    </h1>
+
+
+                    <p className="tenantRecordsSubtitle">
+                        Select your desired action
+                    </p>
+
+
+                    <div className="tenantRecordsButtonSet">
+
+
+                        <button
+                            className="tenantRecordsButton"
+                            onClick={() => navigate("/AddTenant")}
+                        >
+                            Add Tenant
+                        </button>
+
+
+                        <button
+                            className="tenantRecordsButton"
+                            onClick={() => navigate("/SearchTenant")}
+                        >
+                            Modify Tenant Records
+                        </button>
+
+
+                        <button
+                            className="tenantRecordsButton"
+                            onClick={() => navigate("/MoveOutTenant")}
+                        >
+                            Remove Tenant
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
 
         </div>
 
-      </div>
-    </div>
-  );
+    );
+
 };
+
 
 export default TenantRecords;

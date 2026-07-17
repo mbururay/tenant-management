@@ -1,0 +1,181 @@
+.dashboardPage{
+
+    min-height:100vh;
+
+    background:
+    linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+
+    
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+.dashboardHero{
+
+    text-align:center;
+
+    margin-bottom:50px;
+
+}
+
+.dashboardHero h1{
+
+    color:white;
+
+    font-size:3rem;
+
+    margin-bottom:10px;
+
+}
+
+.dashboardHero p{
+
+    color:#cbd5e1;
+
+    font-size:1.1rem;
+
+}
+
+.dashboardGrid{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(280px,1fr)
+        );
+
+    gap:25px;
+
+}
+
+.dashboardCard{
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:35px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:
+        0 10px 25px
+        rgba(0,0,0,.25);
+
+}
+
+.dashboardCard:hover{
+
+    transform:
+        translateY(-8px);
+
+    box-shadow:
+        0 20px 40px
+        rgba(0,0,0,.35);
+
+}
+
+.dashboardCard h2{
+
+    font-size:3rem;
+
+    margin-bottom:15px;
+
+}
+
+.dashboardCard h3{
+
+    margin-bottom:10px;
+
+    color:#111827;
+
+}
+
+.dashboardCard p{
+
+    color:#64748b;
+
+    line-height:1.5;
+
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+    .dashboardPage{
+
+        padding:0 15px 30px 15px;
+
+    }
+
+    .dashboardHero{
+
+        margin-bottom:30px;
+
+    }
+
+    .dashboardHero h1{
+
+        font-size:2rem;
+
+        line-height:1.2;
+
+    }
+
+    .dashboardHero p{
+
+        font-size:0.95rem;
+
+    }
+
+    .dashboardGrid{
+
+        gap:15px;
+
+    }
+
+    .dashboardCard{
+
+        padding:20px;
+
+        border-radius:15px;
+
+    }
+
+    .dashboardCard h2{
+
+        font-size:2.2rem;
+
+        margin-bottom:10px;
+
+    }
+
+    .dashboardCard h3{
+
+        font-size:1.1rem;
+
+    }
+
+    .dashboardCard p{
+
+        font-size:0.9rem;
+
+    }
+
+}

@@ -1,0 +1,139 @@
+.loginPage{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:30px;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.loginCard{
+
+    width:100%;
+    max-width:450px;
+
+    background:rgba(255,255,255,.95);
+
+    backdrop-filter:blur(12px);
+
+    border-radius:20px;
+
+    padding:40px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.25);
+
+    text-align:center;
+}
+
+.loginTitle{
+
+    margin:0;
+
+    color:#111827;
+
+    font-size:34px;
+
+    font-weight:700;
+}
+
+.loginSubtitle{
+
+    margin-top:10px;
+
+    margin-bottom:30px;
+
+    color:#6b7280;
+
+    font-size:15px;
+}
+
+.loginForm{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+}
+
+.loginInput{
+
+    padding:14px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    outline:none;
+
+    transition:.2s;
+}
+
+.loginInput:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,.15);
+}
+
+.loginButton{
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.loginButton:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+}
+
+.loginLink{
+
+    margin-top:18px;
+
+    color:#2563eb;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    transition:.2s;
+}
+
+.loginLink:hover{
+
+    color:#1d4ed8;
+
+    text-decoration:underline;
+}

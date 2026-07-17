@@ -10,20 +10,21 @@ const InvoiceSearch = () => {
   const [name, setHouseNo] = useState("");
   const [invoices, setInvoices] = useState([]);
   const [searched, setSearched] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Please enter a house number.");
+      alert("Please enter a name.");
       return;
     }
 
     try {
 
       const res = await fetch(
-        `http://localhost:3001/searchInvoiceByName/${encodeURIComponent(name)}`
+        `${API_URL}/searchInvoiceByName/${encodeURIComponent(name)}`
       );
 
       const data = await res.json();

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Heading from "../../components/Heading"
-import "./TenantRecords.css"
+import "./MoveOutTenant.css"
 
 const MoveOutTenant = () => {
     const navigate = useNavigate();

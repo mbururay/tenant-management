@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./MoveOutConfirm.css";
+import { authHeaders } from "../../api";
 
 const MoveOutConfirm = () => {
   const { state } = useLocation();
@@ -23,10 +24,12 @@ const MoveOutConfirm = () => {
   const submitToBackend = async () => {
     setLoading(true);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
     try {
-      await fetch("http://localhost:3001/remove-tenant", {
+      await fetch(`${API_URL}/remove-tenant`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(state)
       });
 

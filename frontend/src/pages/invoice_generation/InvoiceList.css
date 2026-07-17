@@ -1,102 +1,291 @@
 .invoiceListPage{
-    display:flex;
-    flex-direction:column;
 
     min-height:100vh;
 
     padding:30px;
+    padding-top:0;
 
     background-image:url("../../TrackerLanding.jpg");
+
     background-size:cover;
+
     background-position:center;
+
 }
+
+
+
+/* PAGE TITLE */
 
 .invoiceListTitle{
+
+    text-align:center;
+
     color:white;
-    margin:25px 0;
+
+    font-size:42px;
+
+    font-weight:700;
+
+    margin:40px 0;
+
 }
 
-.invoiceListTable{
-    width:100%;
-    border-collapse:collapse;
+
+
+
+/* MONTH CARD GRID */
+
+.invoiceMonthGrid{
+
+    width:95%;
+
+    max-width:1400px;
+
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+}
+
+
+
+/* CARD */
+
+.invoiceMonthCard{
 
     background:white;
 
-    border-radius:10px;
-    overflow:hidden;
+    border-radius:18px;
 
-    box-shadow:0 4px 15px rgba(0,0,0,.25);
+    padding:30px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.18);
+
+    transition:.25s ease;
+
 }
 
-.invoiceListTable thead{
-    background:#f3f4f6;
+
+
+.invoiceMonthCard:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.25);
+
 }
 
-.invoiceListTable th{
-    padding:15px;
 
-    text-align:left;
 
-    color:#222;
+.invoiceMonthCard h2{
 
-    font-weight:bold;
+    text-align:center;
 
-    border-bottom:2px solid #ddd;
+    color:#111827;
+
+    font-size:25px;
+
+    margin-bottom:25px;
+
 }
 
-.invoiceListTable td{
-    padding:14px;
 
-    color:#222;
 
-    border-bottom:1px solid #e5e7eb;
+
+/* STATS */
+
+.monthStats{
+
+    background:#f8fafc;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:30px;
+
 }
 
-.invoiceListTable tbody tr:hover{
-    background:#f9fafb;
+
+
+.monthStats p{
+
+    color:#111827;
+
+    font-size:16px;
+
+    margin:12px 0;
+
 }
 
-.invoiceListTable tbody tr:last-child td{
-    border-bottom:none;
+
+
+.monthStats strong{
+
+    color:#1d4ed8;
+
 }
 
-.invoiceStatus{
-    display:inline-block;
 
-    padding:5px 10px;
 
-    border-radius:6px;
 
-    color:white;
+/* BUTTON AREA */
 
-    font-size:12px;
+.monthButtons{
 
-    font-weight:bold;
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
 }
 
-.invoiceStatus.paid{
-    background:#16a34a;
-}
 
-.invoiceStatus.unpaid{
-    background:#f59e0b;
-}
 
-.invoiceOpenButton{
-    padding:8px 14px;
+/* BOTH BUTTONS */
+
+.invoiceOpenButton,
+.downloadPdfBtn{
+
+    min-width:160px;
+
+    padding:13px 22px;
 
     border:none;
 
-    border-radius:6px;
-
-    background:#2563eb;
+    border-radius:12px;
 
     color:white;
 
+    font-size:15px;
+
+    font-weight:700;
+
     cursor:pointer;
+
+    transition:.2s ease;
 
 }
 
+
+
+/* VIEW BUTTON */
+
+.invoiceOpenButton{
+
+    background:#2563eb;
+
+}
+
+
+
 .invoiceOpenButton:hover{
+
     background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
+
+
+
+/* PDF BUTTON */
+
+.downloadPdfBtn{
+
+    background:#16a34a;
+
+}
+
+
+
+.downloadPdfBtn:hover{
+
+    background:#15803d;
+
+    transform:translateY(-2px);
+
+}
+
+
+
+
+/* EMPTY STATE */
+
+.invoiceMonthGrid:empty::after{
+
+    content:"No invoices generated yet.";
+
+    background:white;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    color:#111827;
+
+    text-align:center;
+
+}
+
+
+
+
+/* RESPONSIVE */
+
+@media(max-width:700px){
+
+
+    .invoiceListPage{
+
+        padding:15px;
+
+    }
+
+
+    .invoiceListTitle{
+
+        font-size:32px;
+
+    }
+
+
+    .invoiceMonthGrid{
+
+        width:100%;
+
+        grid-template-columns:1fr;
+
+    }
+
+
+
+    .monthButtons{
+
+        flex-direction:column;
+
+    }
+
+
+
+    .invoiceOpenButton,
+    .downloadPdfBtn{
+
+        width:100%;
+
+    }
+
 }

@@ -1,0 +1,137 @@
+.invoiceMonthPage{
+
+    min-height:100vh;
+
+    padding:30px;
+    padding-top:0;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+.invoiceMonthContainer{
+
+    width:95%;
+    max-width:1400px;
+
+    margin:40px auto;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+.invoiceMonthContainer h1{
+
+    text-align:center;
+
+    color:#111827;
+
+    margin-bottom:30px;
+
+    font-size:36px;
+
+}
+
+.invoiceMonthTable{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.invoiceMonthTable th{
+
+    background:#1d4ed8;
+
+    color:white;
+
+    padding:15px;
+
+    font-size:16px;
+
+}
+
+.invoiceMonthTable td{
+
+    padding:14px;
+
+    text-align:center;
+
+    border:1px solid #e5e7eb;
+
+    color:#000;
+
+}
+
+.invoiceMonthTable tbody tr:nth-child(even){
+
+    background:#f8fafc;
+
+}
+
+.invoiceMonthTable tbody tr:hover{
+
+    background:#e0f2fe;
+
+}
+
+.invoiceOpenButton{
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:8px 16px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+.invoiceOpenButton:hover{
+
+    background:#1d4ed8;
+
+}
+
+.invoiceTotalRow{
+
+    background:#0f172a !important;
+
+}
+
+.invoiceTotalRow td{
+
+    color:white;
+
+    font-weight:700;
+
+    font-size:16px;
+
+}
+
+@media(max-width:1000px){
+
+    .invoiceMonthContainer{
+
+        width:98%;
+
+        padding:15px;
+
+    }
+
+}

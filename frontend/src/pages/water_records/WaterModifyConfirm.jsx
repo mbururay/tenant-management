@@ -1,10 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./WaterModifyConfirm.css";
+import { authHeaders } from "../../api";
 
 const WaterModifyConfirm = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   if (!state || !state.original || !state.updated) {
     return (
@@ -28,11 +30,9 @@ const WaterModifyConfirm = () => {
 
   const handleConfirm = async () => {
     try {
-      const res = await fetch("http://localhost:3001/edit-water", {
+      const res = await fetch(`${API_URL}/edit-water`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: authHeaders(),
         body: JSON.stringify({
           id: original.id,
           houseId: original.houseId,

@@ -1,9 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { authHeaders } from "../../api";
+
 import "./TenantConfirm.css"
 
 const TenantConfirm = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   if (!state) {
     return (
@@ -17,9 +20,9 @@ const TenantConfirm = () => {
   }
 
   const submitToBackend = async () => {
-    await fetch("http://localhost:3001/add-tenant", {
+    await fetch(`${API_URL}/add-tenant`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(),
       body: JSON.stringify(state)
     });
 

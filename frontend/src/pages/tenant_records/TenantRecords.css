@@ -1,74 +1,157 @@
-.modifyTenantPage{
-    display:flex;
-    flex-direction:column;
-
+.tenantRecordsPage{
     min-height:100vh;
 
-    padding:30px;
+    display:flex;
+    flex-direction:column;
 
     background-image:url("../../TrackerLanding.jpg");
     background-size:cover;
     background-position:center;
 }
 
-.modifyTenantCard{
-    width:450px;
 
-    margin:60px auto;
+.tenantRecordsContent{
 
-    padding:35px;
+    flex:1;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:30px;
+
+}
+
+
+.tenantRecordsCard{
+
+    width:600px;
+    max-width:90%;
 
     background:rgba(15,23,42,.92);
 
-    border-radius:12px;
+    border-radius:16px;
 
-    box-shadow:0 4px 15px rgba(0,0,0,.25);
+    padding:45px 40px;
+
+    text-align:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+
+    backdrop-filter:blur(6px);
+
 }
 
-.modifyTenantTitle{
+
+.tenantRecordsTitle{
+
     color:white;
 
-    text-align:center;
+    font-size:38px;
 
-    margin-bottom:10px;
+    margin-bottom:12px;
+
+    text-shadow:0 2px 8px rgba(0,0,0,.4);
+
 }
 
-.modifyTenantSubtitle{
-    color:#d1d5db;
 
-    text-align:center;
+.tenantRecordsSubtitle{
 
-    font-size:18px;
+    color:#cbd5e1;
 
-    margin-bottom:35px;
+    font-size:20px;
+
+    font-weight:400;
+
+    margin-bottom:40px;
+
 }
 
-.modifyTenantButtonSet{
+
+.tenantRecordsButtonSet{
+
     display:flex;
 
     flex-direction:column;
 
-    gap:18px;
+    gap:22px;
+
 }
 
-.modifyTenantButton{
-    padding:14px;
+
+.tenantRecordsButton{
+
+    width:100%;
+
+    padding:18px;
 
     border:none;
 
-    border-radius:8px;
+    border-radius:10px;
 
     background:#2563eb;
 
     color:white;
 
-    font-size:16px;
+    font-size:20px;
+
+    font-weight:600;
 
     cursor:pointer;
 
-    transition:.2s;
+    transition:all .25s ease;
+
 }
 
-.modifyTenantButton:hover{
+
+.tenantRecordsButton:hover{
+
     background:#1d4ed8;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 8px 18px rgba(37,99,235,.35);
+
+}
+
+
+.tenantRecordsButton:active{
+
+    transform:translateY(0);
+
+}
+
+
+@media(max-width:700px){
+
+    .tenantRecordsCard{
+
+        padding:30px 24px;
+
+    }
+
+
+    .tenantRecordsTitle{
+
+        font-size:30px;
+
+    }
+
+
+    .tenantRecordsSubtitle{
+
+        font-size:18px;
+
+    }
+
+
+    .tenantRecordsButton{
+
+        font-size:18px;
+
+        padding:16px;
+
+    }
+
 }

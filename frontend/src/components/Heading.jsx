@@ -9,9 +9,15 @@ import "./Heading.css"
 const Heading = () => {
   return(
     <div id = 'header'>
+        <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/">
+              Home
+            </Link>
+        </div>
+
         <div id = 'tenantView'>
-            <Link id = 'nav-link' to = "/TenantView">
-              Tenant View
+            <Link id = 'nav-link' to = "/TenantTables">
+              Tenant tables
             </Link>
           </div>
 
@@ -36,10 +42,23 @@ const Heading = () => {
           </div>
 
           <div id = 'payUpdate'>
-            <Link id = 'nav-link' to = "/PayUpdate">
+            <Link id = 'nav-link' to = "/PaymentRecords">
               Payment Records
             </Link>
           </div>
+
+          <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/BillSelect">
+              Landlord Bills
+            </Link>
+          </div>
+
+          <div id = 'landBills'>
+            <Link id = 'nav-link' to = "/Login">
+              Logout
+            </Link>
+          </div>
+
       </div>
   )
 }

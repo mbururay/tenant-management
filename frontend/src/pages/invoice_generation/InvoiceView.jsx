@@ -1,17 +1,21 @@
 import Heading from "../../components/Heading";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import "./InvoiceView.css";
 
 const InvoiceView = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
 
   const [invoice, setInvoice] = useState(null);
   const [charges, setCharges] = useState([]);
   const [water, setWater] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`http://localhost:3001/invoice/${id}`)
+    fetch(`${API_URL}/invoice/${id}`)
       .then(res => res.json())
       .then(data => {
         setInvoice(data.invoice);
@@ -19,7 +23,12 @@ const InvoiceView = () => {
         setWater(data.water);
       })
       .catch(console.error);
-  }, [id]);
+  }, [id,API_URL]);
+
+  const printInvoice = () => {
+    window.print();
+    navigate(-1);
+  };
 
 
 
@@ -44,7 +53,7 @@ const InvoiceView = () => {
   const totalDue = currentCharges + accountBalance;
 
   return (
-    <div className="invoicePage">
+    <div className="invoicePage invoiceViewPage">
       <Heading />
 
       <div className="invoiceCard">
@@ -203,7 +212,15 @@ const InvoiceView = () => {
           last known tenant.
         </small>
 
+
       </div>
+
+
+      <button onClick={printInvoice}>
+          Print Invoice
+      </button>
+
+      
 
     </div>
   );

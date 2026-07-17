@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import "./TenantPayConfirm.css";
+import { authHeaders } from "../../api";
 
 const TenantPayConfirm = () => {
   const { state } = useLocation();
@@ -17,34 +18,53 @@ const TenantPayConfirm = () => {
     );
   }
 
-  const submitToBackend = async () => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+const submitToBackend = async (printReceipt = false) => {
+
     try {
-      const res = await fetch("http://localhost:3001/payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(state)
-      });
 
-      const data = await res.json();
+        const res = await fetch(
+            `${API_URL}/payment`,
+            {
+                method: "POST",
+                headers: authHeaders(),
+                body: JSON.stringify(state)
+            }
+        );
 
-      if (!res.ok) {
-        alert(data.error);
-        return;
-      }
+        const data = await res.json();
 
-      alert("Payment recorded successfully!");
+        if (!res.ok) {
 
-      setTimeout(() => {
-        navigate("/PayUpdate");
-      }, 300);
+            alert(data.error);
+            return;
 
-    } catch (err) {
-      console.error(err);
-      alert("Failed to record payment.");
+        }
+
+        alert("Payment recorded successfully!");
+
+        if (printReceipt) {
+          console.log(data);
+
+            navigate(`/ReceiptPrint/${data.paymentId}`);
+
+        } else {
+
+            navigate("/PayUpdate");
+
+        }
+
     }
-  };
+    catch (err) {
+
+        console.error(err);
+
+        alert("Failed to record payment.");
+
+    }
+
+};
 
   return (
     <div className="confirmPage">
@@ -75,19 +95,26 @@ const TenantPayConfirm = () => {
 
         <div className="buttonRow">
 
-          <button
-            className="editBtn"
-            onClick={() => navigate(-1)}
-          >
-            Edit
-          </button>
+            <button
+                className="editBtn"
+                onClick={() => navigate(-1)}
+            >
+                Edit
+            </button>
 
-          <button
-            className="confirmBtn"
-            onClick={submitToBackend}
-          >
-            Confirm Payment
-          </button>
+            <button
+                className="confirmBtn"
+                onClick={() => submitToBackend(false)}
+            >
+                Confirm Payment
+            </button>
+
+            <button
+                className="confirmBtn"
+                onClick={() => submitToBackend(true)}
+            >
+                Confirm & Print Receipt
+            </button>
 
         </div>
 

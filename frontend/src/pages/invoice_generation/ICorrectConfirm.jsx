@@ -1,11 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./ICorrectConfirm.css";
+import { authHeaders } from "../../api";
 
 const ICorrectConfirm = () => {
 
     const navigate = useNavigate();
     const { state } = useLocation();
+    const API_URL = import.meta.env.VITE_API_URL;
+    
 
     if (!state) {
 
@@ -38,27 +41,41 @@ const ICorrectConfirm = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/createInvoiceCorrection",
+                `${API_URL}/createInvoiceCorrection`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(correction)
+
+                    headers: authHeaders(),
+
+                    body: JSON.stringify({
+                        invoiceId: invoice.invoiceId,
+                        tenantId: invoice.tenantId,
+                        amount: correction.amount,
+                        reason: correction.reason,
+                        correctionType:
+                            correction.correctionType
+                    })
                 }
             );
-
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error);
+                throw new Error(
+                    data.error ||
+                    "Failed to create invoice correction."
+                );
             }
 
-            alert("Invoice correction created successfully.");
+            alert(
+                "Invoice correction created successfully."
+            );
 
-            navigate("/InvoiceRecords");
+            navigate(
+                `/InvoiceCorrectionPrint/${data.correctionId}`
+            );
 
-        } catch (err) {
+        }
+        catch (err) {
 
             console.error(err);
             alert(err.message);
@@ -102,9 +119,11 @@ const ICorrectConfirm = () => {
                         <span>Total</span>
                         <span>
                             KES{" "}
-                            {Number(invoice.totalAmount).toLocaleString(undefined,{
-                                minimumFractionDigits:2,
-                                maximumFractionDigits:2
+                            {Number(
+                                invoice.totalAmount
+                            ).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
                             })}
                         </span>
                     </div>
@@ -117,7 +136,9 @@ const ICorrectConfirm = () => {
 
                     <div className="confirmRow">
                         <span>Type</span>
-                        <span>{correction.correctionType}</span>
+                        <span>
+                            {correction.correctionType}
+                        </span>
                     </div>
 
                     <div className="confirmRow">
@@ -133,9 +154,12 @@ const ICorrectConfirm = () => {
                             }}
                         >
                             {correction.amount > 0 ? "+" : ""}
-                            {Number(correction.amount).toLocaleString(undefined,{
-                                minimumFractionDigits:2,
-                                maximumFractionDigits:2
+
+                            {Number(
+                                correction.amount
+                            ).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
                             })}
                         </span>
 
@@ -145,7 +169,9 @@ const ICorrectConfirm = () => {
 
                         <h4>Reason</h4>
 
-                        <p>{correction.reason}</p>
+                        <p>
+                            {correction.reason}
+                        </p>
 
                     </div>
 
@@ -154,6 +180,7 @@ const ICorrectConfirm = () => {
                 <div className="buttonRow">
 
                     <button
+                        type="button"
                         className="cancelButton"
                         onClick={() => navigate(-1)}
                     >
@@ -161,6 +188,7 @@ const ICorrectConfirm = () => {
                     </button>
 
                     <button
+                        type="button"
                         className="continueButton"
                         onClick={handleConfirm}
                     >

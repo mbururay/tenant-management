@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
+import { authHeaders } from "../../api";
 
 const ResetPassword = () => {
     const navigate = useNavigate();
@@ -43,9 +44,7 @@ const ResetPassword = () => {
                 {
                     method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
 
                     body: JSON.stringify({
                         token,

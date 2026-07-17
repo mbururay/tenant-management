@@ -1,6 +1,7 @@
 import { useState } from "react";
 const API_URL = import.meta.env.VITE_API_URL;
 import "./ForgetPassword.css";
+import { authHeaders } from "../../api";
 
 
 const ForgetPassword = () => {
@@ -28,9 +29,7 @@ const ForgetPassword = () => {
                 {
                     method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
 
                     body: JSON.stringify({
                         username

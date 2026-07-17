@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import { authHeaders } from "../../api";
 
 const Login = () => {
 
@@ -10,6 +11,8 @@ const Login = () => {
 
     const [password, setPassword] = useState("");
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const handleLogin = async (e) => {
 
         e.preventDefault();
@@ -17,12 +20,10 @@ const Login = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/login",
+                `${API_URL}/login`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         username,
                         password

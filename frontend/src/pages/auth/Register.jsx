@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authHeaders } from "../../api";
 
 const Register = () => {
 
@@ -10,6 +11,8 @@ const Register = () => {
     const [password, setPassword] = useState("");
 
     const [confirmPassword, setConfirmPassword] = useState("");
+
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleRegister = async (e) => {
 
@@ -39,12 +42,10 @@ const Register = () => {
         try {
 
             const res = await fetch(
-                "http://localhost:3001/register",
+                `${API_URL}/register`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify({
                         username,
                         password

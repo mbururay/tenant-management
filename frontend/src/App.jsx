@@ -60,7 +60,7 @@ import ReceiptPrint from "./pages/payment_records/ReceiptPrint.jsx";
 import PaymentView from "./pages/payment_records/PaymentView.jsx";
 
 // Bills
-import BillSelect from "./pages/landlord_bills/billSelect.jsx";
+import BillSelect from "./pages/landlord_bills/BillSelect.jsx";
 import EnterBills from "./pages/landlord_bills/EnterBill.jsx";
 import EnterBillConfirm from "./pages/landlord_bills/EnterBillConfirm.jsx";
 import DisplayBills from "./pages/landlord_bills/DisplayBills.jsx";

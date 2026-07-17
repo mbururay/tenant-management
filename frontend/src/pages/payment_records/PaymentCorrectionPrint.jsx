@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./PaymentCorrectionPrint.css";
+import { useNavigate } from "react-router-dom";
 
 const PaymentCorrectionPrint = () => {
 
@@ -9,6 +10,8 @@ const PaymentCorrectionPrint = () => {
     const [correction, setCorrection] = useState(null);
 
     const API_URL = import.meta.env.VITE_API_URL;
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -23,6 +26,7 @@ const PaymentCorrectionPrint = () => {
 
     const printPage = () => {
         window.print();
+        navigate(-3);
     };
 
     if (!correction) {

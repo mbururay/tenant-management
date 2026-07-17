@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "./MoveOutConfirm.css";
+import { authHeaders } from "../../api";
 
 const MoveOutConfirm = () => {
   const { state } = useLocation();
@@ -28,7 +29,7 @@ const MoveOutConfirm = () => {
     try {
       await fetch(`${API_URL}/remove-tenant`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(state)
       });
 

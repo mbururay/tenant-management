@@ -124,11 +124,52 @@ const InvoiceList = () => {
 
                             <button
                                 className="downloadPdfBtn"
-                                onClick={() =>
-                                    window.open(
-                                        `${API_URL}/invoice-pdf/${month.month}`
-                                    )
-                                }
+                                onClick={async () => {
+
+                                    try {
+
+                                        const token =
+                                            localStorage.getItem(
+                                                "token"
+                                            );
+
+                                        const res =
+                                            await fetch(
+                                                `${API_URL}/invoice-pdf/${month.month}`,
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            `Bearer ${token}`
+                                                    }
+                                                }
+                                            );
+
+                                        const blob =
+                                            await res.blob();
+
+                                        const url =
+                                            window.URL.createObjectURL(
+                                                blob
+                                            );
+
+                                        window.open(
+                                            url,
+                                            "_blank"
+                                        );
+
+                                    }
+                                    catch (err) {
+
+                                        console.error(err);
+
+                                        alert(
+                                            "Unable to generate PDF"
+                                        );
+
+                                    }
+
+                                }}
+                            
                             >
 
                                 Download PDF

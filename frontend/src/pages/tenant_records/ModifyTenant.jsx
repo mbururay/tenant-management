@@ -21,27 +21,64 @@ const ModifyTenant = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Load tenant details
-  useEffect(() => {
-    fetch(`${API_URL}/tenant/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const tenant = {
-          tenantId: id,
-          name: data.name,
-          phone: data.phone,
-          houseNo: data.houseno,
-          rent: data.rent,
-          garbage: data.garbage
-        };
+useEffect(() => {
 
-        setOriginalData(tenant);
-        setFormData(tenant);
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Unable to load tenant.");
-      });
-  }, [id,API_URL]);
+    const token =
+        localStorage.getItem("token");
+
+    fetch(
+        `${API_URL}/tenant/${id}`,
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+        .then((res) => {
+
+            if (!res.ok) {
+
+                throw new Error(
+                    "Unauthorized"
+                );
+
+            }
+
+            return res.json();
+
+        })
+        .then((data) => {
+
+            const tenant = {
+
+                tenantId: id,
+
+                name: data.name,
+                phone: data.phone,
+
+                houseNo: data.houseno,
+
+                rent: data.rent,
+                garbage: data.garbage
+
+            };
+
+            setOriginalData(tenant);
+            setFormData(tenant);
+
+        })
+        .catch((err) => {
+
+            console.error(err);
+
+            alert(
+                "Unable to load tenant."
+            );
+
+        });
+
+}, [id, API_URL]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({

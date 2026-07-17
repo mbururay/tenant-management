@@ -9,17 +9,55 @@ const InvoicePrint = () => {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-useEffect(() => {
-  fetch(`${API_URL}/month-invoices/${month}`)
-    .then(res => res.json())
-    .then(data => {
-      console.log("DATA:", data);
-      setInvoices(data);
-    })
-    .catch(err => {
-      console.error("FETCH ERROR:", err);
-    });
-}, [month,API_URL]);
+  useEffect(() => {
+
+      const token =
+          localStorage.getItem(
+              "token"
+          );
+
+      fetch(
+          `${API_URL}/month-invoices/${month}`,
+          {
+              headers: {
+                  Authorization:
+                      `Bearer ${token}`
+              }
+          }
+      )
+          .then(res => {
+
+              if (!res.ok) {
+
+                  throw new Error(
+                      `HTTP ${res.status}`
+                  );
+
+              }
+
+              return res.json();
+
+          })
+          .then(data => {
+
+              console.log(
+                  "DATA:",
+                  data
+              );
+
+              setInvoices(data);
+
+          })
+          .catch(err => {
+
+              console.error(
+                  "FETCH ERROR:",
+                  err
+              );
+
+          });
+
+  }, [month, API_URL]);
 
   if (invoices.length === 0) {
     return (

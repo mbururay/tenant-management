@@ -600,7 +600,8 @@ app.get("/invoice/:id", async (req, res) => {
 });
 
 
-app.get("/invoice-pdf/:month", async (req, res) => {
+app.get("/invoice-pdf/:month", auth,async (req, res) => {
+  const token = req.token;
     try {
         const { month } = req.params;
 
@@ -609,6 +610,18 @@ app.get("/invoice-pdf/:month", async (req, res) => {
         });
 
         const page = await browser.newPage();
+
+        await page.evaluateOnNewDocument(
+            (token) => {
+
+                localStorage.setItem(
+                    "token",
+                    token
+                );
+
+            },
+            token
+        );
 
         // Open the React invoice page
         await page.goto(

@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "../invoice_generation/ICorrectConfirm.css";
+import { authHeaders } from "../../api";
 
 const PayCorrectionsConfirm = () => {
 
@@ -37,19 +38,18 @@ const PayCorrectionsConfirm = () => {
     console.log("correction object:", correction);
     console.log(payment);
     console.log(correction);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleConfirm = async () => {
 
         try {
 
             const res = await fetch(
-                "http://localhost:3001/createPaymentCorrection",
+                `${API_URL}/createPaymentCorrection`,
                 {
                     method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: authHeaders(),
 
                     body: JSON.stringify({
                         paymentId: payment.paymentId,

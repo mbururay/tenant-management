@@ -2,6 +2,7 @@ import Heading from "../../components/Heading";
 import { useNavigate } from "react-router-dom";
 import "./IGenerate.css";
 import { useEffect, useState } from "react";
+import { authHeaders } from "../../api";
 
 
 const IGenerate = () => {
@@ -28,6 +29,7 @@ const IGenerate = () => {
     try {
       const res = await fetch(`${API_URL}/gen-invoice`, {
         method: "POST",
+        headers: authHeaders()
       });
 
       const data = await res.json();

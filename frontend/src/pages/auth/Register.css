@@ -1,0 +1,88 @@
+.authPage{
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+}
+
+.authCard{
+    width:100%;
+    max-width:450px;
+
+    padding:40px;
+
+    border-radius:20px;
+
+    background:rgba(15,23,42,.92);
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+}
+
+.authCard h1{
+    color:white;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.authCard form{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.authCard input{
+    width:100%;
+
+    padding:12px 15px;
+
+    border-radius:8px;
+    border:1px solid #334155;
+
+    background:#1e293b;
+    color:white;
+
+    font-size:15px;
+
+    box-sizing:border-box;
+}
+
+.authCard input::placeholder{
+    color:#94a3b8;
+}
+
+.authCard input:focus{
+    outline:none;
+    border-color:#3b82f6;
+}
+
+.authCard button{
+    margin-top:10px;
+
+    padding:12px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#3b82f6;
+    color:white;
+
+    font-size:15px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.authCard button:hover{
+    background:#2563eb;
+    transform:translateY(-2px);
+}

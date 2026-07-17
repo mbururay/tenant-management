@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 const auth = (req, res, next) => {
 
     const authHeader = req.headers.authorization;
+    const a = 1;
 
     if (!authHeader) {
 
@@ -30,6 +31,7 @@ const auth = (req, res, next) => {
 
         return res.status(401).json({
             error: "Invalid token"
+
         });
 
     }

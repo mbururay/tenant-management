@@ -40,6 +40,7 @@ const TenantView = () => {
                 <th>Name</th>
                 <th>Phone(s)</th>
                 <th>House</th>
+                <th>Opening Balance</th>
                 <th>Balance</th>
 
               </tr>
@@ -61,6 +62,20 @@ const TenantView = () => {
                   </td>
 
                   <td>{t.houseno}</td>
+
+                  
+
+                  <td
+                    style={{
+                      color: Number(t.openingbalance) > 0 ? "#dc2626" : "#16a34a",
+                      fontWeight: "600"
+                    }}
+                  >
+                    {Number(t.openingbalance).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </td>
 
                   <td
                     style={{

@@ -39,13 +39,24 @@ app.get("/test-auth", auth, (req, res) => {
 // main dashboard
 app.get("/tenant-dashboard", async (req, res) => {
     try {
+
         const result = await pool.query(`
-      SELECT * FROM tenant_dashboard;
-    `);
+            SELECT
+                td.*,
+                COALESCE(ob.chargeamount, 0) AS openingbalance
+
+            FROM tenant_dashboard td
+
+            LEFT JOIN chargeList ob
+                ON ob.tenantid = td.tenantid
+               AND ob.chargetype = 'Opening Balance';
+        `);
 
         res.json(result.rows);
+
     } catch (err) {
         console.error(err);
+
         res.status(500).json({
             error: err.message
         });

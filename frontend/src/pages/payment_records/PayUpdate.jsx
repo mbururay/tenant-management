@@ -65,8 +65,16 @@ const PayUpdate = () => {
       </form>
 
       {searched && tenants.length === 0 && (
-        <h3 style={{ textAlign: "center" }}>
-          No tenant found.
+        <h3
+          style={{
+            textAlign: "center",
+            color: "blue",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+          onClick={() => navigate("/TenantRecords")}
+        >
+          No tenant found. Click here to add tenant number.
         </h3>
       )}
 

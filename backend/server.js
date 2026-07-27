@@ -2361,6 +2361,117 @@ app.get("/dashboard-summary", async (req, res) => {
 
 });
 
+app.get("/tenant-statement/:id", auth, async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const tenantResult = await pool.query(
+            `
+            SELECT
+                t.name,
+                t.phone,
+                h.houseNo
+            FROM tenantList t
+            JOIN houseList h
+            ON t.houseId = h.houseId
+            WHERE t.id = $1
+            `,
+            [id]
+        );
+
+
+        const transactionResult = await pool.query(
+            `
+            SELECT
+                'CHARGE' AS type,
+                c.chargeDate AS date,
+                c.chargeType AS description,
+                c.chargeAmount AS amount
+            FROM chargeList c
+            WHERE c.tenantId = $1
+
+            UNION ALL
+
+            SELECT
+                'PAYMENT' AS type,
+                p.paymentDate AS date,
+                p.paymentMethod || ' - ' || p.confirmationCode AS description,
+                p.payAmount AS amount
+            FROM paymentList p
+            WHERE p.tenantId = $1
+
+            ORDER BY date ASC;
+            `,
+            [id]
+        );
+
+
+        let balance = 0;
+        let charges = 0;
+        let payments = 0;
+
+
+        const transactions = transactionResult.rows.map(row => {
+
+
+            if(row.type === "CHARGE") {
+
+                balance += Number(row.amount);
+                charges += Number(row.amount);
+
+            } else {
+
+                balance -= Number(row.amount);
+                payments += Number(row.amount);
+
+            }
+
+
+            return {
+                ...row,
+                balance
+            };
+
+
+        });
+
+
+
+        res.json({
+
+            tenant: tenantResult.rows[0],
+
+            summary: {
+
+                openingBalance: 0,
+
+                charges,
+
+                payments,
+
+                balance
+
+            },
+
+
+            transactions
+
+        });
+
+
+    } catch(err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
 
 
 

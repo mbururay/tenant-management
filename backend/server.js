@@ -776,47 +776,56 @@ app.get("/searchTenant/:phone", async (req, res) => {
   }
 });
 
-app.post("/payment",auth, async (req, res) => {
+app.post("/payment", auth, async (req, res) => {
+
   const {
     tenantId,
     payAmount,
     paymentMethod,
-    confirmationCode
+    confirmationCode,
+    paymentDate
   } = req.body;
 
   try {
-    const result = await pool.query(
-  `
-  INSERT INTO paymentList (
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  )
-  VALUES ($1, $2, $3, $4)
-  RETURNING payId
-  `,
-  [
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  ]
-);
 
-res.json({
-  success: true,
-  message: "Payment recorded successfully.",
-  paymentId: result.rows[0].payid
-});
+    const result = await pool.query(
+      `
+      INSERT INTO paymentList (
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING payId
+      `,
+      [
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Payment recorded successfully.",
+      paymentId: result.rows[0].payid
+    });
 
   } catch (err) {
+
     console.error(err);
+
     res.status(500).json({
       success: false,
       error: err.message
     });
+
   }
+
 });
 
 app.get("/searchTenantByName/:name", async (req, res) => {

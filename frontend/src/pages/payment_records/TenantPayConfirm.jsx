@@ -3,6 +3,7 @@ import "./TenantPayConfirm.css";
 import { authHeaders } from "../../api";
 
 const TenantPayConfirm = () => {
+
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -20,53 +21,53 @@ const TenantPayConfirm = () => {
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-const submitToBackend = async (printReceipt = false) => {
+  const submitToBackend = async (printReceipt = false) => {
 
+    
     try {
 
-        const res = await fetch(
-            `${API_URL}/payment`,
-            {
-                method: "POST",
-                headers: authHeaders(),
-                body: JSON.stringify(state)
-            }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-
-            alert(data.error);
-            return;
-
+      const res = await fetch(
+        `${API_URL}/payment`,
+        {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify(state)
         }
+      );
 
-        alert("Payment recorded successfully!");
+      const data = await res.json();
 
-        if (printReceipt) {
-          console.log(data);
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
 
-            navigate(`/ReceiptPrint/${data.paymentId}`);
+      alert("Payment recorded successfully!");
 
-        } else {
+      if (printReceipt) {
 
-            navigate("/PayUpdate");
+        console.log(data);
 
-        }
+        navigate(`/ReceiptPrint/${data.paymentId}`);
 
-    }
-    catch (err) {
+      } else {
 
-        console.error(err);
+        navigate("/PayUpdate");
 
-        alert("Failed to record payment.");
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert("Failed to record payment.");
 
     }
 
-};
+  };
 
   return (
+
     <div className="confirmPage">
 
       <div className="confirmCard">
@@ -93,35 +94,42 @@ const submitToBackend = async (printReceipt = false) => {
           <span>{state.confirmationCode}</span>
         </div>
 
+        <div className="confirmRow">
+          <span>Payment Date</span>
+          <span>{state.paymentDate}</span>
+        </div>
+
         <div className="buttonRow">
 
-            <button
-                className="editBtn"
-                onClick={() => navigate(-1)}
-            >
-                Edit
-            </button>
+          <button
+            className="editBtn"
+            onClick={() => navigate(-1)}
+          >
+            Edit
+          </button>
 
-            <button
-                className="confirmBtn"
-                onClick={() => submitToBackend(false)}
-            >
-                Confirm Payment
-            </button>
+          <button
+            className="confirmBtn"
+            onClick={() => submitToBackend(false)}
+          >
+            Confirm Payment
+          </button>
 
-            <button
-                className="confirmBtn"
-                onClick={() => submitToBackend(true)}
-            >
-                Confirm & Print Receipt
-            </button>
+          <button
+            className="confirmBtn"
+            onClick={() => submitToBackend(true)}
+          >
+            Confirm & Print Receipt
+          </button>
 
         </div>
 
       </div>
 
     </div>
+
   );
+
 };
 
 export default TenantPayConfirm;

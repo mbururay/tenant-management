@@ -12,19 +12,17 @@ sql = ""
 
 for _, row in df.iterrows():
 
-    # Read values
     name = str(row["Name"]).replace("'", "''")
     house = str(row["House No"]).replace("'", "''")
 
     rent = float(row["Rent"])
     garbage = float(row["Garbage"])
-    balance = float(row["Opening Balance"])
+    opening_balance = float(row["Opening Balance"])
 
     previous = int(row["Previous Water Reading"])
     current = int(row["Current Water Reading"])
     usage = current - previous
 
-    # Split phone numbers
     phones = [
         p.strip()
         for p in str(row["Phone Numbers"]).split("/")
@@ -33,17 +31,17 @@ for _, row in df.iterrows():
 
     primary_phone = phones[0].replace("'", "''")
 
-    # Generate phone CTEs
     phone_ctes = ""
 
     for i, phone in enumerate(phones[1:], start=1):
+
         phone = phone.replace("'", "''")
 
         phone_ctes += f""",
 
 phone_{i} AS (
     INSERT INTO phoneList (
-        tenantid,
+        tenantId,
         phone
     )
     SELECT
@@ -53,23 +51,29 @@ phone_{i} AS (
 )
 """
 
-    # Opening balance CTE
-    opening_balance = ""
+    opening_balance_cte = ""
 
-    if balance != 0:
-        opening_balance = f""",
+    if opening_balance != 0:
 
-opening_balance AS (
+        opening_balance_cte = f""",
+
+opening_balance_charge AS (
+
     INSERT INTO chargeList (
-        tenantid,
-        chargetype,
-        chargeamount
+        tenantId,
+        chargeType,
+        chargeAmount,
+        chargeDate
     )
+
     SELECT
         id,
         'Opening Balance',
-        {balance}
+        {opening_balance},
+        CURRENT_DATE
+
     FROM new_tenant
+
 )
 """
 
@@ -79,54 +83,67 @@ BEGIN;
 WITH
 
 new_house AS (
+
     INSERT INTO houseList (
-        houseno,
+        houseNo,
         rent,
         garbage
     )
+
     VALUES (
         '{house}',
         {rent},
         {garbage}
     )
-    RETURNING houseid
+
+    RETURNING houseId
+
 ),
 
 new_tenant AS (
+
     INSERT INTO tenantList (
         name,
         phone,
-        houseid
+        houseId
     )
+
     SELECT
         '{name}',
         '{primary_phone}',
-        houseid
+        houseId
+
     FROM new_house
-    RETURNING id, houseid
+
+    RETURNING id, houseId
+
 )
 {phone_ctes}
-{opening_balance},
+{opening_balance_cte},
 
 initial_water AS (
+
     INSERT INTO waterReadings (
-        houseid,
-        readingmonth,
-        previousreading,
-        currentreading,
+        houseId,
+        readingMonth,
+        previousReading,
+        currentReading,
         usage,
         rate,
         bill
     )
+
     SELECT
-        houseid,
+        houseId,
         CURRENT_DATE,
         {previous},
         {current},
         {usage},
         0,
         0
+
     FROM new_tenant
+
 )
 
 SELECT 1;

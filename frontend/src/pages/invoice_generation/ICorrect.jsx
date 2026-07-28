@@ -18,57 +18,71 @@ const ICorrection = () => {
 
     const API_URL = import.meta.env.VITE_API_URL;
 
-    
 
-useEffect(() => {
+    useEffect(() => {
 
-    const fetchInvoice = async () => {
+        const fetchInvoice = async () => {
 
-        try {
-            console.log(API_URL);
+            try {
 
-            const res = await fetch(
-                `${API_URL}/invoice/${invoiceId}`
-            );
-
-            if (!res.ok) {
-
-                throw new Error(
-                    "Failed to load invoice"
+                const res = await fetch(
+                    `${API_URL}/invoice/${invoiceId}`
                 );
+
+
+                if (!res.ok) {
+
+                    throw new Error(
+                        "Failed to load invoice"
+                    );
+
+                }
+
+
+                const data = await res.json();
+
+
+                setInvoice({
+
+                    invoiceId: data.invoice.invoiceid,
+
+                    tenantId: data.invoice.tenantid,
+
+                    tenant: data.invoice.name,
+
+                    houseNo: data.invoice.houseno,
+
+                    billingDate: data.invoice.billingdate,
+
+                    totalAmount: data.invoice.totalamount,
+
+                    accountBalance:
+                        Number(data.invoice.accountbalance || 0),
+
+                    charges:
+                        data.charges || [],
+
+                    water:
+                        data.water || null
+
+                });
+
+
+            } catch(err) {
+
+                console.error(err);
 
             }
 
-            const data = await res.json();
+        };
 
-            setInvoice({
 
-                invoiceId: data.invoice.invoiceid,
-                tenantId: data.invoice.tenantid,
+        fetchInvoice();
 
-                tenant: data.invoice.name,
-                houseNo: data.invoice.houseno,
 
-                billingDate: data.invoice.billingdate,
-                totalAmount: data.invoice.totalamount,
+    }, [invoiceId, API_URL]);
 
-                charges: data.charges,
-                water: data.water
 
-            });
-
-        }
-        catch (err) {
-
-            console.error(err);
-
-        }
-
-    };
-
-    fetchInvoice();
-
-}, [invoiceId,API_URL]);
 
     const handleChange = (e) => {
 
@@ -79,18 +93,28 @@ useEffect(() => {
 
     };
 
+
+
     const handleSubmit = (e) => {
 
         e.preventDefault();
 
-        if (
+
+        if(
             !formData.correctionType ||
             !formData.amount ||
             !formData.reason.trim()
-        ) {
-            alert("Please complete all fields.");
+        ){
+
+            alert(
+                "Please complete all fields."
+            );
+
             return;
+
         }
+
+
 
         navigate("/ICorrectConfirm", {
 
@@ -101,10 +125,17 @@ useEffect(() => {
                 correction: {
 
                     invoiceId: invoice.invoiceId,
+
                     tenantId: invoice.tenantId,
-                    amount: Number(formData.amount),
-                    reason: formData.reason,
-                    correctionType: formData.correctionType
+
+                    amount:
+                        Number(formData.amount),
+
+                    reason:
+                        formData.reason,
+
+                    correctionType:
+                        formData.correctionType
 
                 }
 
@@ -114,7 +145,24 @@ useEffect(() => {
 
     };
 
-    if (!invoice) {
+
+
+    const money = (amount) => {
+
+        return Number(amount || 0)
+            .toLocaleString(
+                "en-GB",
+                {
+                    minimumFractionDigits:2,
+                    maximumFractionDigits:2
+                }
+            );
+
+    };
+
+
+
+    if(!invoice){
 
         return (
 
@@ -124,9 +172,9 @@ useEffect(() => {
 
                 <h2
                     style={{
-                        color: "white",
-                        textAlign: "center",
-                        marginTop: "100px"
+                        color:"white",
+                        textAlign:"center",
+                        marginTop:"100px"
                     }}
                 >
                     Loading Invoice...
@@ -138,145 +186,305 @@ useEffect(() => {
 
     }
 
+
+
+    const currentCharges =
+        invoice.charges.reduce(
+            (sum,c)=>
+                sum + Number(c.chargeamount),
+            0
+        )
+        +
+        (
+            invoice.water
+            ? Number(invoice.water.bill)
+            : 0
+        );
+
+
+
+    const totalAfterBalance =
+        currentCharges +
+        invoice.accountBalance;
+
+
+
     return (
 
         <div className="editTenantPage">
 
             <Heading />
 
+
+
             <h1 className="editTenantTitle">
                 Create Invoice Correction
             </h1>
+
+
+
 
             {/* ORIGINAL INVOICE */}
 
             <form className="editTenantForm">
 
-    <section className="editSection">
 
-        <h3>Original Invoice</h3>
+                <section className="editSection">
 
-        <label>Invoice Number</label>
 
-        <input
-            className="editInput houseDisplay"
-            value={invoice.invoiceId}
-            readOnly
-        />
+                    <h3>
+                        Original Invoice
+                    </h3>
 
-        <label>Tenant</label>
 
-        <input
-            className="editInput houseDisplay"
-            value={invoice.tenant}
-            readOnly
-        />
 
-        <label>House</label>
+                    <label>
+                        Invoice Number
+                    </label>
 
-        <input
-            className="editInput houseDisplay"
-            value={invoice.houseNo}
-            readOnly
-        />
+                    <input
+                        className="editInput houseDisplay"
+                        value={invoice.invoiceId}
+                        readOnly
+                    />
 
-        <label>Billing Date</label>
 
-        <input
-            className="editInput houseDisplay"
-            value={new Date(invoice.billingDate).toLocaleDateString()}
-            readOnly
-        />
 
-        <h3 style={{ marginTop: "30px" }}>
-            Invoice Breakdown
-        </h3>
+                    <label>
+                        Tenant
+                    </label>
 
-        <div className="invoiceBreakdown">
+                    <input
+                        className="editInput houseDisplay"
+                        value={invoice.tenant}
+                        readOnly
+                    />
 
-            {invoice.charges.map((charge) => (
 
-                <div
-                    className="invoiceLine"
-                    key={charge.chargeid}
-                >
 
-                    <span>{charge.chargetype}</span>
+                    <label>
+                        House
+                    </label>
 
-                    <span>
-                        KES{" "}
-                        {Number(charge.chargeamount).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}
-                    </span>
+                    <input
+                        className="editInput houseDisplay"
+                        value={invoice.houseNo}
+                        readOnly
+                    />
 
-                </div>
 
-            ))}
 
-            <div className="invoiceLine">
+                    <label>
+                        Billing Date
+                    </label>
 
-                <span>Water</span>
+                    <input
+                        className="editInput houseDisplay"
+                        value={
+                            new Date(
+                                invoice.billingDate
+                            )
+                            .toLocaleDateString()
+                        }
+                        readOnly
+                    />
 
-                <span>
 
-                    KES{" "}
 
-                    {invoice.water
-                        ? Number(invoice.water.bill).toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                          })
-                        : "0.00"}
 
-                </span>
+                    <h3 style={{marginTop:"30px"}}>
+                        Invoice Breakdown
+                    </h3>
 
-            </div>
 
-            <hr />
 
-            <div
-                className="invoiceLine"
-                style={{
-                    fontWeight: "bold",
-                    fontSize: "18px"
-                }}
-            >
 
-                <span>Total</span>
+                    <div className="invoiceBreakdown">
 
-                <span>
 
-                    KES{" "}
+                    {
+                        invoice.charges.map((charge)=>(
 
-                    {Number(invoice.totalAmount).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })}
 
-                </span>
+                            <div
+                                className="invoiceLine"
+                                key={charge.chargeid}
+                            >
 
-            </div>
+                                <span>
+                                    {charge.chargetype}
+                                </span>
 
-        </div>
 
-    </section>
+                                <span>
+                                    KES {money(
+                                        charge.chargeamount
+                                    )}
+                                </span>
 
-</form>
+
+                            </div>
+
+
+                        ))
+                    }
+
+
+
+
+                    <div className="invoiceLine">
+
+                        <span>
+                            Water
+                        </span>
+
+
+                        <span>
+                            KES {
+
+                                invoice.water
+
+                                ?
+
+                                money(invoice.water.bill)
+
+                                :
+
+                                "0.00"
+
+                            }
+                        </span>
+
+                    </div>
+
+
+
+
+
+                    <hr />
+
+
+
+
+                    <div className="invoiceLine">
+
+
+                        <span>
+                            {
+                                invoice.accountBalance >= 0
+                                ?
+                                "Balance Brought Forward"
+                                :
+                                "Account Credit"
+                            }
+                        </span>
+
+
+
+                        <span
+                            style={{
+                                color:
+                                invoice.accountBalance < 0
+                                ?
+                                "#16a34a"
+                                :
+                                "#dc2626"
+                            }}
+                        >
+
+                            KES {
+
+                                invoice.accountBalance < 0
+
+                                ?
+
+                                `-${money(
+                                    Math.abs(
+                                        invoice.accountBalance
+                                    )
+                                )}`
+
+                                :
+
+                                money(
+                                    invoice.accountBalance
+                                )
+
+                            }
+
+                        </span>
+
+
+                    </div>
+
+
+
+
+
+                    <div
+                        className="invoiceLine"
+                        style={{
+                            fontWeight:"bold",
+                            fontSize:"18px"
+                        }}
+                    >
+
+                        <span>
+                            Total Due
+                        </span>
+
+
+                        <span>
+
+                            KES {
+                                money(
+                                    totalAfterBalance
+                                )
+                            }
+
+                        </span>
+
+
+                    </div>
+
+
+
+
+                    </div>
+
+
+
+                </section>
+
+
+            </form>
+
+
+
+
 
             {/* CORRECTION FORM */}
+
 
             <form
                 className="editTenantForm"
                 onSubmit={handleSubmit}
             >
 
+
                 <section className="editSection">
 
-                    <h3>Create Correction</h3>
 
-                    <label>Correction Type</label>
+                    <h3>
+                        Create Correction
+                    </h3>
+
+
+
+                    <label>
+                        Correction Type
+                    </label>
+
 
                     <select
                         className="editInput"
@@ -285,27 +493,51 @@ useEffect(() => {
                         onChange={handleChange}
                     >
 
-                        <option value="">Select...</option>
+                        <option value="">
+                            Select...
+                        </option>
+
 
                         <option value="Rent">
                             Rent
                         </option>
 
+
                         <option value="Garbage">
                             Garbage
                         </option>
+
 
                         <option value="Water">
                             Water
                         </option>
 
+
+                        <option value="Opening Balance">
+                            Opening Balance
+                        </option>
+
+
+                        <option value="Account Credit">
+                            Account Credit
+                        </option>
+
+
                         <option value="Other">
                             Other
                         </option>
 
+
                     </select>
 
-                    <label>Correction Amount (KES)</label>
+
+
+
+
+                    <label>
+                        Correction Amount (KES)
+                    </label>
+
 
                     <input
                         className="editInput"
@@ -313,47 +545,90 @@ useEffect(() => {
                         name="amount"
                         value={formData.amount}
                         onChange={handleChange}
-                        placeholder="Use negative for credit"
+                        placeholder="Use negative values for credits"
                     />
 
-                    <label>Reason</label>
+
+
+
+
+                    <label>
+                        Reason
+                    </label>
+
 
                     <textarea
+
                         className="editInput"
+
                         name="reason"
+
                         rows="5"
+
                         value={formData.reason}
+
                         onChange={handleChange}
+
                         placeholder="Explain why this correction is required..."
+
                     />
+
+
 
                 </section>
 
+
+
+
+
                 <div className="buttonRow">
 
-                    <button
-                        type="button"
-                        className="cancelButton"
-                        onClick={() => navigate(-1)}
-                    >
-                        Cancel
-                    </button>
 
                     <button
-                        type="submit"
-                        className="continueButton"
+
+                        type="button"
+
+                        className="cancelButton"
+
+                        onClick={() => navigate(-1)}
+
                     >
-                        Review Correction
+
+                        Cancel
+
                     </button>
+
+
+
+
+                    <button
+
+                        type="submit"
+
+                        className="continueButton"
+
+                    >
+
+                        Review Correction
+
+                    </button>
+
+
 
                 </div>
 
+
+
             </form>
 
+
+
         </div>
+
 
     );
 
 };
+
 
 export default ICorrection;

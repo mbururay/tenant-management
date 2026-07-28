@@ -26,6 +26,7 @@ import ModifyTenantConfirm from "./pages/tenant_records/ModifyTenantConfirm.jsx"
 import MoveOutTenant from "./pages/tenant_records/MoveOutTenant.jsx";
 import MoveOutConfirm from "./pages/tenant_records/MoveOutConfirm.jsx";
 import SearchTenant from "./pages/tenant_records/SearchTenant.jsx";
+import TenantStatement from "./pages/tenant_view/TenantStatement.jsx";
 
 // Water
 import WaterUpdate from "./pages/water_records/WaterUpdate.jsx";
@@ -105,6 +106,8 @@ function App() {
             <Route path="/MoveOutTenant" element={<Protected element={<MoveOutTenant />} />} />
             <Route path="/MoveOutConfirm" element={<Protected element={<MoveOutConfirm />} />} />
             <Route path="/SearchTenant" element={<Protected element={<SearchTenant />} />} />
+            <Route path="/tenant-statement/:id" element={<TenantStatement />}/>
+            
 
             {/* Water */}
 

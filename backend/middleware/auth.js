@@ -22,16 +22,19 @@ const auth = (req, res, next) => {
             process.env.JWT_SECRET
         );
 
+        console.log("TOKEN VALID:", decoded);
+
         req.user = decoded;
 
         next();
 
     }
-    catch {
+    catch (err) {
+
+        console.error("JWT ERROR:", err.message);
 
         return res.status(401).json({
-            error: "Invalid token"
-
+            error: err.message
         });
 
     }

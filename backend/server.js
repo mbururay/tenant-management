@@ -255,183 +255,459 @@ app.get("/invoice-info", async (req, res) => {
   }
 });
 
-app.post("/gen-invoice", auth,async (req, res) => {
+app.post("/gen-invoice", auth, async (req, res) => {
+
   try {
 
-    // Bill month
+    // Next billing month
     const billingDate = new Date();
     billingDate.setMonth(billingDate.getMonth() + 1);
     billingDate.setDate(1);
 
-    // Get all active tenants
-    const tenants = await pool.query(`
-      SELECT
+
+
+    const tenants = await pool.query(
+    `
+    SELECT
         t.id,
         t.houseId,
         h.rent,
         h.garbage
-      FROM tenantList t
-      JOIN houseList h
-      ON t.houseId = h.houseId
-      WHERE t.moveOut IS NULL
-    `);
+
+    FROM tenantList t
+
+    JOIN houseList h
+    ON t.houseId = h.houseId
+
+    WHERE t.moveOut IS NULL
+    `
+    );
+
 
     let created = 0;
 
-    for (const t of tenants.rows) {
+
+
+    for(const t of tenants.rows){
+
 
       const tenantId = t.id;
       const houseId = t.houseid;
 
 
-      const rentExists = await pool.query(`
-        SELECT 1
-        FROM chargeList
-        WHERE tenantId = $1
-        AND chargeType = 'Rent'
-        AND billingDate = $2
-      `,[tenantId,billingDate]);
+
+      /*
+        ADD MONTHLY CHARGES
+      */
+
+
+      const rentExists = await pool.query(
+      `
+      SELECT 1
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND chargeType = 'Rent'
+      AND billingDate = $2
+      `,
+      [
+        tenantId,
+        billingDate
+      ]);
+
+
 
       if(rentExists.rows.length === 0){
 
-        await pool.query(`
-          INSERT INTO chargeList(
+        await pool.query(
+        `
+        INSERT INTO chargeList(
             tenantId,
             chargeType,
             chargeAmount,
             billingDate
-          )
-          VALUES($1,'Rent',$2,$3)
-        `,[tenantId,t.rent,billingDate]);
+        )
+
+        VALUES(
+            $1,
+            'Rent',
+            $2,
+            $3
+        )
+        `,
+        [
+          tenantId,
+          t.rent,
+          billingDate
+        ]);
 
       }
 
 
-      const garbageExists = await pool.query(`
-        SELECT 1
-        FROM chargeList
-        WHERE tenantId = $1
-        AND chargeType = 'Garbage'
-        AND billingDate = $2
-      `,[tenantId,billingDate]);
+
+
+      const garbageExists = await pool.query(
+      `
+      SELECT 1
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND chargeType = 'Garbage'
+      AND billingDate = $2
+      `,
+      [
+        tenantId,
+        billingDate
+      ]);
+
+
 
       if(garbageExists.rows.length === 0){
 
-        await pool.query(`
-          INSERT INTO chargeList(
+
+        await pool.query(
+        `
+        INSERT INTO chargeList(
             tenantId,
             chargeType,
             chargeAmount,
             billingDate
-          )
-          VALUES($1,'Garbage',$2,$3)
-        `,[tenantId,t.garbage,billingDate]);
+        )
+
+        VALUES(
+            $1,
+            'Garbage',
+            $2,
+            $3
+        )
+        `,
+        [
+          tenantId,
+          t.garbage,
+          billingDate
+        ]);
 
       }
 
 
-      const charges = await pool.query(`
-        SELECT
+
+
+      /*
+        GET UNINVOICED CHARGES
+      */
+
+
+      const charges = await pool.query(
+      `
+      SELECT
           chargeId,
           chargeAmount
-        FROM chargeList
-        WHERE tenantId = $1
-        AND invoiceId IS NULL
-      `,[tenantId]);
+
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND invoiceId IS NULL
+      `,
+      [
+        tenantId
+      ]);
 
 
-      const water = await pool.query(`
-        SELECT
+
+
+
+      /*
+        GET WATER
+      */
+
+
+      const water = await pool.query(
+      `
+      SELECT
           id,
           bill
-        FROM waterReadings
-        WHERE houseId = $1
-        AND invoiceId IS NULL
-        ORDER BY readingMonth DESC
-        LIMIT 1
-      `,[houseId]);
 
-      if(charges.rows.length === 0 && water.rows.length === 0){
+      FROM waterReadings
+
+      WHERE houseId = $1
+      AND invoiceId IS NULL
+
+      ORDER BY readingMonth DESC
+
+      LIMIT 1
+      `,
+      [
+        houseId
+      ]);
+
+
+
+
+
+
+      if(
+        charges.rows.length === 0 &&
+        water.rows.length === 0
+      ){
+
         continue;
+
       }
 
-      const invoice = await pool.query(`
-        INSERT INTO invoiceList(
+
+
+
+
+      /*
+        CALCULATE PREVIOUS BALANCE
+
+        Previous invoices
+        -
+        Payments
+      */
+
+
+      const previousBalanceResult = await pool.query(
+      `
+      SELECT
+
+      COALESCE(
+          (
+            SELECT SUM(totalAmount)
+
+            FROM invoiceList
+
+            WHERE tenantId = $1
+          ),
+          0
+      )
+
+      -
+
+      COALESCE(
+          (
+            SELECT SUM(payAmount)
+
+            FROM paymentList
+
+            WHERE tenantId = $1
+          ),
+          0
+      )
+
+      AS balance
+
+      `,
+      [
+        tenantId
+      ]);
+
+
+
+      const previousBalance =
+        Number(previousBalanceResult.rows[0].balance);
+
+
+
+
+
+
+      /*
+        CREATE INVOICE
+      */
+
+
+      const invoice = await pool.query(
+      `
+      INSERT INTO invoiceList(
           tenantId,
           generatedDate,
-          billingDate
-        )
-        VALUES(
+          billingDate,
+          previousBalance
+      )
+
+      VALUES(
           $1,
           CURRENT_DATE,
-          $2
-        )
-        RETURNING invoiceId
-      `,[tenantId,billingDate]);
+          $2,
+          $3
+      )
 
-      const invoiceId = invoice.rows[0].invoiceid;
+      RETURNING invoiceId
+      `,
+      [
+        tenantId,
+        billingDate,
+        previousBalance
+      ]);
 
 
 
-      const chargeTotal = await pool.query(`
-        SELECT
-          COALESCE(SUM(chargeAmount),0) AS total
-        FROM chargeList
-        WHERE tenantId = $1
-        AND invoiceId IS NULL
-      `,[tenantId]);
+      const invoiceId =
+        invoice.rows[0].invoiceid;
+
+
+
+
+
+
+
+      /*
+        CALCULATE CURRENT CHARGES
+      */
+
+
+      const chargeTotal = await pool.query(
+      `
+      SELECT
+
+      COALESCE(
+        SUM(chargeAmount),
+        0
+      ) AS total
+
+      FROM chargeList
+
+      WHERE tenantId = $1
+
+      AND invoiceId IS NULL
+
+      `,
+      [
+        tenantId
+      ]);
+
+
 
       const totalCharges =
         Number(chargeTotal.rows[0].total);
 
+
+
       const waterBill =
         water.rows.length > 0
-        ? Number(water.rows[0].bill)
-        : 0;
-
-      const total = totalCharges + waterBill;
-
-
-      await pool.query(`
-        UPDATE chargeList
-        SET invoiceId = $1
-        WHERE tenantId = $2
-        AND invoiceId IS NULL
-      `,[invoiceId,tenantId]);
+        ?
+        Number(water.rows[0].bill)
+        :
+        0;
 
 
-      await pool.query(`
-        UPDATE waterReadings
-        SET invoiceId = $1
-        WHERE houseId = $2
-        AND invoiceId IS NULL
-      `,[invoiceId,houseId]);
 
 
-      await pool.query(`
-        UPDATE invoiceList
-        SET totalAmount = $1
-        WHERE invoiceId = $2
-      `,[total,invoiceId]);
+      const total =
+        totalCharges + waterBill;
+
+
+
+
+
+
+
+      /*
+        ASSIGN CHARGES TO INVOICE
+      */
+
+
+      await pool.query(
+      `
+      UPDATE chargeList
+
+      SET invoiceId = $1
+
+      WHERE tenantId = $2
+
+      AND invoiceId IS NULL
+
+      `,
+      [
+        invoiceId,
+        tenantId
+      ]);
+
+
+
+
+
+
+      /*
+        ASSIGN WATER TO INVOICE
+      */
+
+
+      await pool.query(
+      `
+      UPDATE waterReadings
+
+      SET invoiceId = $1
+
+      WHERE houseId = $2
+
+      AND invoiceId IS NULL
+
+      `,
+      [
+        invoiceId,
+        houseId
+      ]);
+
+
+
+
+
+
+      /*
+        SAVE TOTAL
+      */
+
+
+      await pool.query(
+      `
+      UPDATE invoiceList
+
+      SET totalAmount = $1
+
+      WHERE invoiceId = $2
+
+      `,
+      [
+        total,
+        invoiceId
+      ]);
+
+
 
       created++;
 
+
     }
 
+
+
+
+
     res.json({
+
       success:true,
-      message:`${created} invoices generated`
+
+      message:
+      `${created} invoices generated`
+
     });
+
+
 
   } catch(err){
 
     console.error(err);
 
     res.status(500).json({
+
       error:err.message
+
     });
 
   }
+
 });
 
 app.get("/invoices", async (req, res) => {
@@ -546,6 +822,7 @@ app.get("/invoice/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
+
     // invoice header
     const invoice = await pool.query(`
       SELECT
@@ -553,6 +830,7 @@ app.get("/invoice/:id", async (req, res) => {
           i.tenantId,
           i.billingDate,
           i.totalAmount,
+          i.previousBalance AS accountBalance,
 
           t.name,
           h.houseNo
@@ -566,21 +844,39 @@ app.get("/invoice/:id", async (req, res) => {
       ON h.houseId = t.houseId
 
       WHERE i.invoiceId = $1
+
     `, [id]);
 
 
-    // charges
+    if(invoice.rows.length === 0){
+
+      return res.status(404).json({
+        error:"Invoice not found"
+      });
+
+    }
+
+
+
+    // charges attached to this invoice
     const charges = await pool.query(`
       SELECT 
           chargeId, 
           chargeType, 
           chargeAmount
+
       FROM chargeList
+
       WHERE invoiceId = $1
+
+      ORDER BY chargeId ASC
+
     `, [id]);
 
 
-    // water
+
+
+    // water attached to this invoice
     const water = await pool.query(`
       SELECT
           previousReading,
@@ -588,28 +884,40 @@ app.get("/invoice/:id", async (req, res) => {
           usage,
           rate,
           bill
+
       FROM waterReadings
+
       WHERE invoiceId = $1
+
       LIMIT 1;
+
     `, [id]);
 
 
+
+
     res.json({
+
       invoice: invoice.rows[0],
+
       charges: charges.rows,
+
       water: water.rows[0] || null
+
     });
 
 
+
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
       error: err.message
     });
+
   }
 });
-
 
 app.get("/invoice-pdf/:month", auth,async (req, res) => {
   const token = req.token;
@@ -642,10 +950,6 @@ app.get("/invoice-pdf/:month", auth,async (req, res) => {
             }
         );
 
-        await page.screenshot({
-            path: "debug.png",
-            fullPage: true
-        });
 
         const pdfBuffer = await page.pdf({
             format: "A4",
@@ -776,47 +1080,56 @@ app.get("/searchTenant/:phone", async (req, res) => {
   }
 });
 
-app.post("/payment",auth, async (req, res) => {
+app.post("/payment", auth, async (req, res) => {
+
   const {
     tenantId,
     payAmount,
     paymentMethod,
-    confirmationCode
+    confirmationCode,
+    paymentDate
   } = req.body;
 
   try {
-    const result = await pool.query(
-  `
-  INSERT INTO paymentList (
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  )
-  VALUES ($1, $2, $3, $4)
-  RETURNING payId
-  `,
-  [
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  ]
-);
 
-res.json({
-  success: true,
-  message: "Payment recorded successfully.",
-  paymentId: result.rows[0].payid
-});
+    const result = await pool.query(
+      `
+      INSERT INTO paymentList (
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING payId
+      `,
+      [
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Payment recorded successfully.",
+      paymentId: result.rows[0].payid
+    });
 
   } catch (err) {
+
     console.error(err);
+
     res.status(500).json({
       success: false,
       error: err.message
     });
+
   }
+
 });
 
 app.get("/searchTenantByName/:name", async (req, res) => {
@@ -2352,6 +2665,117 @@ app.get("/dashboard-summary", async (req, res) => {
 
 });
 
+app.get("/tenant-statement/:id", auth, async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const tenantResult = await pool.query(
+            `
+            SELECT
+                t.name,
+                t.phone,
+                h.houseNo
+            FROM tenantList t
+            JOIN houseList h
+            ON t.houseId = h.houseId
+            WHERE t.id = $1
+            `,
+            [id]
+        );
+
+
+        const transactionResult = await pool.query(
+            `
+            SELECT
+                'CHARGE' AS type,
+                c.chargeDate AS date,
+                c.chargeType AS description,
+                c.chargeAmount AS amount
+            FROM chargeList c
+            WHERE c.tenantId = $1
+
+            UNION ALL
+
+            SELECT
+                'PAYMENT' AS type,
+                p.paymentDate AS date,
+                p.paymentMethod || ' - ' || p.confirmationCode AS description,
+                p.payAmount AS amount
+            FROM paymentList p
+            WHERE p.tenantId = $1
+
+            ORDER BY date ASC;
+            `,
+            [id]
+        );
+
+
+        let balance = 0;
+        let charges = 0;
+        let payments = 0;
+
+
+        const transactions = transactionResult.rows.map(row => {
+
+
+            if(row.type === "CHARGE") {
+
+                balance += Number(row.amount);
+                charges += Number(row.amount);
+
+            } else {
+
+                balance -= Number(row.amount);
+                payments += Number(row.amount);
+
+            }
+
+
+            return {
+                ...row,
+                balance
+            };
+
+
+        });
+
+
+
+        res.json({
+
+            tenant: tenantResult.rows[0],
+
+            summary: {
+
+                openingBalance: 0,
+
+                charges,
+
+                payments,
+
+                balance
+
+            },
+
+
+            transactions
+
+        });
+
+
+    } catch(err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
 
 
 

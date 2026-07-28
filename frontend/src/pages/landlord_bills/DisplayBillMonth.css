@@ -200,3 +200,32 @@
     }
 
 }
+
+.paidStatus{
+
+    background:#dcfce7;
+
+    color:#166534;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-weight:700;
+
+}
+
+
+.unpaidStatus{
+
+    background:#fee2e2;
+
+    color:#991b1b;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-weight:700;
+
+}

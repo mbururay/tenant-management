@@ -137,83 +137,100 @@ const ModifyBill = () => {
 
                     </h3>
 
-                    {formData.map(
-                        (bill, index) => (
+                {formData.map(
+                (bill, index) => (
 
-                            <div
-                                key={
-                                    bill.billid
-                                }
-                                style={{
-                                    marginBottom:
-                                        "30px"
-                                }}
-                            >
+                    <div
+                        key={bill.billid}
+                        style={{
+                            marginBottom:"30px"
+                        }}
+                    >
 
-                                <label>
-                                    Category
-                                </label>
+                        <label>
+                            Category
+                        </label>
 
-                                <input
-                                    className="editInput houseDisplay"
-                                    value={
-                                        bill.category
-                                    }
-                                    readOnly
-                                />
+                        <input
+                            className="editInput houseDisplay"
+                            value={bill.category}
+                            readOnly
+                        />
 
-                                <label>
-                                    Description
-                                </label>
 
-                                <input
-                                    className="editInput"
-                                    value={
-                                        bill.description
-                                    }
-                                    onChange={
-                                        (
-                                            e
-                                        ) =>
-                                            handleChange(
-                                                index,
-                                                "description",
-                                                e
-                                                    .target
-                                                    .value
-                                            )
-                                    }
-                                />
 
-                                <label>
-                                    Amount
-                                    (KES)
-                                </label>
+                        <label>
+                            Description
+                        </label>
 
-                                <input
-                                    className="editInput"
-                                    type="number"
-                                    value={
-                                        bill.amount
-                                    }
-                                    onChange={
-                                        (
-                                            e
-                                        ) =>
-                                            handleChange(
-                                                index,
-                                                "amount",
-                                                e
-                                                    .target
-                                                    .value
-                                            )
-                                    }
-                                />
+                        <input
+                            className="editInput"
+                            value={bill.description || ""}
+                            onChange={(e) =>
+                                handleChange(
+                                    index,
+                                    "description",
+                                    e.target.value
+                                )
+                            }
+                        />
 
-                            </div>
 
-                        )
-                    )}
+
+                        <label>
+                            Amount (KES)
+                        </label>
+
+                        <input
+                            className="editInput"
+                            type="number"
+                            value={bill.amount}
+                            onChange={(e) =>
+                                handleChange(
+                                    index,
+                                    "amount",
+                                    e.target.value
+                                )
+                            }
+                        />
+
+
+
+                        <label>
+                            Payment Status
+                        </label>
+
+
+                        <select
+                            className="editInput"
+                            value={bill.status || "NOT PAID"}
+                            onChange={(e) =>
+                                handleChange(
+                                    index,
+                                    "status",
+                                    e.target.value
+                                )
+                            }
+                        >
+
+                            <option value="NOT PAID">
+                                NOT PAID
+                            </option>
+
+
+                            <option value="PAID">
+                                PAID
+                            </option>
+
+
+                        </select>
+
+
+
+                    </div>
+
+                )
+            )}
 
                 </section>
 

@@ -114,16 +114,40 @@ const EnterBillConfirm = () => {
                                 <small>Amount</small>
 
                                 <p>
+
                                     KES{" "}
+
                                     {Number(
                                         bill.amount
-                                    ).toLocaleString(undefined,{
-                                        minimumFractionDigits:2,
-                                        maximumFractionDigits:2
-                                    })}
+                                    ).toLocaleString(
+                                        "en-GB",
+                                        {
+                                            minimumFractionDigits:2,
+                                            maximumFractionDigits:2
+                                        }
+                                    )}
+
                                 </p>
 
                             </div>
+
+                        </div>
+
+                        <div className="confirmRow">
+
+                            <span>Status</span>
+
+                            <span
+                                className={
+                                    bill.status === "Paid"
+                                        ? "statusPaid"
+                                        : "statusUnpaid"
+                                }
+                            >
+
+                                {bill.status}
+
+                            </span>
 
                         </div>
 
@@ -140,13 +164,19 @@ const EnterBillConfirm = () => {
                     </span>
 
                     <span>
+
                         KES{" "}
+
                         {Number(
                             totalAmount
-                        ).toLocaleString(undefined,{
-                            minimumFractionDigits:2,
-                            maximumFractionDigits:2
-                        })}
+                        ).toLocaleString(
+                            "en-GB",
+                            {
+                                minimumFractionDigits:2,
+                                maximumFractionDigits:2
+                            }
+                        )}
+
                     </span>
 
                 </div>

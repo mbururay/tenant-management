@@ -1,76 +1,157 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Heading from "../../components/Heading"
-import "./MoveOutTenant.css"
+import { useNavigate } from "react-router-dom";
+import Heading from "../../components/Heading";
+import "./SearchTenant.css";
 
 const MoveOutTenant = () => {
+
     const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    houseNo: "",
-    moveOut: "",
+    const [name, setName] = useState("");
 
-  });
+    const [tenants, setTenants] = useState([]);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+    const [searched, setSearched] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-     console.log("SUBMIT CLICKED");
-    console.log(formData);
+    const API_URL = import.meta.env.VITE_API_URL;
 
-    // validation
-    if (!formData.houseNo || !formData.moveOut) {
-      alert("All fields are required");
-      return;
-    }
 
-    navigate("/MoveOutConfirm", {
-    state: {
-      houseNo: formData.houseNo,
-      moveOut: formData.moveOut
-    }
-    });
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+        if (!name.trim()) {
+
+            alert("Please enter a tenant name.");
+
+            return;
+
+        }
+
+        try {
+
+            const res = await fetch(
+                `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
+            );
+
+            const data = await res.json();
+
+            setTenants(data);
+
+            setSearched(true);
+
+        }
+        catch (err) {
+
+            console.error(err);
+
+            alert("Search failed.");
+
+        }
+
+    };
+
+
+    return (
+
+        <div className="payUpdatePage">
+
+            <Heading />
+
+            <h1 className="waterTitle">
+                Move Out Tenant
+            </h1>
+
+            <form
+                onSubmit={handleSubmit}
+                className="waterForm"
+            >
+
+                <section className="waterSection">
+
+                    <h3>
+                        Search Tenant
+                    </h3>
+
+                    <input
+                        className="waterInput"
+                        placeholder="Tenant Name"
+                        value={name}
+                        onChange={(e) =>
+                            setName(e.target.value)
+                        }
+                    />
+
+                </section>
+
+                <button
+                    className="waterButton"
+                    type="submit"
+                >
+                    Search
+                </button>
+
+            </form>
+
+
+            {searched && tenants.length === 0 && (
+
+                <h3
+                    style={{
+                        textAlign: "center",
+                        marginTop: "25px"
+                    }}
+                >
+                    No tenants found.
+                </h3>
+
+            )}
+
+
+            {tenants.length > 0 && (
+
+                <div className="tenantResults">
+
+                    <h2>
+                        Select Tenant
+                    </h2>
+
+                    {tenants.map((tenant) => (
+
+                        <div
+                            key={tenant.id}
+                            className="tenantCard"
+                            onClick={() =>
+                                navigate(
+                                    `/MoveOutSettlement/${tenant.id}`
+                                )
+                            }
+                        >
+
+                            <h3>
+                                {tenant.name}
+                            </h3>
+
+                            <p>
+                                House {tenant.houseno}
+                            </p>
+
+                            <p>
+                                {tenant.phone}
+                            </p>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
+
+        </div>
+
+    );
+
 };
-
-  return (
-    <div id="mainPage">
-      <Heading />
-
-      <h1>Move Out Tenant</h1>
-
-      <form onSubmit={handleSubmit} className="formCard">
-
-        <section>
-          <h3>Tenant Info Entry</h3>
-
-          <input
-            name="houseNo"
-            placeholder="House Number (e.g. D1)"
-            onChange={handleChange}
-          />
-
-          <input
-            type="date"
-            name="moveOut"
-            onChange={handleChange}
-            required
-            />
-
-        </section>
-
-        <button type="submit">
-          Continue
-        </button>
-
-      </form>
-    </div>
-  );
-}
 
 export default MoveOutTenant;

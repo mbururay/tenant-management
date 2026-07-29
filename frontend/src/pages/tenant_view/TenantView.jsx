@@ -7,6 +7,8 @@ const TenantView = () => {
 
   const [tenants, setTenants] = useState([]);
 
+  const [search, setSearch] = useState("");
+
   const API_URL = import.meta.env.VITE_API_URL;
 
   const navigate = useNavigate();
@@ -23,6 +25,42 @@ const TenantView = () => {
 
 
 
+  const filteredTenants = tenants.filter((t) => {
+
+    const term = search.trim().toLowerCase();
+
+    if (!term) return true;
+
+
+    const phones = Array.isArray(t.phone)
+      ? t.phone.join(" ")
+      : String(t.phone || "");
+
+
+    return (
+
+      String(t.name || "")
+        .toLowerCase()
+        .includes(term)
+
+      ||
+
+      String(t.houseno || "")
+        .toLowerCase()
+        .includes(term)
+
+      ||
+
+      phones
+        .toLowerCase()
+        .includes(term)
+
+    );
+
+  });
+
+
+
   return (
 
     <div className="tenantViewPage">
@@ -36,6 +74,27 @@ const TenantView = () => {
         <h1 className="tenantViewTitle">
           Tenant View
         </h1>
+
+
+
+        <div className="tenantSearchBar">
+
+          <input
+
+            type="text"
+
+            placeholder="Search tenant, house, phone..."
+
+            value={search}
+
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+
+          />
+
+        </div>
+
 
 
 
@@ -65,113 +124,198 @@ const TenantView = () => {
 
 
 
+
             <tbody>
 
 
             {
-              tenants.map((t) => (
+              filteredTenants.length > 0
 
-                <tr
+              ?
 
-                  key={t.tenantid}
+              (
 
-                  onClick={() =>
-                    navigate(`/tenant-statement/${t.tenantid}`)
-                  }
+                filteredTenants.map((t) => (
 
-                  style={{
-                    cursor:"pointer"
-                  }}
+                  <tr
 
-                >
+                    key={t.tenantid}
 
-
-                  <td>
-                    {t.name}
-                  </td>
-
-
-
-                  <td>
-
-                    {
-                      Array.isArray(t.phone)
-                      ?
-                      t.phone.join(", ")
-                      :
-                      t.phone
+                    onClick={() =>
+                      navigate(`/tenant-statement/${t.tenantid}`)
                     }
 
-                  </td>
-
-
-
-                  <td>
-                    {t.houseno}
-                  </td>
-
-
-
-                  <td
-
                     style={{
-                      color:
-                        Number(t.openingbalance) > 0
-                        ? "#dc2626"
-                        : "#16a34a",
-
-                      fontWeight:"600"
+                      cursor:"pointer"
                     }}
 
                   >
 
-                    {
-                      Number(t.openingbalance)
-                      .toLocaleString(
-                        "en-GB",
-                        {
-                          minimumFractionDigits:2,
-                          maximumFractionDigits:2
-                        }
-                      )
-                    }
-
-                  </td>
 
 
+                    <td>
+
+                      {t.name}
+
+                    </td>
+
+
+
+
+                    <td>
+
+                      {
+                        Array.isArray(t.phone)
+
+                        ?
+
+                        t.phone.join(", ")
+
+                        :
+
+                        t.phone
+
+                      }
+
+                    </td>
+
+
+
+
+                    <td>
+
+                      {t.houseno}
+
+                    </td>
+
+
+
+
+                    <td
+
+                      style={{
+
+                        color:
+
+                          Number(t.openingbalance) > 0
+
+                          ?
+
+                          "#dc2626"
+
+                          :
+
+                          "#16a34a",
+
+
+                        fontWeight:"600"
+
+                      }}
+
+                    >
+
+                      {
+                        Number(t.openingbalance)
+                        .toLocaleString(
+
+                          "en-GB",
+
+                          {
+
+                            minimumFractionDigits:2,
+
+                            maximumFractionDigits:2
+
+                          }
+
+                        )
+
+                      }
+
+
+                    </td>
+
+
+
+
+                    <td
+
+                      style={{
+
+                        color:
+
+                          Number(t.balance) > 0
+
+                          ?
+
+                          "#dc2626"
+
+                          :
+
+                          "#16a34a",
+
+
+                        fontWeight:"600"
+
+                      }}
+
+                    >
+
+
+                      {
+                        Number(t.balance)
+                        .toLocaleString(
+
+                          "en-GB",
+
+                          {
+
+                            minimumFractionDigits:2,
+
+                            maximumFractionDigits:2
+
+                          }
+
+                        )
+
+                      }
+
+
+                    </td>
+
+
+
+
+                  </tr>
+
+                ))
+
+              )
+
+
+              :
+
+
+              (
+
+                <tr>
 
                   <td
-
-                    style={{
-                      color:
-                        Number(t.balance) > 0
-                        ? "#dc2626"
-                        : "#16a34a",
-
-                      fontWeight:"600"
-                    }}
-
+                    colSpan="5"
+                    className="noResults"
                   >
 
-                    {
-                      Number(t.balance)
-                      .toLocaleString(
-                        "en-GB",
-                        {
-                          minimumFractionDigits:2,
-                          maximumFractionDigits:2
-                        }
-                      )
-                    }
+                    No tenants found
 
                   </td>
-
-
 
                 </tr>
 
-              ))
+              )
+
+
             }
+
 
 
             </tbody>

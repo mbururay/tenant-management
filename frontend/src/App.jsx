@@ -27,6 +27,10 @@ import MoveOutTenant from "./pages/tenant_records/MoveOutTenant.jsx";
 import MoveOutConfirm from "./pages/tenant_records/MoveOutConfirm.jsx";
 import SearchTenant from "./pages/tenant_records/SearchTenant.jsx";
 import TenantStatement from "./pages/tenant_view/TenantStatement.jsx";
+import MoveOutSettlement from "./pages/tenant_records/MoveOutSettlement.jsx"
+import MoveOutList from "./pages/tenant_records/MoveOutList.jsx";
+import MoveOutView from "./pages/tenant_records/MoveOutView.jsx";
+
 
 // Water
 import WaterUpdate from "./pages/water_records/WaterUpdate.jsx";
@@ -107,6 +111,10 @@ function App() {
             <Route path="/MoveOutConfirm" element={<Protected element={<MoveOutConfirm />} />} />
             <Route path="/SearchTenant" element={<Protected element={<SearchTenant />} />} />
             <Route path="/tenant-statement/:id" element={<TenantStatement />}/>
+            <Route path="/MoveOutSettlement/:id" element={<MoveOutSettlement />}/>
+            <Route path="/MoveOutList" element={<MoveOutList />}/>
+            <Route path="/MoveOutView/:moveoutid" element={<MoveOutView />}/>
+
             
 
             {/* Water */}

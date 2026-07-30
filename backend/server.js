@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import PDFDocument from "pdfkit";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -1265,6 +1266,8 @@ app.get("/invoice-pdf/:month", auth,async (req, res) => {
         const { month } = req.params;
 
         const browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath: await chromium.executablePath(),
             headless: true
         });
 

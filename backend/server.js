@@ -3,6 +3,16 @@ import cors from "cors";
 import pool from "./db.js";
 import PDFDocument from "pdfkit";
 import puppeteer from "puppeteer";
+
+    const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH ||
+        "/opt/render/.cache/puppeteer/chrome/linux-150.0.7871.24/chrome-linux64/chrome",
+    headless: true,
+    args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox"
+    ]
+    });
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";

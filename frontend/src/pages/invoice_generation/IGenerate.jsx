@@ -65,10 +65,12 @@ const IGenerate = () => {
         <div className="summaryItem">
           <span>Billing Month</span>
           <strong>
-            {new Date(billingMonth).toLocaleDateString("en-GB", {
-              month: "long",
-              year: "numeric"
-            })}
+            {billingMonth === "No invoices yet"
+              ? billingMonth
+              : new Date(billingMonth).toLocaleDateString("en-GB", {
+                  month: "long",
+                  year: "numeric"
+                })}   
           </strong>
         </div>
 

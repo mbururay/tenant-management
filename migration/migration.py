@@ -130,7 +130,8 @@ initial_water AS (
         currentReading,
         usage,
         rate,
-        bill
+        bill,
+        isOpening
     )
 
     SELECT
@@ -140,7 +141,8 @@ initial_water AS (
         {current},
         {usage},
         0,
-        0
+        0,
+        TRUE
 
     FROM new_tenant
 

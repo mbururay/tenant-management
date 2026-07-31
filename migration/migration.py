@@ -12,8 +12,13 @@ sql = ""
 
 for _, row in df.iterrows():
 
-    name = str(row["Name"]).replace("'", "''")
-    house = str(row["House No"]).replace("'", "''")
+    name = (
+    str(row["Name"])
+    .strip()
+    .title()
+    .replace("'", "''")
+)
+    house = str(row["House No"]).strip().upper().replace("'", "''")
 
     rent = float(row["Rent"])
     garbage = float(row["Garbage"])

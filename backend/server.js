@@ -626,17 +626,18 @@ app.post("/gen-invoice", auth, async (req, res) => {
       const water = await pool.query(
       `
       SELECT
-          id,
-          bill
+        id,
+        bill
 
-      FROM waterReadings
+        FROM waterReadings
 
-      WHERE houseId = $1
-      AND invoiceId IS NULL
+        WHERE houseId = $1
+        AND invoiceId IS NULL
+        AND isOpening = FALSE
 
-      ORDER BY readingMonth DESC
+        ORDER BY readingMonth DESC
 
-      LIMIT 1
+        LIMIT 1;
       `,
       [
         houseId

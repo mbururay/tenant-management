@@ -3135,25 +3135,33 @@ app.get("/tenant-statement/:id", auth, async (req, res) => {
 
         const transactions = transactionResult.rows.map(row => {
 
+            const amount = Number(row.amount);
 
-            if(row.type === "CHARGE") {
+            let debit = 0;
+            let credit = 0;
 
-                balance += Number(row.amount);
-                charges += Number(row.amount);
+            if (row.type === "CHARGE") {
+
+                debit = amount;
+                balance += debit;
+                charges += debit;
 
             } else {
 
-                balance -= Number(row.amount);
-                payments += Number(row.amount);
+                credit = amount;
+                balance -= credit;
+                payments += credit;
 
             }
 
-
             return {
-                ...row,
+                date: row.date,
+                type: row.type,
+                description: row.description,
+                debit,
+                credit,
                 balance
             };
-
 
         });
 

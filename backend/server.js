@@ -622,6 +622,7 @@ app.post("/gen-invoice", auth, async (req, res) => {
         GET WATER
       */
 
+        console.log("House:", houseId);
 
       const water = await pool.query(
       `
@@ -832,27 +833,26 @@ app.post("/gen-invoice", auth, async (req, res) => {
 
 
 
-      /*
-        ASSIGN WATER TO INVOICE
-      */
+/*
+    ASSIGN ONLY THE WATER READING THAT WAS INVOICED
+*/
 
+if (water.rows.length > 0) {
 
-      await pool.query(
-      `
-      UPDATE waterReadings
+    await pool.query(
+    `
+    UPDATE waterReadings
 
-      SET invoiceId = $1
+    SET invoiceId = $1
 
-      WHERE houseId = $2
-
-      AND invoiceId IS NULL
-
-      `,
-      [
+    WHERE id = $2
+    `,
+    [
         invoiceId,
-        houseId
-      ]);
+        water.rows[0].id
+    ]);
 
+}
 
 
 
@@ -883,6 +883,8 @@ app.post("/gen-invoice", auth, async (req, res) => {
 
 
     }
+
+    
 
 
 
@@ -1218,22 +1220,28 @@ app.get("/invoice/:id", async (req, res) => {
 
 
 
+    
     // water attached to this invoice
-    const water = await pool.query(`
-      SELECT
-          previousReading,
-          currentReading,
-          usage,
-          rate,
-          bill
+    const water = await pool.query(
+    `
+    SELECT
+        previousReading,
+        currentReading,
+        usage,
+        rate,
+        bill
 
-      FROM waterReadings
+    FROM waterReadings
 
-      WHERE invoiceId = $1
+    WHERE invoiceId = $1
+    AND isOpening = FALSE
 
-      LIMIT 1;
+    ORDER BY readingMonth DESC
 
-    `, [id]);
+    LIMIT 1
+    `,
+    [id]
+    );
 
 
 
@@ -3089,43 +3097,75 @@ app.get("/tenant-statement/:id", auth, async (req, res) => {
     try {
 
         const tenantResult = await pool.query(
-            `
-            SELECT
-                t.name,
-                t.phone,
-                h.houseNo
-            FROM tenantList t
-            JOIN houseList h
+        `
+        SELECT
+            t.name,
+            t.phone,
+            h.houseNo
+
+        FROM tenantList t
+
+        JOIN houseList h
             ON t.houseId = h.houseId
-            WHERE t.id = $1
-            `,
-            [id]
+
+        WHERE t.id = $1
+        `,
+        [id]
         );
 
 
         const transactionResult = await pool.query(
-            `
-            SELECT
-                'CHARGE' AS type,
-                c.chargeDate AS date,
-                c.chargeType AS description,
-                c.chargeAmount AS amount
-            FROM chargeList c
-            WHERE c.tenantId = $1
+        `
+        SELECT
+            'CHARGE' AS type,
+            c.chargeDate AS date,
+            c.chargeType AS description,
+            c.chargeAmount AS amount
 
-            UNION ALL
+        FROM chargeList c
 
-            SELECT
-                'PAYMENT' AS type,
-                p.paymentDate AS date,
-                p.paymentMethod || ' - ' || p.confirmationCode AS description,
-                p.payAmount AS amount
-            FROM paymentList p
-            WHERE p.tenantId = $1
+        WHERE c.tenantId = $1
 
-            ORDER BY date ASC;
-            `,
-            [id]
+
+        UNION ALL
+
+
+        SELECT
+            'CHARGE' AS type,
+            w.readingMonth AS date,
+            'Water' AS description,
+            w.bill AS amount
+
+        FROM waterReadings w
+
+        JOIN houseList h
+            ON h.houseId = w.houseId
+
+        JOIN tenantList t
+            ON t.houseId = h.houseId
+
+        WHERE t.id = $1
+        AND w.isOpening = FALSE
+        AND w.invoiceId IS NOT NULL
+
+
+        UNION ALL
+
+
+        SELECT
+            'PAYMENT' AS type,
+            p.paymentDate AS date,
+            p.paymentMethod || ' - ' || p.confirmationCode AS description,
+            p.payAmount AS amount
+
+        FROM paymentList p
+
+        WHERE p.tenantId = $1
+
+
+        ORDER BY date ASC;
+        `,
+        [id]
         );
 
 
@@ -3147,7 +3187,9 @@ app.get("/tenant-statement/:id", auth, async (req, res) => {
                 balance += debit;
                 charges += debit;
 
-            } else {
+            }
+
+            else {
 
                 credit = amount;
                 balance -= credit;
@@ -3156,16 +3198,17 @@ app.get("/tenant-statement/:id", auth, async (req, res) => {
             }
 
             return {
+
                 date: row.date,
                 type: row.type,
                 description: row.description,
                 debit,
                 credit,
                 balance
+
             };
 
         });
-
 
 
         res.json({
@@ -3184,13 +3227,13 @@ app.get("/tenant-statement/:id", auth, async (req, res) => {
 
             },
 
-
             transactions
 
         });
 
+    }
 
-    } catch(err) {
+    catch(err) {
 
         console.error(err);
 

@@ -63,6 +63,7 @@ import PaySearch from "./pages/payment_records/PaySearch.jsx";
 import PaymentCorrectionPrint from "./pages/payment_records/PaymentCorrectionPrint.jsx";
 import ReceiptPrint from "./pages/payment_records/ReceiptPrint.jsx";
 import PaymentView from "./pages/payment_records/PaymentView.jsx";
+import PhoneAdd from "./pages/payment_records/PhoneAdd.jsx";
 
 // Bills
 import BillSelect from "./pages/landlord_bills/BillSelect.jsx";
@@ -151,6 +152,8 @@ function App() {
             <Route path="/PaymentCorrectionPrint/:id" element={<Protected element={<PaymentCorrectionPrint />} />} />
             <Route path="/ReceiptPrint/:paymentId" element={<Protected element={<ReceiptPrint />} />} />
             <Route path="/PaymentView" element={<Protected element={<PaymentView />} />} />
+            <Route path="/PhoneAdd" element={<PhoneAdd />} />
+
 
             {/* Bills */}
 

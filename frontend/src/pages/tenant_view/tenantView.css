@@ -1,12 +1,9 @@
 .tenantViewPage{
 
-    display:flex;
-    flex-direction:column;
-
     min-height:100vh;
 
-    padding:30px;
-    padding-top:0;
+    display:flex;
+    flex-direction:column;
 
     background-image:url("../../TrackerLanding.jpg");
     background-size:cover;
@@ -14,20 +11,23 @@
 
 }
 
+
 .tenantViewContainer{
 
     width:95%;
-    max-width:1400px;
+    max-width:1600px;
 
-    margin:35px auto;
+    margin:40px auto;
 
 }
+
+
 
 .tenantViewTitle{
 
     text-align:center;
 
-    margin-bottom:28px;
+    margin-bottom:25px;
 
     color:white;
 
@@ -39,61 +39,107 @@
 
 }
 
+
+
+/* SEARCH */
+
+.tenantSearchBar{
+
+    display:flex;
+
+    justify-content:center;
+
+    margin-bottom:25px;
+
+}
+
+
+.tenantSearchBar input{
+
+    width:500px;
+
+    max-width:100%;
+
+    padding:14px 18px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    outline:none;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.2);
+
+}
+
+
+
+/* TABLE */
+
 .tenantViewTableContainer{
+
+    overflow-x:auto;
 
     background:white;
 
     border-radius:16px;
 
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
     padding:20px;
 
-    overflow-x:auto;
-
-    box-shadow:0 12px 30px rgba(0,0,0,.22);
-
 }
+
+
 
 .tenantViewTable{
 
     width:100%;
 
-    min-width:750px;
+    min-width:1000px;
 
     border-collapse:collapse;
 
 }
 
-/* ---------- HEADER ---------- */
+
+
+.tenantViewTable th,
+.tenantViewTable td{
+
+    padding:15px 18px;
+
+    text-align:center;
+
+    border:1px solid #d1d5db;
+
+    white-space:nowrap;
+
+}
+
+
 
 .tenantViewTable thead th{
 
-    background:#2563eb;
+    background:#1d4ed8;
 
     color:white;
-
-    padding:16px;
-
-    text-align:left;
 
     font-size:16px;
 
     font-weight:700;
 
-}
+    position:sticky;
 
-/* ---------- CELLS ---------- */
+    top:0;
 
-.tenantViewTable td{
-
-    padding:15px 16px;
-
-    color:#111827;
-
-    border-bottom:1px solid #e5e7eb;
+    z-index:2;
 
 }
 
-/* ---------- ROW STRIPES ---------- */
+
 
 .tenantViewTable tbody tr:nth-child(even){
 
@@ -101,37 +147,55 @@
 
 }
 
-/* ---------- HOVER ---------- */
+
 
 .tenantViewTable tbody tr:hover{
 
     background:#dbeafe;
 
-    transition:background .2s ease;
+}
+
+
+
+.tenantViewTable td{
+
+    color:#000;
+
+    font-size:15px;
 
 }
 
-/* ---------- LAST ROW ---------- */
 
-.tenantViewTable tbody tr:last-child td{
 
-    border-bottom:none;
+/* Balance columns */
 
-}
-
-/* ---------- BALANCE COLUMN ---------- */
-
-.tenantViewTable td:last-child{
-
-    text-align:right;
+.tenantViewTable td:nth-child(4),
+.tenantViewTable td:nth-child(5){
 
     font-weight:700;
 
 }
 
-/* ---------- RESPONSIVE ---------- */
 
-@media(max-width:900px){
+
+/* EMPTY SEARCH */
+
+.noResults{
+
+    text-align:center;
+
+    padding:25px;
+
+    font-weight:600;
+
+    color:#6b7280;
+
+}
+
+
+
+@media(max-width:1000px){
+
 
     .tenantViewContainer{
 
@@ -139,11 +203,13 @@
 
     }
 
+
     .tenantViewTitle{
 
         font-size:30px;
 
     }
+
 
     .tenantViewTableContainer{
 
@@ -151,11 +217,6 @@
 
     }
 
-    .tenantViewTable{
-
-        min-width:650px;
-
-    }
 
     .tenantViewTable th,
     .tenantViewTable td{
@@ -163,6 +224,13 @@
         padding:12px;
 
         font-size:14px;
+
+    }
+
+
+    .tenantSearchBar input{
+
+        width:100%;
 
     }
 

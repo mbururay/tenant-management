@@ -48,6 +48,13 @@ const TenantTables = () => {
                             House Pivot Table
                         </button>
 
+                        <button
+                            className="tenantTablesButton"
+                            onClick={() => navigate("/MoveOutList")}
+                        >
+                            Move Out Tables
+                        </button>
+
 
                     </div>
 

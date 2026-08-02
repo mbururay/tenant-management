@@ -5,13 +5,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@react-email/components": "^1.0.12",
+    "@sparticuz/chromium": "^149.0.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "crypto": "^1.0.1",
@@ -20,7 +23,7 @@
     "jsonwebtoken": "^9.0.3",
     "pdfkit": "^0.19.1",
     "pg": "^8.21.0",
-    "puppeteer": "^25.3.0",
+    "puppeteer-core": "^25.4.0",
     "react": "^19.2.7",
     "react-email": "^6.7.0",
     "resend": "^6.17.2"

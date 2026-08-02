@@ -6,7 +6,6 @@ import "./DisplayBillMonth.css";
 const DisplayBillMonth = () => {
 
     const { month } = useParams();
-    
 
     const navigate = useNavigate();
 
@@ -14,30 +13,33 @@ const DisplayBillMonth = () => {
 
     const API_URL = import.meta.env.VITE_API_URL;
 
+
     useEffect(() => {
 
         fetch(
             `${API_URL}/bill-month/${month}`
         )
-            .then(res => res.json())
-            .then(data => {
+        .then(res => res.json())
+        .then(data => {
 
-                console.log("Fetched bills:", data);
+            console.log("Fetched bills:", data);
 
-                setBills(data);
+            setBills(data);
 
-            })
-            .catch(err => console.error(err));
+        })
+        .catch(err => console.error(err));
 
-    }, [month,API_URL]);
+    }, [month, API_URL]);
 
-    console.log("Current bills state:", bills);
+
 
     const total = bills.reduce(
         (sum, bill) =>
             sum + Number(bill.amount),
         0
     );
+
+
 
     const formatMonth = (monthString) => {
 
@@ -52,12 +54,14 @@ const DisplayBillMonth = () => {
         ).toLocaleDateString(
             "en-GB",
             {
-                month: "long",
-                year: "numeric"
+                month:"long",
+                year:"numeric"
             }
         );
 
     };
+
+
 
     return (
 
@@ -65,27 +69,35 @@ const DisplayBillMonth = () => {
 
             <Heading />
 
+
             <div className="billMonthContainer">
+
 
                 <h1>
                     Landlord Bills
                 </h1>
 
+
                 <h2>
                     {formatMonth(month)}
                 </h2>
 
+
+
                 <h3
                     style={{
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        color: "#dc2626"
+                        textAlign:"center",
+                        marginBottom:"20px",
+                        color:"#dc2626"
                     }}
                 >
                     Bills Found: {bills.length}
                 </h3>
 
+
+
                 <table className="billMonthTable">
+
 
                     <thead>
 
@@ -95,29 +107,41 @@ const DisplayBillMonth = () => {
                                 Category
                             </th>
 
+
                             <th>
                                 Description
                             </th>
+
 
                             <th>
                                 Amount (KES)
                             </th>
 
+
+                            <th>
+                                Status
+                            </th>
+
+
                         </tr>
 
                     </thead>
 
+
+
                     <tbody>
 
-                        {bills.length === 0 ? (
+
+                    {
+                        bills.length === 0 ? (
 
                             <tr>
 
                                 <td
-                                    colSpan="3"
+                                    colSpan="4"
                                     style={{
-                                        textAlign: "center",
-                                        padding: "30px"
+                                        textAlign:"center",
+                                        padding:"30px"
                                     }}
                                 >
                                     No bills found for this month.
@@ -125,43 +149,79 @@ const DisplayBillMonth = () => {
 
                             </tr>
 
+
                         ) : (
 
-                            bills.map((bill, index) => (
 
-                                <tr key={index}>
+                            bills.map((bill) => (
+
+
+                                <tr key={bill.billid}>
+
 
                                     <td>
                                         {bill.category}
                                     </td>
 
+
+
                                     <td>
                                         {bill.description}
                                     </td>
+
+
 
                                     <td>
 
                                         {Number(
                                             bill.amount
                                         ).toLocaleString(
-                                            undefined,
+                                            "en-GB",
                                             {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
+                                                minimumFractionDigits:2,
+                                                maximumFractionDigits:2
                                             }
                                         )}
 
                                     </td>
 
+
+
+                                    <td>
+
+                                        <span
+                                            className={
+                                                bill.status === "PAID"
+                                                ?
+                                                "paidStatus"
+                                                :
+                                                "unpaidStatus"
+                                            }
+                                        >
+
+                                            {bill.status}
+
+                                        </span>
+
+                                    </td>
+
+
                                 </tr>
+
 
                             ))
 
-                        )}
+                        )
 
-                        {bills.length > 0 && (
+                    }
+
+
+
+                    {
+                        bills.length > 0 && (
 
                             <tr className="totalRow">
+
 
                                 <td colSpan="2">
 
@@ -169,39 +229,54 @@ const DisplayBillMonth = () => {
 
                                 </td>
 
-                                <td>
+
+                                <td colSpan="2">
+
 
                                     {total.toLocaleString(
-                                        undefined,
+                                        "en-GB",
                                         {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
+                                            minimumFractionDigits:2,
+                                            maximumFractionDigits:2
                                         }
                                     )}
 
+
                                 </td>
+
 
                             </tr>
 
-                        )}
+                        )
+                    }
+
 
                     </tbody>
 
+
                 </table>
+
+
 
                 <button
                     className="backButton"
                     onClick={() => navigate(-1)}
                 >
+
                     Back
+
                 </button>
 
+
+
             </div>
+
 
         </div>
 
     );
 
 };
+
 
 export default DisplayBillMonth;

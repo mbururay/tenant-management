@@ -48,26 +48,73 @@ const IGenerate = () => {
   };
 
   return (
-    <div id="mainPage">
-      <Heading />
+<div className="generatePage">
+    <Heading />
 
-      <h1>Billing Month
-        {new Date(billingMonth).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })}
-      </h1>
+    <div className = "generateContent">
+          <div className="generateCard">
 
-      <h2>There are {tenantCount} active tenants</h2>
+      <h1>Generate Monthly Invoices</h1>
 
-      <button onClick={genClick} disabled={loading}>
-        {loading
-          ? "Generating..."
-          : `Generate all ${tenantCount} Invoices`}
-      </button>
+      <p className="subtitle">
+        You're about to generate invoices for the next billing cycle.
+      </p>
+
+      <div className="summary">
+
+        <div className="summaryItem">
+          <span>Billing Month</span>
+          <strong>
+            {billingMonth === "No invoices yet"
+              ? billingMonth
+              : new Date(billingMonth).toLocaleDateString("en-GB", {
+                  month: "long",
+                  year: "numeric"
+                })}   
+          </strong>
+        </div>
+
+        <div className="summaryItem">
+          <span>Active Tenants</span>
+          <strong>{tenantCount}</strong>
+        </div>
+
+      </div>
+
+      <div className="warning">
+        This action will create invoices for all active tenants who have
+        not yet been billed for this month.
+      </div>
+
+      <div className="buttonRow">
+
+        <button
+          className="cancelBtn"
+          onClick={() => navigate(-1)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="generateBtn"
+          onClick={genClick}
+          disabled={loading}
+        >
+          {loading
+            ? "Generating..."
+            : "Generate Invoices"}
+        </button>
+
+      </div>
+
     </div>
-  );
+
+    </div>
+
+
+
+  </div>
+);
 };
 
 export default IGenerate;

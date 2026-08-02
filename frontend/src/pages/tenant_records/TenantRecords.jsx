@@ -56,6 +56,8 @@ const TenantRecords = () => {
                             Remove Tenant
                         </button>
 
+                        
+
 
                     </div>
 

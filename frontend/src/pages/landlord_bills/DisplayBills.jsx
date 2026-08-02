@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
+import "./DisplayBills.css";
 
 const DisplayBills = () => {
 
@@ -18,6 +19,7 @@ const DisplayBills = () => {
                 console.log(data);
                 setBills(data);
             })
+            
             .catch(err => console.error(err));
 
     }, [API_URL]);
@@ -131,18 +133,37 @@ const DisplayBills = () => {
 
                                                 <td
                                                     key={`${month}-${category}`}
+                                                    style={{
+                                                        backgroundColor:
+                                                            bill
+                                                            ? bill.paid === true
+                                                                ? "#dcfce7"
+                                                                : "#fee2e2"
+                                                            : "transparent",
+
+                                                        color:
+                                                            bill
+                                                            ? bill.paid === true
+                                                                ? "#166534"
+                                                                : "#991b1b"
+                                                            : "#000",
+                                                        fontWeight:
+                                                            bill
+                                                            ? "700"
+                                                            : "normal"
+                                                    }}
                                                 >
 
                                                     {bill
                                                         ? Number(
-                                                              bill.amount
-                                                          ).toLocaleString(
-                                                              undefined,
-                                                              {
-                                                                  minimumFractionDigits: 2,
-                                                                  maximumFractionDigits: 2
-                                                              }
-                                                          )
+                                                            bill.amount
+                                                        ).toLocaleString(
+                                                            "en-GB",
+                                                            {
+                                                                minimumFractionDigits:2,
+                                                                maximumFractionDigits:2
+                                                            }
+                                                        )
                                                         : "-"}
 
                                                 </td>
@@ -169,30 +190,34 @@ const DisplayBills = () => {
 
                                         <td>
 
-                                            <button
-                                                className="viewMonthBtn"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/DisplayBillsMonth/${month}`
-                                                    )
-                                                }
-                                            >
-                                                View
-                                            </button>
+                                            <div className="billActionButtons">
 
-                                            <button
-                                                className="editMonthBtn"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/ModifyBill/${month}`
-                                                    )
-                                                }
-                                            >
-                                                Edit
-                                            </button>
+                                                <button
+                                                    className="viewMonthBtn"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/DisplayBillMonth/${month}`
+                                                        )
+                                                    }
+                                                >
+                                                    View
+                                                </button>
+
+
+                                                <button
+                                                    className="editMonthBtn"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/ModifyBill/${month}`
+                                                        )
+                                                    }
+                                                >
+                                                    Edit
+                                                </button>
+
+                                            </div>
 
                                         </td>
-
                                     </tr>
 
                                 );

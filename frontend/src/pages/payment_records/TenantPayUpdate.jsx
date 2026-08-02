@@ -4,30 +4,36 @@ import Heading from "../../components/Heading";
 import "./TenantPayUpdate.css";
 
 const TenantPayUpdate = () => {
+
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [formData, setFormData] = useState({
-  tenantId: id,
-  paymentMethod: "",
-  payAmount: "",
-  confirmationCode: ""
-});
+    tenantId: id,
+    paymentMethod: "",
+    payAmount: "",
+    confirmationCode: "",
+    paymentDate: ""
+  });
 
   const handleChange = (e) => {
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+
   };
 
   const handleSubmit = (e) => {
+
     e.preventDefault();
 
     if (
-        !formData.paymentMethod ||
-        !formData.payAmount ||
-        !formData.confirmationCode
+      !formData.paymentMethod ||
+      !formData.payAmount ||
+      !formData.confirmationCode ||
+      !formData.paymentDate
     ) {
       alert("All fields are required.");
       return;
@@ -39,17 +45,21 @@ const TenantPayUpdate = () => {
     }
 
     navigate("/TenantPayConfirm", {
-        state: {
-            tenantId: formData.tenantId,
-            paymentMethod: formData.paymentMethod,
-            payAmount: formData.payAmount,
-            confirmationCode: formData.confirmationCode
-        }
+      state: {
+        tenantId: formData.tenantId,
+        paymentMethod: formData.paymentMethod,
+        payAmount: formData.payAmount,
+        confirmationCode: formData.confirmationCode,
+        paymentDate: formData.paymentDate
+      }
     });
+
   };
 
   return (
+
     <div className="tenantPayUpdatePage">
+
       <Heading />
 
       <h1 className="tenantTitle">
@@ -67,18 +77,17 @@ const TenantPayUpdate = () => {
 
           <label>Payment Method</label>
 
-        <select
+          <select
             name="paymentMethod"
             value={formData.paymentMethod}
             onChange={handleChange}
             className="tenantPayInput"
-            >
+          >
             <option value="">Select Payment Method</option>
             <option value="NBK Bank Transfer">NBK Bank Transfer</option>
             <option value="SC Bank Transfer">SC Bank Transfer</option>
-        </select>
-
-        
+            <option value="MPESA">M-Pesa</option>
+          </select>
 
           <label>Payment Amount (KES)</label>
 
@@ -100,7 +109,17 @@ const TenantPayUpdate = () => {
             placeholder="Confirmation Code"
             value={formData.confirmationCode}
             onChange={handleChange}
-            />
+          />
+
+          <label>Payment Date</label>
+
+          <input
+            className="tenantPayInput"
+            type="date"
+            name="paymentDate"
+            value={formData.paymentDate}
+            onChange={handleChange}
+          />
 
         </section>
 
@@ -112,8 +131,11 @@ const TenantPayUpdate = () => {
         </button>
 
       </form>
+
     </div>
+
   );
+
 };
 
 export default TenantPayUpdate;

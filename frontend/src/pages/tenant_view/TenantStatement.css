@@ -1,0 +1,370 @@
+.tenantStatementPage {
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background-image:url("../../TrackerLanding.jpg");
+    background-size:cover;
+    background-position:center;
+
+}
+
+
+.tenantStatementContainer {
+
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding-bottom: 50px;
+
+}
+
+
+/* Back button */
+
+.backButton {
+
+    background: #334155;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 18px;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    margin-bottom: 25px;
+
+}
+
+
+.backButton:hover {
+
+    background: #1e293b;
+
+}
+
+
+
+
+/* Tenant header */
+
+.tenantStatementHeader {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 14px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+    margin-bottom: 25px;
+
+}
+
+
+.tenantStatementHeader h1 {
+
+    margin: 0 0 15px;
+
+    font-size: 30px;
+
+    color: #111827;
+
+}
+
+
+.tenantStatementHeader h2 {
+
+    margin: 0 0 10px;
+
+    font-size: 24px;
+
+    color: #334155;
+
+}
+
+
+.tenantStatementHeader p {
+
+    margin: 6px 0;
+
+    color: #64748b;
+
+    font-size: 16px;
+
+}
+
+
+
+
+/* Balance */
+
+.balanceCard {
+
+    background: linear-gradient(
+        135deg,
+        #fee2e2,
+        #fecaca
+    );
+
+    padding: 30px;
+
+    border-radius: 16px;
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+.balanceCard h3 {
+
+    margin: 0;
+
+    color: #7f1d1d;
+
+    font-size: 18px;
+
+}
+
+
+.balanceCard h1 {
+
+    margin: 15px 0;
+
+    font-size: 42px;
+
+    color: #dc2626;
+
+}
+
+
+.balanceCard p {
+
+    margin: 0;
+
+    color: #991b1b;
+
+}
+
+
+
+
+
+/* Summary cards */
+
+.summaryCards {
+
+    display: grid;
+
+    grid-template-columns: repeat(
+        3,
+        1fr
+    );
+
+    gap: 20px;
+
+    margin-bottom: 35px;
+
+}
+
+
+.summaryCard {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.08);
+
+    text-align: center;
+
+}
+
+
+.summaryCard h3 {
+
+    color: #64748b;
+
+    margin-bottom: 12px;
+
+    font-size: 16px;
+
+}
+
+
+.summaryCard p {
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+
+    margin: 0;
+
+}
+
+
+
+
+
+/* Transaction section */
+
+.transactionSection {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.08);
+
+}
+
+
+
+.transactionSection h2 {
+
+    margin-top: 0;
+
+    margin-bottom: 20px;
+
+    color: #111827;
+
+}
+
+
+
+
+/* Statement table */
+
+.statementTable {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+
+.statementTable th {
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+    padding: 14px;
+
+    text-align: left;
+
+    font-size: 14px;
+
+}
+
+
+.statementTable td {
+
+    padding: 14px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #475569;
+
+}
+
+
+
+.statementTable tr:hover {
+
+    background: #f8fafc;
+
+}
+
+
+
+.statementTable td:nth-child(4) {
+
+    color: #dc2626;
+
+    font-weight: 600;
+
+}
+
+
+
+.statementTable td:nth-child(5) {
+
+    color: #16a34a;
+
+    font-weight: 600;
+
+}
+
+
+
+.statementTable td:last-child {
+
+    font-weight: 700;
+
+    color: #0f172a;
+
+}
+
+
+
+
+/* Mobile */
+
+@media(max-width: 800px) {
+
+
+    .tenantStatementContainer {
+
+        width: 95%;
+
+    }
+
+
+
+    .summaryCards {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+
+    .statementTable {
+
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: nowrap;
+
+    }
+
+
+
+    .balanceCard h1 {
+
+        font-size: 32px;
+
+    }
+
+
+}

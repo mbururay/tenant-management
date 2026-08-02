@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import pool from "./db.js";
 import PDFDocument from "pdfkit";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -224,6 +225,207 @@ app.post("/remove-tenant",auth, async (req, res) => {
     }
 });
 
+app.get("/moveout-tenant/:id", async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+                t.id,
+                t.name,
+                h.houseNo,
+                c.chargeAmount AS deposit
+            FROM tenantList t
+
+            LEFT JOIN houseList h
+                ON t.houseId = h.houseId
+
+            LEFT JOIN chargeList c
+                ON t.id = c.tenantId
+               AND c.chargeType = 'Deposit'
+
+            WHERE t.id = $1
+            `,
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Tenant not found"
+            });
+
+        }
+
+        res.json(result.rows[0]);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.post("/complete-moveout", auth, async (req, res) => {
+
+    const {
+
+        tenant,
+
+        moveOutDate,
+
+        depositHeld,
+
+        totalCharges,
+
+        refundDue,
+
+        balanceOwing,
+
+        charges
+
+    } = req.body;
+
+    const client = await pool.connect();
+
+    try {
+
+        await client.query("BEGIN");
+
+        //
+        // Save move out summary
+        //
+
+        const moveOutResult = await client.query(
+            `
+            INSERT INTO moveOutList
+            (
+                tenantId,
+                moveOutDate,
+                depositHeld,
+                totalCharges,
+                refundDue,
+                balanceOwing
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6
+            )
+            RETURNING moveOutId
+            `,
+            [
+                tenant.id,
+                moveOutDate,
+                depositHeld,
+                totalCharges,
+                refundDue,
+                balanceOwing
+            ]
+        );
+
+        const moveOutId = moveOutResult.rows[0].moveoutid;
+
+        //
+        // Save all deductions
+        //
+
+        for (const charge of charges) {
+
+            await client.query(
+                `
+                INSERT INTO moveOutCharge
+                (
+                    moveOutId,
+                    description,
+                    amount
+                )
+                VALUES
+                (
+                    $1,
+                    $2,
+                    $3
+                )
+                `,
+                [
+                    moveOutId,
+                    charge.description,
+                    charge.amount
+                ]
+            );
+
+        }
+
+        //
+        // Mark tenant as moved out
+        //
+
+        await client.query(
+            `
+            UPDATE tenantList
+            SET moveOut = $1
+            WHERE id = $2
+            `,
+            [
+                moveOutDate,
+                tenant.id
+            ]
+        );
+
+        //
+        // Mark tenant as moved out
+        //
+
+        await client.query(
+            `
+            UPDATE tenantList
+            SET moveOut = $1
+            WHERE id = $2
+            `,
+            [
+                moveOutDate,
+                tenant.id
+            ]
+        );
+
+        await client.query("COMMIT");
+
+        res.json({
+            success: true,
+            message: "Move out completed successfully."
+        });
+
+    } catch (err) {
+
+        await client.query("ROLLBACK");
+
+        console.error(err);
+
+        res.status(500).json({
+            success: false,
+            error: err.message
+        });
+
+    } finally {
+
+        client.release();
+
+    }
+
+});
+
 app.get("/invoice-info", async (req, res) => {
   try {
 
@@ -255,183 +457,462 @@ app.get("/invoice-info", async (req, res) => {
   }
 });
 
-app.post("/gen-invoice", auth,async (req, res) => {
+app.post("/gen-invoice", auth, async (req, res) => {
+
   try {
 
-    // Bill month
+    // Next billing month
     const billingDate = new Date();
     billingDate.setMonth(billingDate.getMonth() + 1);
     billingDate.setDate(1);
 
-    // Get all active tenants
-    const tenants = await pool.query(`
-      SELECT
+
+
+    const tenants = await pool.query(
+    `
+    SELECT
         t.id,
         t.houseId,
         h.rent,
         h.garbage
-      FROM tenantList t
-      JOIN houseList h
-      ON t.houseId = h.houseId
-      WHERE t.moveOut IS NULL
-    `);
+
+    FROM tenantList t
+
+    JOIN houseList h
+    ON t.houseId = h.houseId
+
+    WHERE t.moveOut IS NULL
+    `
+    );
+
 
     let created = 0;
 
-    for (const t of tenants.rows) {
+
+
+    for(const t of tenants.rows){
+
 
       const tenantId = t.id;
       const houseId = t.houseid;
 
 
-      const rentExists = await pool.query(`
-        SELECT 1
-        FROM chargeList
-        WHERE tenantId = $1
-        AND chargeType = 'Rent'
-        AND billingDate = $2
-      `,[tenantId,billingDate]);
+
+      /*
+        ADD MONTHLY CHARGES
+      */
+
+
+      const rentExists = await pool.query(
+      `
+      SELECT 1
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND chargeType = 'Rent'
+      AND billingDate = $2
+      `,
+      [
+        tenantId,
+        billingDate
+      ]);
+
+
 
       if(rentExists.rows.length === 0){
 
-        await pool.query(`
-          INSERT INTO chargeList(
+        await pool.query(
+        `
+        INSERT INTO chargeList(
             tenantId,
             chargeType,
             chargeAmount,
             billingDate
-          )
-          VALUES($1,'Rent',$2,$3)
-        `,[tenantId,t.rent,billingDate]);
+        )
+
+        VALUES(
+            $1,
+            'Rent',
+            $2,
+            $3
+        )
+        `,
+        [
+          tenantId,
+          t.rent,
+          billingDate
+        ]);
 
       }
 
 
-      const garbageExists = await pool.query(`
-        SELECT 1
-        FROM chargeList
-        WHERE tenantId = $1
-        AND chargeType = 'Garbage'
-        AND billingDate = $2
-      `,[tenantId,billingDate]);
+
+
+      const garbageExists = await pool.query(
+      `
+      SELECT 1
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND chargeType = 'Garbage'
+      AND billingDate = $2
+      `,
+      [
+        tenantId,
+        billingDate
+      ]);
+
+
 
       if(garbageExists.rows.length === 0){
 
-        await pool.query(`
-          INSERT INTO chargeList(
+
+        await pool.query(
+        `
+        INSERT INTO chargeList(
             tenantId,
             chargeType,
             chargeAmount,
             billingDate
-          )
-          VALUES($1,'Garbage',$2,$3)
-        `,[tenantId,t.garbage,billingDate]);
+        )
+
+        VALUES(
+            $1,
+            'Garbage',
+            $2,
+            $3
+        )
+        `,
+        [
+          tenantId,
+          t.garbage,
+          billingDate
+        ]);
 
       }
 
 
-      const charges = await pool.query(`
-        SELECT
+
+
+      /*
+        GET UNINVOICED CHARGES
+      */
+
+
+      const charges = await pool.query(
+      `
+      SELECT
           chargeId,
           chargeAmount
-        FROM chargeList
-        WHERE tenantId = $1
-        AND invoiceId IS NULL
-      `,[tenantId]);
+
+      FROM chargeList
+
+      WHERE tenantId = $1
+      AND invoiceId IS NULL
+      `,
+      [
+        tenantId
+      ]);
 
 
-      const water = await pool.query(`
-        SELECT
-          id,
-          bill
+
+
+
+      /*
+        GET WATER
+      */
+
+        console.log("House:", houseId);
+
+      const water = await pool.query(
+      `
+      SELECT
+        id,
+        bill
+
         FROM waterReadings
+
         WHERE houseId = $1
         AND invoiceId IS NULL
-        ORDER BY readingMonth DESC
-        LIMIT 1
-      `,[houseId]);
+        AND isOpening = FALSE
 
-      if(charges.rows.length === 0 && water.rows.length === 0){
+        ORDER BY readingMonth DESC
+
+        LIMIT 1;
+      `,
+      [
+        houseId
+      ]);
+
+
+
+
+
+
+      if(
+        charges.rows.length === 0 &&
+        water.rows.length === 0
+      ){
+
         continue;
+
       }
 
-      const invoice = await pool.query(`
-        INSERT INTO invoiceList(
+
+
+
+
+      /*
+        CALCULATE PREVIOUS BALANCE
+
+        Previous invoices
+        -
+        Payments
+      */
+
+
+      const previousBalanceResult = await pool.query(
+      `
+      SELECT
+
+      COALESCE(
+          (
+            SELECT SUM(totalAmount)
+
+            FROM invoiceList
+
+            WHERE tenantId = $1
+          ),
+          0
+      )
+
+      -
+
+      COALESCE(
+          (
+            SELECT SUM(payAmount)
+
+            FROM paymentList
+
+            WHERE tenantId = $1
+          ),
+          0
+      )
+
+      AS balance
+
+      `,
+      [
+        tenantId
+      ]);
+
+
+
+      const previousBalance =
+        Number(previousBalanceResult.rows[0].balance);
+
+
+
+
+
+
+      /*
+        CREATE INVOICE
+      */
+
+
+      const invoice = await pool.query(
+      `
+      INSERT INTO invoiceList(
           tenantId,
           generatedDate,
-          billingDate
-        )
-        VALUES(
+          billingDate,
+          previousBalance
+      )
+
+      VALUES(
           $1,
           CURRENT_DATE,
-          $2
-        )
-        RETURNING invoiceId
-      `,[tenantId,billingDate]);
+          $2,
+          $3
+      )
 
-      const invoiceId = invoice.rows[0].invoiceid;
+      RETURNING invoiceId
+      `,
+      [
+        tenantId,
+        billingDate,
+        previousBalance
+      ]);
 
 
 
-      const chargeTotal = await pool.query(`
-        SELECT
-          COALESCE(SUM(chargeAmount),0) AS total
-        FROM chargeList
-        WHERE tenantId = $1
-        AND invoiceId IS NULL
-      `,[tenantId]);
+      const invoiceId =
+        invoice.rows[0].invoiceid;
+
+
+
+
+
+
+
+      /*
+        CALCULATE CURRENT CHARGES
+      */
+
+
+      const chargeTotal = await pool.query(
+      `
+      SELECT
+
+      COALESCE(
+        SUM(chargeAmount),
+        0
+      ) AS total
+
+      FROM chargeList
+
+      WHERE tenantId = $1
+
+      AND invoiceId IS NULL
+
+      `,
+      [
+        tenantId
+      ]);
+
+
 
       const totalCharges =
         Number(chargeTotal.rows[0].total);
 
+
+
       const waterBill =
         water.rows.length > 0
-        ? Number(water.rows[0].bill)
-        : 0;
-
-      const total = totalCharges + waterBill;
-
-
-      await pool.query(`
-        UPDATE chargeList
-        SET invoiceId = $1
-        WHERE tenantId = $2
-        AND invoiceId IS NULL
-      `,[invoiceId,tenantId]);
+        ?
+        Number(water.rows[0].bill)
+        :
+        0;
 
 
-      await pool.query(`
-        UPDATE waterReadings
-        SET invoiceId = $1
-        WHERE houseId = $2
-        AND invoiceId IS NULL
-      `,[invoiceId,houseId]);
 
 
-      await pool.query(`
-        UPDATE invoiceList
-        SET totalAmount = $1
-        WHERE invoiceId = $2
-      `,[total,invoiceId]);
+      const total =
+        totalCharges + waterBill;
+
+
+
+
+
+
+
+      /*
+        ASSIGN CHARGES TO INVOICE
+      */
+
+
+      await pool.query(
+      `
+      UPDATE chargeList
+
+      SET invoiceId = $1
+
+      WHERE tenantId = $2
+
+      AND invoiceId IS NULL
+
+      `,
+      [
+        invoiceId,
+        tenantId
+      ]);
+
+
+
+
+
+
+/*
+    ASSIGN ONLY THE WATER READING THAT WAS INVOICED
+*/
+
+if (water.rows.length > 0) {
+
+    await pool.query(
+    `
+    UPDATE waterReadings
+
+    SET invoiceId = $1
+
+    WHERE id = $2
+    `,
+    [
+        invoiceId,
+        water.rows[0].id
+    ]);
+
+}
+
+
+
+
+
+      /*
+        SAVE TOTAL
+      */
+
+
+      await pool.query(
+      `
+      UPDATE invoiceList
+
+      SET totalAmount = $1
+
+      WHERE invoiceId = $2
+
+      `,
+      [
+        total,
+        invoiceId
+      ]);
+
+
 
       created++;
 
+
     }
 
+    
+
+
+
+
+
     res.json({
+
       success:true,
-      message:`${created} invoices generated`
+
+      message:
+      `${created} invoices generated`
+
     });
+
+
 
   } catch(err){
 
     console.error(err);
 
     res.status(500).json({
+
       error:err.message
+
     });
 
   }
+
 });
 
 app.get("/invoices", async (req, res) => {
@@ -465,6 +946,145 @@ app.get("/invoices", async (req, res) => {
       error: err.message
     });
   }
+});
+
+app.get("/moveout-list", async (req, res) => {
+
+    try {
+
+        const result = await pool.query(
+            `
+            SELECT
+
+                m.moveOutId,
+                t.name,
+                h.houseNo,
+
+                m.moveOutDate,
+
+                m.depositHeld,
+                m.totalCharges,
+                m.refundDue,
+                m.balanceOwing,
+
+                m.createdAt
+
+            FROM moveOutList m
+
+            JOIN tenantList t
+                ON m.tenantId = t.id
+
+            LEFT JOIN houseList h
+                ON t.houseId = h.houseId
+
+            ORDER BY
+                m.moveOutDate DESC,
+                t.name;
+            `
+        );
+
+        res.json(result.rows);
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
+
+app.get("/moveout-view/:moveoutId", async (req, res) => {
+
+    const { moveoutId } = req.params;
+
+    try {
+
+        const summary = await pool.query(
+            `
+            SELECT
+
+                m.moveOutId,
+
+                m.moveOutDate,
+
+                m.depositHeld,
+                m.totalCharges,
+                m.refundDue,
+                m.balanceOwing,
+
+                t.id,
+                t.name,
+                t.phone,
+
+                h.houseNo
+
+            FROM moveOutList m
+
+            JOIN tenantList t
+                ON m.tenantId = t.id
+
+            LEFT JOIN houseList h
+                ON t.houseId = h.houseId
+
+            WHERE
+                m.moveOutId = $1
+            `,
+            [moveoutId]
+        );
+
+        if (summary.rows.length === 0) {
+
+            return res.status(404).json({
+                error: "Move out record not found"
+            });
+
+        }
+
+        const deductions = await pool.query(
+            `
+            SELECT
+
+                chargeId,
+                description,
+                amount
+
+            FROM moveOutCharge
+
+            WHERE
+                moveOutId = $1
+
+            ORDER BY
+                chargeId
+            `,
+            [moveoutId]
+        );
+
+        res.json({
+
+            summary: summary.rows[0],
+
+            deductions: deductions.rows
+
+        });
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
 });
 
 app.get("/invoice-months", async (req, res) => {
@@ -546,6 +1166,7 @@ app.get("/invoice/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
+
     // invoice header
     const invoice = await pool.query(`
       SELECT
@@ -553,6 +1174,7 @@ app.get("/invoice/:id", async (req, res) => {
           i.tenantId,
           i.billingDate,
           i.totalAmount,
+          i.previousBalance AS accountBalance,
 
           t.name,
           h.houseNo
@@ -566,50 +1188,86 @@ app.get("/invoice/:id", async (req, res) => {
       ON h.houseId = t.houseId
 
       WHERE i.invoiceId = $1
+
     `, [id]);
 
 
-    // charges
+    if(invoice.rows.length === 0){
+
+      return res.status(404).json({
+        error:"Invoice not found"
+      });
+
+    }
+
+
+
+    // charges attached to this invoice
     const charges = await pool.query(`
       SELECT 
           chargeId, 
           chargeType, 
           chargeAmount
+
       FROM chargeList
+
       WHERE invoiceId = $1
+
+      ORDER BY chargeId ASC
+
     `, [id]);
 
 
-    // water
-    const water = await pool.query(`
-      SELECT
-          previousReading,
-          currentReading,
-          usage,
-          rate,
-          bill
-      FROM waterReadings
-      WHERE invoiceId = $1
-      LIMIT 1;
-    `, [id]);
+
+
+    
+    // water attached to this invoice
+    const water = await pool.query(
+    `
+    SELECT
+        previousReading,
+        currentReading,
+        usage,
+        rate,
+        bill
+
+    FROM waterReadings
+
+    WHERE invoiceId = $1
+    AND isOpening = FALSE
+
+    ORDER BY readingMonth DESC
+
+    LIMIT 1
+    `,
+    [id]
+    );
+
+
 
 
     res.json({
+
       invoice: invoice.rows[0],
+
       charges: charges.rows,
+
       water: water.rows[0] || null
+
     });
 
 
+
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
       error: err.message
     });
+
   }
 });
-
 
 app.get("/invoice-pdf/:month", auth,async (req, res) => {
   const token = req.token;
@@ -617,6 +1275,8 @@ app.get("/invoice-pdf/:month", auth,async (req, res) => {
         const { month } = req.params;
 
         const browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath: await chromium.executablePath(),
             headless: true
         });
 
@@ -642,10 +1302,6 @@ app.get("/invoice-pdf/:month", auth,async (req, res) => {
             }
         );
 
-        await page.screenshot({
-            path: "debug.png",
-            fullPage: true
-        });
 
         const pdfBuffer = await page.pdf({
             format: "A4",
@@ -794,6 +1450,7 @@ app.get("/searchTenant/:phone", async (req, res) => {
   }
 });
 
+
 app.post("/phone", async (req,res)=>{
 
     const {
@@ -854,47 +1511,55 @@ app.post("/phone", async (req,res)=>{
 
 });
 
-app.post("/payment",auth, async (req, res) => {
+app.post("/payment", auth, async (req, res) => {
   const {
     tenantId,
     payAmount,
     paymentMethod,
-    confirmationCode
+    confirmationCode,
+    paymentDate
   } = req.body;
 
   try {
-    const result = await pool.query(
-  `
-  INSERT INTO paymentList (
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  )
-  VALUES ($1, $2, $3, $4)
-  RETURNING payId
-  `,
-  [
-    tenantId,
-    payAmount,
-    paymentMethod,
-    confirmationCode
-  ]
-);
 
-res.json({
-  success: true,
-  message: "Payment recorded successfully.",
-  paymentId: result.rows[0].payid
-});
+    const result = await pool.query(
+      `
+      INSERT INTO paymentList (
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING payId
+      `,
+      [
+        tenantId,
+        payAmount,
+        paymentMethod,
+        confirmationCode,
+        paymentDate
+      ]
+    );
+
+    res.json({
+      success: true,
+      message: "Payment recorded successfully.",
+      paymentId: result.rows[0].payid
+    });
 
   } catch (err) {
+
     console.error(err);
+
     res.status(500).json({
       success: false,
       error: err.message
     });
+
   }
+
 });
 
 app.get("/searchTenantByName/:name", async (req, res) => {
@@ -1511,7 +2176,7 @@ app.get("/invoice-correction/:id", async (req,res)=>{
 
 });
 
-app.post("/create-bills", auth,async (req, res) => {
+app.post("/create-bills", auth, async (req, res) => {
 
     const { billingMonth, bills } = req.body;
 
@@ -1538,21 +2203,24 @@ app.post("/create-bills", auth,async (req, res) => {
                     billDate,
                     category,
                     description,
-                    amount
+                    amount,
+                    status
                 )
                 VALUES
                 (
                     $1,
                     $2,
                     $3,
-                    $4
+                    $4,
+                    $5
                 )
                 `,
                 [
                     `${billingMonth}-01`,
                     bill.category,
                     bill.description,
-                    bill.amount
+                    bill.amount,
+                    bill.status
                 ]
             );
 
@@ -1592,12 +2260,20 @@ app.get("/bill-pivot", async (req, res) => {
             SELECT
                 TO_CHAR(billDate, 'YYYY-MM') AS month,
                 category,
-                SUM(amount) AS amount
+                SUM(amount) AS amount,
+
+                BOOL_AND(
+                    LOWER(TRIM(status)) = 'paid'
+                ) AS paid
+
             FROM billList
+
             GROUP BY
                 TO_CHAR(billDate, 'YYYY-MM'),
                 category
+
             ORDER BY month
+
             `
         );
 
@@ -1621,7 +2297,9 @@ app.get("/bill-month/:month", async (req, res) => {
 
     const { month } = req.params;
 
+
     console.log("Month received:", month);
+
 
     try {
 
@@ -1631,16 +2309,29 @@ app.get("/bill-month/:month", async (req, res) => {
                 billid,
                 category,
                 description,
-                amount
+                amount,
+                status,
+                billdate
             FROM billList
-            `
+
+            WHERE TO_CHAR(
+                billDate,
+                'YYYY-MM'
+            ) = $1
+
+            ORDER BY billid
+            `,
+            [month]
         );
 
+
         res.json(result.rows);
+
 
     } catch (err) {
 
         console.error("QUERY ERROR:", err);
+
 
         res.status(500).json({
             error: err.message
@@ -1650,58 +2341,105 @@ app.get("/bill-month/:month", async (req, res) => {
 
 });
 
-app.put("/modify-bills",auth, async (req, res) => {
+
+
+
+
+
+
+app.put("/modify-bills", auth, async (req, res) => {
 
     const { bills } = req.body;
 
+
     const client = await pool.connect();
+
 
     try {
 
+
         await client.query("BEGIN");
 
+
+
         for (const bill of bills) {
+
 
             await client.query(
                 `
                 UPDATE billList
+
                 SET
+
                     category = $1,
+
                     description = $2,
-                    amount = $3
-                WHERE billid = $4
+
+                    amount = $3,
+
+                    status = $4
+
+                WHERE billid = $5
                 `,
                 [
+
                     bill.category,
+
                     bill.description,
+
                     bill.amount,
+
+                    bill.status,
+
                     bill.billid
+
                 ]
             );
 
+
         }
+
+
 
         await client.query("COMMIT");
 
+
+
         res.json({
-            success: true,
-            message: "Bills updated successfully"
+
+            success:true,
+
+            message:"Bills updated successfully"
+
         });
 
-    } catch (err) {
+
+
+    } catch(err) {
+
 
         await client.query("ROLLBACK");
 
+
         console.error(err);
 
+
+
         res.status(500).json({
-            success: false,
-            error: err.message
+
+            success:false,
+
+            error:err.message
+
         });
+
+
 
     } finally {
 
+
         client.release();
+
 
     }
 
@@ -2430,6 +3168,160 @@ app.get("/dashboard-summary", async (req, res) => {
 
 });
 
+app.get("/tenant-statement/:id", auth, async (req, res) => {
+
+    const { id } = req.params;
+
+    try {
+
+        const tenantResult = await pool.query(
+        `
+        SELECT
+            t.name,
+            t.phone,
+            h.houseNo
+
+        FROM tenantList t
+
+        JOIN houseList h
+            ON t.houseId = h.houseId
+
+        WHERE t.id = $1
+        `,
+        [id]
+        );
+
+
+        const transactionResult = await pool.query(
+        `
+        SELECT
+            'CHARGE' AS type,
+            c.chargeDate AS date,
+            c.chargeType AS description,
+            c.chargeAmount AS amount
+
+        FROM chargeList c
+
+        WHERE c.tenantId = $1
+
+
+        UNION ALL
+
+
+        SELECT
+            'CHARGE' AS type,
+            w.readingMonth AS date,
+            'Water' AS description,
+            w.bill AS amount
+
+        FROM waterReadings w
+
+        JOIN houseList h
+            ON h.houseId = w.houseId
+
+        JOIN tenantList t
+            ON t.houseId = h.houseId
+
+        WHERE t.id = $1
+        AND w.isOpening = FALSE
+        AND w.invoiceId IS NOT NULL
+
+
+        UNION ALL
+
+
+        SELECT
+            'PAYMENT' AS type,
+            p.paymentDate AS date,
+            p.paymentMethod || ' - ' || p.confirmationCode AS description,
+            p.payAmount AS amount
+
+        FROM paymentList p
+
+        WHERE p.tenantId = $1
+
+
+        ORDER BY date ASC;
+        `,
+        [id]
+        );
+
+
+        let balance = 0;
+        let charges = 0;
+        let payments = 0;
+
+
+        const transactions = transactionResult.rows.map(row => {
+
+            const amount = Number(row.amount);
+
+            let debit = 0;
+            let credit = 0;
+
+            if (row.type === "CHARGE") {
+
+                debit = amount;
+                balance += debit;
+                charges += debit;
+
+            }
+
+            else {
+
+                credit = amount;
+                balance -= credit;
+                payments += credit;
+
+            }
+
+            return {
+
+                date: row.date,
+                type: row.type,
+                description: row.description,
+                debit,
+                credit,
+                balance
+
+            };
+
+        });
+
+
+        res.json({
+
+            tenant: tenantResult.rows[0],
+
+            summary: {
+
+                openingBalance: 0,
+
+                charges,
+
+                payments,
+
+                balance
+
+            },
+
+            transactions
+
+        });
+
+    }
+
+    catch(err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            error: err.message
+        });
+
+    }
+
+});
 
 
 

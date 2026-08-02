@@ -8,13 +8,17 @@ const ModifyBillConfirm = () => {
 
     const { state } = useLocation();
 
+
+
     if (!state) {
 
         return (
 
             <div className="confirmPage">
 
-                <h2>No bill data found.</h2>
+                <h2>
+                    No bill data found.
+                </h2>
 
                 <button
                     onClick={() =>
@@ -30,13 +34,19 @@ const ModifyBillConfirm = () => {
 
     }
 
+
+
     const {
         month,
         original,
         updated
     } = state;
 
+
+
     const API_URL = import.meta.env.VITE_API_URL;
+
+
 
     const submitChanges = async () => {
 
@@ -45,13 +55,17 @@ const ModifyBillConfirm = () => {
             const res = await fetch(
                 `${API_URL}/modify-bills`,
                 {
-                    method: "PUT",
+                    method:"PUT",
+
                     headers: authHeaders(),
+
                     body: JSON.stringify({
                         bills: updated
                     })
                 }
             );
+
+
 
             if (!res.ok) {
 
@@ -61,15 +75,21 @@ const ModifyBillConfirm = () => {
 
             }
 
+
+
             alert(
                 "Bills updated successfully."
             );
 
+
             navigate(-2);
 
-        } catch (err) {
+
+
+        } catch(err) {
 
             console.error(err);
+
 
             alert(
                 "Failed to update bills."
@@ -79,23 +99,36 @@ const ModifyBillConfirm = () => {
 
     };
 
+
+
+
+
     const changes = [];
 
-    updated.forEach((newBill) => {
+
+
+    updated.forEach((newBill)=>{
+
 
         const oldBill =
             original.find(
                 b =>
-                    b.billid ===
-                    newBill.billid
+                    b.billid === newBill.billid
             );
 
-        if (!oldBill) return;
 
-        if (
+
+        if(!oldBill) return;
+
+
+
+
+        // Description change
+
+        if(
             oldBill.description !==
             newBill.description
-        ) {
+        ){
 
             changes.push({
 
@@ -109,20 +142,24 @@ const ModifyBillConfirm = () => {
                     oldBill.description,
 
                 new:
-                    newBill.description
+                    newBill.description,
+
+                type:"text"
 
             });
 
         }
 
-        if (
-            Number(
-                oldBill.amount
-            ) !==
-            Number(
-                newBill.amount
-            )
-        ) {
+
+
+
+
+        // Amount change
+
+        if(
+            Number(oldBill.amount) !==
+            Number(newBill.amount)
+        ){
 
             changes.push({
 
@@ -133,50 +170,110 @@ const ModifyBillConfirm = () => {
                     `${newBill.category} Amount`,
 
                 old:
-                    `KES ${Number(
-                        oldBill.amount
-                    ).toLocaleString()}`,
+                    `KES ${
+                        Number(oldBill.amount)
+                        .toLocaleString(
+                            "en-GB",
+                            {
+                                minimumFractionDigits:2,
+                                maximumFractionDigits:2
+                            }
+                        )
+                    }`,
 
                 new:
-                    `KES ${Number(
-                        newBill.amount
-                    ).toLocaleString()}`
+                    `KES ${
+                        Number(newBill.amount)
+                        .toLocaleString(
+                            "en-GB",
+                            {
+                                minimumFractionDigits:2,
+                                maximumFractionDigits:2
+                            }
+                        )
+                    }`,
+
+                type:"money"
 
             });
 
         }
 
+
+
+
+
+        // Status change
+
+        if(
+            oldBill.status !==
+            newBill.status
+        ){
+
+            changes.push({
+
+                key:
+                    `${newBill.billid}-status`,
+
+                label:
+                    `${newBill.category} Status`,
+
+                old:
+                    oldBill.status,
+
+                new:
+                    newBill.status,
+
+                type:"text"
+
+            });
+
+        }
+
+
+
     });
+
+
+
+
 
     const originalTotal =
         original.reduce(
-            (sum, bill) =>
-                sum +
-                Number(
-                    bill.amount
-                ),
+            (sum,bill)=>
+                sum + Number(bill.amount),
             0
         );
 
+
+
     const updatedTotal =
         updated.reduce(
-            (sum, bill) =>
-                sum +
-                Number(
-                    bill.amount
-                ),
+            (sum,bill)=>
+                sum + Number(bill.amount),
             0
         );
+
+
+
+
 
     return (
 
         <div className="confirmPage">
 
+
             <div className="confirmCard">
+
+
 
                 <h2>
                     Confirm Bill Changes
                 </h2>
+
+
+
+
 
                 <div className="confirmRow">
 
@@ -184,11 +281,16 @@ const ModifyBillConfirm = () => {
                         Billing Month
                     </span>
 
+
                     <span>
                         {month}
                     </span>
 
                 </div>
+
+
+
+
 
                 <div className="confirmRow">
 
@@ -196,21 +298,27 @@ const ModifyBillConfirm = () => {
                         Original Total
                     </span>
 
+
                     <span>
 
                         KES{" "}
 
                         {originalTotal.toLocaleString(
-                            undefined,
+                            "en-GB",
                             {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
+                                minimumFractionDigits:2,
+                                maximumFractionDigits:2
                             }
                         )}
 
                     </span>
 
+
                 </div>
+
+
+
+
 
                 <div className="confirmRow">
 
@@ -218,129 +326,213 @@ const ModifyBillConfirm = () => {
                         Updated Total
                     </span>
 
+
                     <span>
 
                         KES{" "}
 
                         {updatedTotal.toLocaleString(
-                            undefined,
+                            "en-GB",
                             {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
+                                minimumFractionDigits:2,
+                                maximumFractionDigits:2
                             }
                         )}
 
                     </span>
 
+
                 </div>
+
+
+
+
 
                 <hr />
 
-                {changes.length === 0 ? (
 
-                    <h3
-                        style={{
-                            textAlign:
-                                "center"
-                        }}
-                    >
-                        No changes detected.
-                    </h3>
 
-                ) : (
 
-                    changes.map(
-                        change => (
 
-                            <div
-                                key={
-                                    change.key
-                                }
-                                className="changeCard"
-                            >
+                {
+                    changes.length === 0
 
-                                <h3>
-                                    {
-                                        change.label
+                    ?
+
+                    (
+
+                        <h3
+                            style={{
+                                textAlign:"center"
+                            }}
+                        >
+                            No changes detected.
+                        </h3>
+
+                    )
+
+                    :
+
+                    (
+
+                        changes.map(
+                            change => (
+
+                                <div
+
+                                    key={
+                                        change.key
                                     }
-                                </h3>
 
-                                <div className="changeValues">
+                                    className="changeCard"
 
-                                    <div className="oldValue">
+                                >
 
-                                        <small>
-                                            Current
-                                        </small>
 
-                                        <p>
-                                            {
-                                                change.old
-                                            }
-                                        </p>
+                                    <h3>
+
+                                        {
+                                            change.label
+                                        }
+
+                                    </h3>
+
+
+
+
+                                    <div className="changeValues">
+
+
+
+                                        <div className="oldValue">
+
+
+                                            <small>
+                                                Current
+                                            </small>
+
+
+                                            <p>
+                                                {
+                                                    change.old
+                                                }
+                                            </p>
+
+
+                                        </div>
+
+
+
+
+
+                                        <div className="arrow">
+
+                                            →
+
+                                        </div>
+
+
+
+
+
+                                        <div className="newValue">
+
+
+                                            <small>
+                                                New
+                                            </small>
+
+
+                                            <p>
+                                                {
+                                                    change.new
+                                                }
+                                            </p>
+
+
+                                        </div>
+
+
+
 
                                     </div>
 
-                                    <div className="arrow">
 
-                                        →
-
-                                    </div>
-
-                                    <div className="newValue">
-
-                                        <small>
-                                            New
-                                        </small>
-
-                                        <p>
-                                            {
-                                                change.new
-                                            }
-                                        </p>
-
-                                    </div>
 
                                 </div>
 
-                            </div>
+
+                            )
 
                         )
+
                     )
 
-                )}
+                }
+
+
+
+
+
+
 
                 <div className="buttonRow">
 
+
                     <button
+
                         className="editBtn"
+
                         onClick={() =>
                             navigate(-1)
                         }
+
                     >
+
                         Back
+
                     </button>
 
+
+
+
+
                     <button
+
                         className="confirmBtn"
+
                         onClick={
                             submitChanges
                         }
+
                         disabled={
                             changes.length === 0
                         }
+
                     >
+
                         Confirm Changes
+
                     </button>
+
+
+
 
                 </div>
 
+
+
+
+
             </div>
+
+
 
         </div>
 
     );
 
 };
+
 
 export default ModifyBillConfirm;

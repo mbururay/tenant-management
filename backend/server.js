@@ -755,25 +755,103 @@ app.get("/searchTenant/:phone", async (req, res) => {
 
     const { phone } = req.params;
 
-    const result = await pool.query(`
-      SELECT
+    const result = await pool.query(
+    `
+    SELECT DISTINCT
         t.id,
         t.name,
         h.houseNo
-      FROM tenantList t
-      JOIN houseList h
+
+    FROM tenantList t
+
+    JOIN houseList h
         ON t.houseId = h.houseId
-      WHERE t.phone = $1
-      AND t.moveOut IS NULL
-      ORDER BY t.name
-    `, [phone]);
+
+    LEFT JOIN phoneList p
+        ON t.id = p.tenantId
+
+    WHERE
+        (
+            t.phone = $1
+            OR p.phone = $1
+        )
+        AND t.moveOut IS NULL
+
+    ORDER BY t.name
+    `,
+    [phone]);
 
     res.json(result.rows);
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ error: err.message });
+
+    res.status(500).json({
+      error: err.message
+    });
+
   }
+});
+
+app.post("/phone", async (req,res)=>{
+
+    const {
+        tenantId,
+        phone
+    } = req.body;
+
+    try{
+
+        const exists = await pool.query(
+        `
+        SELECT 1
+        FROM phoneList
+        WHERE phone=$1
+        `,
+        [phone]);
+
+        if(exists.rows.length){
+
+            return res.status(400).json({
+                message:"Phone already exists."
+            });
+
+        }
+
+        await pool.query(
+        `
+        INSERT INTO phoneList
+        (
+            tenantId,
+            phone
+        )
+        VALUES
+        (
+            $1,
+            $2
+        )
+        `,
+        [
+            tenantId,
+            phone
+        ]);
+
+        res.json({
+            message:"Phone added successfully."
+        });
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:err.message
+        });
+
+    }
+
 });
 
 app.post("/payment",auth, async (req, res) => {

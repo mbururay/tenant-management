@@ -233,7 +233,7 @@ const MoveOutSettlement = () => {
                     <input
                         className="editInput houseDisplay"
                         value={`KES ${depositHeld.toLocaleString("en-GB")}`}
-                        readOnly
+                        
                     />
 
                 </section>

@@ -12,8 +12,7 @@ const PayCorrections = () => {
     const [payment, setPayment] = useState(null);
 
     const [formData, setFormData] = useState({
-        fieldName: "",
-        newValue: "",
+        adjustmentAmount: "",
         reason: ""
     });
 
@@ -60,77 +59,37 @@ const PayCorrections = () => {
 
     const handleSubmit = (e) => {
 
-        e.preventDefault();
+    e.preventDefault();
 
-        if (
-            !formData.fieldName ||
-            !formData.newValue ||
-            !formData.reason.trim()
-        ) {
+    if (
+        formData.adjustmentAmount === "" ||
+        !formData.reason.trim()
+    ) {
+        alert("Please complete all fields.");
+        return;
+    }
 
-            alert("Please complete all fields.");
-            return;
+    navigate("/PayCorrectionsConfirm", {
 
-        }
+        state: {
 
-        const oldValues = {
+            payment,
 
-            paymentMethod: payment.paymentMethod,
+            correction: {
 
-            confirmationCode:
-                payment.confirmationCode || "",
+                paymentId: payment.paymentId,
 
-            paymentAmount:
-                payment.paymentAmount
+                adjustmentAmount: Number(formData.adjustmentAmount),
 
-        };
-
-        const oldValue =
-            oldValues[formData.fieldName];
-
-        if (
-            String(oldValue).trim() ===
-            String(formData.newValue).trim()
-        ) {
-
-            alert(
-                "New value must be different from the current value."
-            );
-
-            return;
-
-        }
-
-        navigate("/PayCorrectionsConfirm", {
-
-            state: {
-
-                payment,
-
-                correction: {
-
-                    paymentId:
-                        payment.paymentId,
-
-                    fieldName:
-                        formData.fieldName,
-
-                    oldValue,
-
-                    newValue:
-                        formData.newValue,
-
-                    reason:
-                        formData.reason
-
-                }
+                reason: formData.reason
 
             }
 
-        });
+        }
 
-    };
+    });
 
+};
 
 
     if (!payment) {
@@ -260,103 +219,39 @@ const PayCorrections = () => {
 
             {/* CORRECTION FORM */}
 
-            <form
+                        <form
                 className="editTenantForm"
                 onSubmit={handleSubmit}
             >
-
                 <section className="editSection">
 
-                    <h3>Create Correction</h3>
+                    <h3>Create Payment Adjustment</h3>
 
-                    <label>Field To Correct</label>
+                    <label>Adjustment Amount</label>
 
-                    <select
+                    <input
+                        type="number"
+                        step="0.01"
                         className="editInput"
-                        name="fieldName"
-                        value={formData.fieldName}
-                        onChange={(e) =>
-                            setFormData({
-                                fieldName: e.target.value,
-                                newValue: "",
-                                reason:
-                                    formData.reason
-                            })
-                        }
-                    >
+                        name="adjustmentAmount"
+                        value={formData.adjustmentAmount}
+                        onChange={handleChange}
+                        placeholder="Use + to increase, - to decrease"
+                    />
 
-                        <option value="">
-                            Select...
-                        </option>
+                    <label>Preview</label>
 
-                        <option value="paymentMethod">
-                            Payment Method
-                        </option>
-
-                        <option value="confirmationCode">
-                            Confirmation Code
-                        </option>
-
-                        <option value="paymentAmount">
-                            Payment Amount
-                        </option>
-
-                    </select>
-
-
-
-                    <label>New Value</label>
-
-                    {formData.fieldName ===
-                    "paymentMethod" ? (
-
-                        <select
-                            className="editInput"
-                            name="newValue"
-                            value={formData.newValue}
-                            onChange={handleChange}
-                        >
-
-                            <option value="">
-                                Select Method
-                            </option>
-
-                            <option value="NBK Bank Transfer">
-                                NBK Bank Transfer
-                            </option>
-
-                            <option value="SC Bank Transfer">
-                                SC Bank Transfer
-                            </option>
-
-                        </select>
-
-                    ) : formData.fieldName ===
-                      "paymentAmount" ? (
-
-                        <input
-                            type="number"
-                            step="0.01"
-                            className="editInput"
-                            name="newValue"
-                            value={formData.newValue}
-                            onChange={handleChange}
-                            placeholder="Enter corrected amount"
-                        />
-
-                    ) : (
-
-                        <input
-                            className="editInput"
-                            name="newValue"
-                            value={formData.newValue}
-                            onChange={handleChange}
-                            placeholder="Enter corrected value"
-                        />
-
-                    )}
-
-
+                    <input
+                        className="editInput houseDisplay"
+                        readOnly
+                        value={`KES ${(
+                            Number(payment.paymentAmount) +
+                            (Number(formData.adjustmentAmount) || 0)
+                        ).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}`}
+                    />
 
                     <label>Reason</label>
 
@@ -366,12 +261,10 @@ const PayCorrections = () => {
                         name="reason"
                         value={formData.reason}
                         onChange={handleChange}
-                        placeholder="Explain why this correction is required..."
+                        placeholder="Explain why this payment adjustment is required..."
                     />
 
                 </section>
-
-
 
                 <div className="buttonRow">
 

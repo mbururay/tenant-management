@@ -161,31 +161,64 @@ export const generateInvoice = async (req, res) => {
                 `
                 SELECT
 
-                COALESCE(
-                    (
-                        SELECT SUM(totalAmount)
-                        FROM invoiceList
-                        WHERE tenantId = $1
-                    ),
-                    0
+                (
+
+                    COALESCE(
+                        (
+                            SELECT SUM(totalAmount)
+                            FROM invoiceList
+                            WHERE tenantId = $1
+                        ),
+                        0
+                    )
+
+                    +
+
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            JOIN invoiceList i
+                                ON i.invoiceId = ic.invoiceId
+                            WHERE i.tenantId = $1
+                        ),
+                        0
+                    )
+
                 )
 
                 -
 
-                COALESCE(
-                    (
-                        SELECT SUM(payAmount)
-                        FROM paymentList
-                        WHERE tenantId = $1
-                    ),
-                    0
+                (
+
+                    COALESCE(
+                        (
+                            SELECT SUM(payAmount)
+                            FROM paymentList
+                            WHERE tenantId = $1
+                        ),
+                        0
+                    )
+
+                    +
+
+                    COALESCE(
+                        (
+                            SELECT SUM(pc.adjustmentAmount)
+                            FROM paymentCorrection pc
+                            JOIN paymentList p
+                                ON p.payId = pc.paymentId
+                            WHERE p.tenantId = $1
+                        ),
+                        0
+                    )
+
                 )
 
-                AS balance
+                AS balance;
                 `,
                 [tenantId]
             );
-
             const previousBalance = Number(previousBalanceResult.rows[0].balance);
 
             /*
@@ -310,13 +343,27 @@ export const getInvoiceById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // invoice header
+
+        // Invoice header
         const invoice = await pool.query(`
             SELECT
                 i.invoiceId,
                 i.tenantId,
                 i.billingDate,
-                i.totalAmount,
+
+                (
+                    i.totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = i.invoiceId
+                        ),
+                        0
+                    )
+                ) AS totalAmount,
+
                 i.previousBalance AS accountBalance,
 
                 t.name,
@@ -325,10 +372,10 @@ export const getInvoiceById = async (req, res) => {
             FROM invoiceList i
 
             JOIN tenantList t
-            ON t.id = i.tenantId
+                ON t.id = i.tenantId
 
             JOIN houseList h
-            ON h.houseId = t.houseId
+                ON h.houseId = t.houseId
 
             WHERE i.invoiceId = $1
         `, [id]);
@@ -339,11 +386,11 @@ export const getInvoiceById = async (req, res) => {
             });
         }
 
-        // charges attached to this invoice
+        // Charges
         const charges = await pool.query(`
-            SELECT 
-                chargeId, 
-                chargeType, 
+            SELECT
+                chargeId,
+                chargeType,
                 chargeAmount
 
             FROM chargeList
@@ -353,9 +400,8 @@ export const getInvoiceById = async (req, res) => {
             ORDER BY chargeId ASC
         `, [id]);
 
-        // water attached to this invoice
-        const water = await pool.query(
-            `
+        // Water
+        const water = await pool.query(`
             SELECT
                 previousReading,
                 currentReading,
@@ -371,20 +417,39 @@ export const getInvoiceById = async (req, res) => {
             ORDER BY readingMonth DESC
 
             LIMIT 1
-            `,
-            [id]
-        );
+        `, [id]);
+
+        // Invoice Corrections
+        const corrections = await pool.query(`
+            SELECT
+                correctionId,
+                correctionType,
+                adjustmentAmount,
+                reason,
+                createdAt
+
+            FROM invoiceCorrection
+
+            WHERE invoiceId = $1
+
+            ORDER BY createdAt ASC
+        `, [id]);
 
         res.json({
             invoice: invoice.rows[0],
             charges: charges.rows,
-            water: water.rows[0] || null
+            water: water.rows[0] || null,
+            corrections: corrections.rows
         });
+
     } catch (err) {
+
         console.error(err);
+
         res.status(500).json({
             error: err.message
         });
+
     }
 };
 
@@ -432,7 +497,18 @@ export const getInvoiceByMonth = async (req, res) => {
             SELECT
                 i.invoiceid,
                 i.billingdate,
-                i.totalamount,
+                (
+                    i.totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = i.invoiceId
+                        ),
+                        0
+                    )
+                ) AS totalAmount,
                 t.name,
                 t.houseid
             FROM invoiceList i
@@ -470,7 +546,18 @@ export const getInvoiceMonths = async (req, res) => {
             SELECT
                 TO_CHAR(billingDate,'YYYY-MM') AS month,
                 COUNT(*) AS invoiceCount,
-                SUM(totalAmount) AS totalBilled
+                SUM(
+                    totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = invoiceList.invoiceId
+                        ),
+                        0
+                    )
+                ) AS totalBilled
             FROM invoiceList
             GROUP BY TO_CHAR(billingDate,'YYYY-MM')
             ORDER BY month DESC
@@ -497,7 +584,18 @@ export const getInvoices = async (req, res) => {
                 i.invoiceId,
                 i.generatedDate,
                 i.billingDate,
-                i.totalAmount,
+                (
+                    i.totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = i.invoiceId
+                        ),
+                        0
+                    )
+                ) AS totalAmount,
 
                 t.name,
                 h.houseNo
@@ -535,7 +633,18 @@ export const getMonthInvoices = async (req, res) => {
             SELECT
                 i.invoiceId,
                 i.billingDate,
-                i.totalAmount,
+                (
+                    i.totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = i.invoiceId
+                        ),
+                        0
+                    )
+                ) AS totalAmount,
                 t.name,
                 h.houseNo
             FROM invoiceList i
@@ -608,7 +717,18 @@ export const searchInvoiceByName = async (req, res) => {
                 h.houseno         AS "houseNo",
                 il.generateddate  AS "generatedDate",
                 il.billingdate    AS "billingDate",
-                il.totalamount    AS "totalAmount"
+                (
+                    il.totalAmount
+                    +
+                    COALESCE(
+                        (
+                            SELECT SUM(ic.adjustmentAmount)
+                            FROM invoiceCorrection ic
+                            WHERE ic.invoiceId = il.invoiceId
+                        ),
+                        0
+                    )
+                ) AS "totalAmount"
 
             FROM invoiceList il
 
@@ -645,13 +765,12 @@ export const searchInvoiceByName = async (req, res) => {
 export const createInvoiceCorrection = async (req, res) => {
     const {
         invoiceId,
-        tenantId,
         amount,
         reason,
         correctionType
     } = req.body;
 
-    if (!invoiceId || !tenantId || !amount || !reason || !correctionType) {
+    if (!invoiceId || !amount || !reason || !correctionType) {
         return res.status(400).json({
             success: false,
             error: "Missing required fields"
@@ -663,7 +782,6 @@ export const createInvoiceCorrection = async (req, res) => {
     try {
         await client.query("BEGIN");
 
-        // Verify invoice exists
         const invoiceCheck = await client.query(
             `
             SELECT invoiceId
@@ -674,6 +792,8 @@ export const createInvoiceCorrection = async (req, res) => {
         );
 
         if (invoiceCheck.rows.length === 0) {
+            await client.query("ROLLBACK");
+
             return res.status(404).json({
                 success: false,
                 error: "Invoice not found"
@@ -685,11 +805,9 @@ export const createInvoiceCorrection = async (req, res) => {
             INSERT INTO invoiceCorrection
             (
                 invoiceId,
-                tenantId,
                 adjustmentAmount,
                 reason,
                 correctionType,
-                status,
                 createdAt
             )
             VALUES
@@ -698,13 +816,16 @@ export const createInvoiceCorrection = async (req, res) => {
                 $2,
                 $3,
                 $4,
-                $5,
-                'Draft',
                 CURRENT_TIMESTAMP
             )
             RETURNING correctionId
             `,
-            [invoiceId, tenantId, amount, reason, correctionType]
+            [
+                invoiceId,
+                amount,
+                reason,
+                correctionType
+            ]
         );
 
         await client.query("COMMIT");
@@ -714,38 +835,45 @@ export const createInvoiceCorrection = async (req, res) => {
             message: "Invoice correction created.",
             correctionId: result.rows[0].correctionid
         });
+
     } catch (err) {
+
         await client.query("ROLLBACK");
+
         console.error(err);
+
         res.status(500).json({
             success: false,
             error: err.message
         });
+
     } finally {
+
         client.release();
+
     }
 };
 
-// ======================================================
-// GET INVOICE CORRECTION BY ID
-// ======================================================
-// GET /invoice-correction/:id
 export const getInvoiceCorrectionById = async (req, res) => {
     const { id } = req.params;
 
     try {
+
         const correction = await pool.query(`
             SELECT
                 ic.correctionId,
                 ic.adjustmentAmount,
                 ic.reason,
                 ic.correctionType,
-                ic.status,
                 ic.createdAt,
 
                 i.invoiceId,
                 i.billingDate,
-                i.totalAmount,
+
+                i.totalAmount
+                +
+                COALESCE(adj.totalCorrections, 0)
+                AS totalAmount,
 
                 t.name,
                 h.houseNo
@@ -753,15 +881,25 @@ export const getInvoiceCorrectionById = async (req, res) => {
             FROM invoiceCorrection ic
 
             JOIN invoiceList i
-            ON i.invoiceId = ic.invoiceId
+                ON i.invoiceId = ic.invoiceId
 
             JOIN tenantList t
-            ON t.id = ic.tenantId
+                ON t.id = i.tenantId
 
             JOIN houseList h
-            ON h.houseId = t.houseId
+                ON h.houseId = t.houseId
 
-            WHERE ic.correctionId = $1
+            LEFT JOIN
+            (
+                SELECT
+                    invoiceId,
+                    SUM(adjustmentAmount) AS totalCorrections
+                FROM invoiceCorrection
+                GROUP BY invoiceId
+            ) adj
+                ON adj.invoiceId = i.invoiceId
+
+            WHERE ic.correctionId = $1;
         `, [id]);
 
         if (correction.rows.length === 0) {
@@ -771,13 +909,18 @@ export const getInvoiceCorrectionById = async (req, res) => {
         }
 
         res.json(correction.rows[0]);
+
     } catch (err) {
+
         console.error(err);
+
         res.status(500).json({
             error: err.message
         });
+
     }
 };
+
 
 export const printMonthlyInvoice = async (req, res) => {
     const token = req.token;

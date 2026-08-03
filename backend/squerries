@@ -5,56 +5,128 @@ DROP VIEW IF EXISTS info;
 DROP VIEW IF EXISTS tview;
 DROP VIEW IF EXISTS hview;
 
-CREATE VIEW hview AS 
-SELECT houseId,houseNo 
+----------------------------------------------------
+-- HOUSE VIEW
+----------------------------------------------------
+
+CREATE VIEW hview AS
+SELECT
+    houseId,
+    houseNo
 FROM houseList;
 
+----------------------------------------------------
+-- ACTIVE TENANTS
+----------------------------------------------------
 
-CREATE VIEW tview AS 
-SELECT id, houseId, name, phone 
-FROM tenantList 
-WHERE moveout IS NULL;
+CREATE VIEW tview AS
+SELECT
+    id,
+    houseId,
+    name,
+    phone
+FROM tenantList
+WHERE moveOut IS NULL;
 
-CREATE VIEW info AS 
-SELECT 
+----------------------------------------------------
+-- TENANT + HOUSE INFO
+----------------------------------------------------
+
+CREATE VIEW info AS
+SELECT
     t.id AS tenantId,
     t.name,
     t.phone,
     t.houseId,
     h.houseNo
 FROM tview t
-INNER JOIN hview h 
+INNER JOIN hview h
 ON h.houseId = t.houseId;
 
+----------------------------------------------------
+-- TOTAL CHARGES
+-- (Invoices + Invoice Corrections)
+----------------------------------------------------
+
 CREATE VIEW chargeView AS
-SELECT 
-    tenantId,
-    SUM(totalAmount) AS totalCharge
-FROM invoiceList
-GROUP BY tenantId;
+
+SELECT
+    i.tenantId,
+
+    COALESCE(SUM(i.totalAmount),0)
+    +
+    COALESCE(
+        (
+            SELECT SUM(ic.adjustmentAmount)
+            FROM invoiceCorrection ic
+            WHERE ic.invoiceId IN
+            (
+                SELECT invoiceId
+                FROM invoiceList inv
+                WHERE inv.tenantId = i.tenantId
+            )
+        ),
+        0
+    )
+    AS totalCharge
+
+FROM invoiceList i
+
+GROUP BY i.tenantId;
+
+----------------------------------------------------
+-- TOTAL PAYMENTS
+-- (Payments + Payment Corrections)
+----------------------------------------------------
 
 CREATE VIEW payView AS
-SELECT 
-    tenantId,
-    SUM(payAmount) AS totalpay
-FROM paymentList
-GROUP BY tenantId;
+
+SELECT
+    p.tenantId,
+
+    COALESCE(SUM(p.payAmount),0)
+    +
+    COALESCE(
+        (
+            SELECT SUM(pc.adjustmentAmount)
+            FROM paymentCorrection pc
+            WHERE pc.paymentId IN
+            (
+                SELECT payId
+                FROM paymentList pay
+                WHERE pay.tenantId = p.tenantId
+            )
+        ),
+        0
+    )
+    AS totalPay
+
+FROM paymentList p
+
+GROUP BY p.tenantId;
+
+----------------------------------------------------
+-- TENANT DASHBOARD
+----------------------------------------------------
 
 CREATE VIEW tenant_dashboard AS
-SELECT 
+
+SELECT
+
     i.tenantId,
     i.name,
     i.phone,
     i.houseNo,
 
-    COALESCE(c.totalCharge, 0)
-    - COALESCE(p.totalpay, 0)
+    COALESCE(c.totalCharge,0)
+    -
+    COALESCE(p.totalPay,0)
     AS balance
 
 FROM info i
 
-LEFT JOIN chargeView c 
-ON i.tenantId = c.tenantId
+LEFT JOIN chargeView c
+ON c.tenantId = i.tenantId
 
-LEFT JOIN payView p 
-ON i.tenantId = p.tenantId;
+LEFT JOIN payView p
+ON p.tenantId = i.tenantId;

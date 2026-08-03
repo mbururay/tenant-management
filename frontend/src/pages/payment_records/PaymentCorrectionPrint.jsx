@@ -1,42 +1,40 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./PaymentCorrectionPrint.css";
-import { useNavigate } from "react-router-dom";
 
 const PaymentCorrectionPrint = () => {
 
     const { id } = useParams();
 
+    const navigate = useNavigate();
+
     const [correction, setCorrection] = useState(null);
 
     const API_URL = import.meta.env.VITE_API_URL;
 
-    const navigate = useNavigate();
-
     useEffect(() => {
 
-        fetch(
-            `${API_URL}/payment-correction/${id}`
-        )
+        fetch(`${API_URL}/payment-correction/${id}`)
             .then(res => res.json())
             .then(data => setCorrection(data))
             .catch(console.error);
 
-    }, [id,API_URL]);
+    }, [id, API_URL]);
 
     const printPage = () => {
+
         window.print();
+
         navigate(-3);
+
     };
 
     if (!correction) {
 
         return (
-
             <div className="correctionPage">
                 <h2>Loading...</h2>
             </div>
-
         );
 
     }
@@ -47,56 +45,50 @@ const PaymentCorrectionPrint = () => {
 
             <div className="correctionCard">
 
-                <h1>
-                    SERENE HOMES APARTMENTS
-                </h1>
+                <h1>SERENE HOMES APARTMENTS</h1>
 
-                <p>
-                    PO BOX 19967-03400, Nairobi
-                </p>
+                <p>PO BOX 19967-03400, Nairobi</p>
 
-                <p>
-                    Tel: 0745113765
-                </p>
+                <p>Tel: 0745113765</p>
 
-                <p>
-                    Email: serenehomes21@gmail.com
-                </p>
+                <p>Email: serenehomes21@gmail.com</p>
 
                 <hr />
 
-                <h2>
-                    PAYMENT CORRECTION NOTICE
-                </h2>
+                <h2>PAYMENT CORRECTION NOTICE</h2>
 
                 <div className="correctionHeader">
 
                     <div>
+
                         <strong>Correction No</strong>
-                        <p>
-                            #{correction.correctionid}
-                        </p>
+
+                        <p>#{correction.correctionId}</p>
+
                     </div>
 
                     <div>
+
                         <strong>Payment No</strong>
-                        <p>
-                            #{correction.paymentid}
-                        </p>
+
+                        <p>#{correction.paymentId}</p>
+
                     </div>
 
                     <div>
+
                         <strong>Tenant</strong>
-                        <p>
-                            {correction.name}
-                        </p>
+
+                        <p>{correction.tenant}</p>
+
                     </div>
 
                     <div>
+
                         <strong>House</strong>
-                        <p>
-                            {correction.houseno}
-                        </p>
+
+                        <p>{correction.houseNo}</p>
+
                     </div>
 
                 </div>
@@ -107,17 +99,9 @@ const PaymentCorrectionPrint = () => {
 
                         <tr>
 
-                            <th>
-                                Field
-                            </th>
+                            <th>Description</th>
 
-                            <th>
-                                Old Value
-                            </th>
-
-                            <th>
-                                New Value
-                            </th>
+                            <th>Amount (KES)</th>
 
                         </tr>
 
@@ -127,16 +111,60 @@ const PaymentCorrectionPrint = () => {
 
                         <tr>
 
+                            <td>Original Payment</td>
+
                             <td>
-                                {correction.fieldname}
+                                {Number(
+                                    correction.originalAmount
+                                ).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>Adjustment</td>
+
+                            <td
+                                style={{
+                                    color:
+                                        Number(correction.adjustmentAmount) >= 0
+                                            ? "#15803d"
+                                            : "#dc2626",
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                {Number(correction.adjustmentAmount) >= 0
+                                    ? "+"
+                                    : ""}
+                                {Number(
+                                    correction.adjustmentAmount
+                                ).toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>
+                                <strong>Corrected Payment</strong>
                             </td>
 
                             <td>
-                                {correction.oldvalue}
-                            </td>
-
-                            <td>
-                                {correction.newvalue}
+                                <strong>
+                                    {Number(
+                                        correction.correctedAmount
+                                    ).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}
+                                </strong>
                             </td>
 
                         </tr>
@@ -147,13 +175,9 @@ const PaymentCorrectionPrint = () => {
 
                 <div className="reasonBox">
 
-                    <h3>
-                        Reason For Correction
-                    </h3>
+                    <h3>Reason For Correction</h3>
 
-                    <p>
-                        {correction.reason}
-                    </p>
+                    <p>{correction.reason}</p>
 
                 </div>
 
@@ -161,14 +185,10 @@ const PaymentCorrectionPrint = () => {
 
                     <p>
 
-                        <strong>
-                            Created:
-                        </strong>
-
-                        {" "}
+                        <strong>Created:</strong>{" "}
 
                         {new Date(
-                            correction.createdat
+                            correction.createdAt
                         ).toLocaleDateString()}
 
                     </p>

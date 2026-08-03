@@ -85,23 +85,24 @@ export const createPayment = async (req, res) => {
 export const createPaymentCorrection = async (req, res) => {
     const {
         paymentId,
-        fieldName,
-        oldValue,
-        newValue,
+        adjustmentAmount,
         reason
     } = req.body;
 
-    // Validate required fields
-    if (!paymentId || !fieldName || !reason) {
+    if (!paymentId || adjustmentAmount === undefined || !reason) {
         return res.status(400).json({
             success: false,
-            error: "Missing required fields: paymentId, fieldName, and reason are required"
+            error: "Missing required fields."
         });
     }
 
+    const client = await pool.connect();
+
     try {
-        // Verify payment exists
-        const paymentCheck = await pool.query(
+
+        await client.query("BEGIN");
+
+        const paymentCheck = await client.query(
             `
             SELECT payId
             FROM paymentList
@@ -111,20 +112,22 @@ export const createPaymentCorrection = async (req, res) => {
         );
 
         if (paymentCheck.rows.length === 0) {
+
+            await client.query("ROLLBACK");
+
             return res.status(404).json({
                 success: false,
-                error: "Payment not found"
+                error: "Payment not found."
             });
+
         }
 
-        const result = await pool.query(
+        const result = await client.query(
             `
-            INSERT INTO paymentCorrections
+            INSERT INTO paymentCorrection
             (
                 paymentId,
-                fieldName,
-                oldValue,
-                newValue,
+                adjustmentAmount,
                 reason,
                 createdAt
             )
@@ -133,29 +136,42 @@ export const createPaymentCorrection = async (req, res) => {
                 $1,
                 $2,
                 $3,
-                $4,
-                $5,
                 CURRENT_TIMESTAMP
             )
             RETURNING correctionId
             `,
-            [paymentId, fieldName, oldValue, newValue, reason]
+            [
+                paymentId,
+                adjustmentAmount,
+                reason
+            ]
         );
+
+        await client.query("COMMIT");
 
         res.status(201).json({
             success: true,
-            message: "Payment correction created",
+            message: "Payment correction created.",
             correctionId: result.rows[0].correctionid
         });
+
     } catch (err) {
+
+        await client.query("ROLLBACK");
+
         console.error(err);
+
         res.status(500).json({
             success: false,
-            error: "Failed to create payment correction"
+            error: err.message
         });
+
+    } finally {
+
+        client.release();
+
     }
 };
-
 // ======================================================
 // GET PAYMENT BY ID
 // ======================================================
@@ -222,35 +238,38 @@ export const getPaymentCorrectionById = async (req, res) => {
     }
 
     try {
+
         const result = await pool.query(
             `
             SELECT
-                pc.correctionId,
-                pc.paymentId,
-                pc.fieldName,
-                pc.oldValue,
-                pc.newValue,
-                pc.reason,
-                pc.createdAt,
+                pc.correctionId        AS "correctionId",
+                pc.adjustmentAmount    AS "adjustmentAmount",
+                pc.reason              AS "reason",
+                pc.createdAt           AS "createdAt",
 
-                p.payamount,
-                p.paymentmethod,
-                p.confirmationcode,
-                p.paydate,
+                p.payId                AS "paymentId",
+                p.payDate              AS "paymentDate",
+                p.paymentMethod        AS "paymentMethod",
+                p.confirmationCode     AS "confirmationCode",
 
-                t.name,
-                h.houseNo
+                p.payAmount            AS "originalAmount",
 
-            FROM paymentCorrections pc
+                (p.payAmount + pc.adjustmentAmount)
+                                        AS "correctedAmount",
+
+                t.name                 AS "tenant",
+                h.houseNo              AS "houseNo"
+
+            FROM paymentCorrection pc
 
             JOIN paymentList p
-            ON p.payid = pc.paymentId
+                ON p.payId = pc.paymentId
 
             JOIN tenantList t
-            ON t.id = p.tenantid
+                ON t.id = p.tenantId
 
             LEFT JOIN houseList h
-            ON h.houseId = t.houseid
+                ON h.houseId = t.houseId
 
             WHERE pc.correctionId = $1
             `,
@@ -264,11 +283,15 @@ export const getPaymentCorrectionById = async (req, res) => {
         }
 
         res.json(result.rows[0]);
+
     } catch (err) {
+
         console.error(err);
+
         res.status(500).json({
             error: err.message
         });
+
     }
 };
 

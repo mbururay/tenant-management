@@ -9,11 +9,8 @@ const PayCorrectionsConfirm = () => {
     const { state } = useLocation();
 
     if (!state) {
-
         return (
-
             <div className="editTenantPage">
-
                 <Heading />
 
                 <h2
@@ -25,20 +22,17 @@ const PayCorrectionsConfirm = () => {
                 >
                     No payment correction to review.
                 </h2>
-
             </div>
-
         );
-
     }
 
     const { payment, correction } = state;
 
-    console.log("payment object:", payment);
-    console.log("correction object:", correction);
-    console.log(payment);
-    console.log(correction);
     const API_URL = import.meta.env.VITE_API_URL;
+
+    const correctedAmount =
+        Number(payment.paymentAmount) +
+        Number(correction.adjustmentAmount);
 
     const handleConfirm = async () => {
 
@@ -53,9 +47,7 @@ const PayCorrectionsConfirm = () => {
 
                     body: JSON.stringify({
                         paymentId: payment.paymentId,
-                        fieldName: correction.fieldName,
-                        oldValue: correction.oldValue,
-                        newValue: correction.newValue,
+                        adjustmentAmount: correction.adjustmentAmount,
                         reason: correction.reason
                     })
                 }
@@ -73,8 +65,7 @@ const PayCorrectionsConfirm = () => {
                 `/PaymentCorrectionPrint/${data.correctionId}`
             );
 
-        }
-        catch (err) {
+        } catch (err) {
 
             console.error(err);
 
@@ -111,13 +102,11 @@ const PayCorrectionsConfirm = () => {
                     </div>
 
                     <div className="confirmRow">
-                        <span>Amount</span>
+                        <span>Original Amount</span>
 
                         <span>
                             KES{" "}
-                            {Number(
-                                payment.paymentAmount
-                            ).toLocaleString(
+                            {Number(payment.paymentAmount).toLocaleString(
                                 undefined,
                                 {
                                     minimumFractionDigits: 2,
@@ -125,7 +114,6 @@ const PayCorrectionsConfirm = () => {
                                 }
                             )}
                         </span>
-
                     </div>
 
                     <div className="confirmRow">
@@ -145,27 +133,46 @@ const PayCorrectionsConfirm = () => {
                     <h3>Correction Details</h3>
 
                     <div className="confirmRow">
-                        <span>Field Being Corrected</span>
-                        <span>{correction.fieldName}</span>
-                    </div>
-
-                    <div className="confirmRow">
-                        <span>Current Value</span>
-                        <span>{correction.oldValue}</span>
-                    </div>
-
-                    <div className="confirmRow">
-                        <span>New Value</span>
+                        <span>Adjustment</span>
 
                         <span
                             style={{
-                                color: "#15803d",
+                                color:
+                                    Number(correction.adjustmentAmount) >= 0
+                                        ? "#15803d"
+                                        : "#dc2626",
                                 fontWeight: "bold"
                             }}
                         >
-                            {correction.newValue}
+                            {Number(correction.adjustmentAmount) >= 0 ? "+" : ""}
+                            KES{" "}
+                            {Number(correction.adjustmentAmount).toLocaleString(
+                                undefined,
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            )}
                         </span>
+                    </div>
 
+                    <div className="confirmRow">
+                        <span>Corrected Amount</span>
+
+                        <span
+                            style={{
+                                fontWeight: "bold"
+                            }}
+                        >
+                            KES{" "}
+                            {correctedAmount.toLocaleString(
+                                undefined,
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            )}
+                        </span>
                     </div>
 
                     <div className="confirmReason">

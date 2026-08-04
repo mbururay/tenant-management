@@ -11,29 +11,37 @@ const SearchTenant = () => {
   const [searched, setSearched] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!name.trim()) {
-      alert("Please enter a tenant name.");
+  if (!name.trim()) {
+    alert("Please enter a tenant name.");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
+    );
+
+    const response = await res.json();
+
+    console.log(response);
+
+    if (!res.ok) {
+      setTenants([]);
+      setSearched(true);
       return;
     }
 
-    try {
-      const res = await fetch(
-        `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
-      );
+    setTenants(response.data || []);
+    setSearched(true);
 
-      const data = await res.json();
-
-      setTenants(data);
-      setSearched(true);
-
-    } catch (err) {
-      console.error(err);
-      alert("Search failed.");
-    }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Search failed.");
+  }
+};
 
   return (
     <div className="payUpdatePage">

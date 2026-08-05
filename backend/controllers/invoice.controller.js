@@ -862,7 +862,7 @@ export const getInvoiceCorrectionById = async (req, res) => {
         const correction = await pool.query(`
             SELECT
                 ic.correctionId,
-                ic.adjustmentAmount,
+                ic.adjustmentAmount, 
                 ic.reason,
                 ic.correctionType,
                 ic.createdAt,
@@ -870,14 +870,11 @@ export const getInvoiceCorrectionById = async (req, res) => {
                 i.invoiceId,
                 i.billingDate,
 
-                i.totalAmount
-                +
-                COALESCE(adj.totalCorrections, 0)
-                AS totalAmount,
-
+                i.totalAmount AS totalAmount,
+                
                 t.name,
                 h.houseNo
-
+                
             FROM invoiceCorrection ic
 
             JOIN invoiceList i

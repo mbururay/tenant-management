@@ -116,14 +116,7 @@ const Login = () => {
                     Forgot Password?
                 </p>
 
-                <p
-                    className="loginLink"
-                    onClick={() =>
-                        navigate("/register")
-                    }
-                >
-                    New User? Register Account
-                </p>
+                 
 
             </div>
 

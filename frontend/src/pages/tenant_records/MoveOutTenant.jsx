@@ -36,10 +36,9 @@ const MoveOutTenant = () => {
 
             const data = await res.json();
 
-            setTenants(data);
+            setTenants(data.data || []);
 
             setSearched(true);
-
         }
         catch (err) {
 

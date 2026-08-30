@@ -9,45 +9,49 @@ const SearchTenant = () => {
   const [name, setName] = useState("");
   const [tenants, setTenants] = useState([]);
   const [searched, setSearched] = useState(false);
+
   const API_URL = import.meta.env.VITE_API_URL;
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!name.trim()) {
-    alert("Please enter a tenant name.");
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
-    );
-
-    const response = await res.json();
-
-    console.log(response);
-
-    if (!res.ok) {
-      setTenants([]);
-      setSearched(true);
+    if (!name.trim()) {
+      alert("Please enter a tenant name.");
       return;
     }
 
-    setTenants(response.data || []);
-    setSearched(true);
+    try {
+      const res = await fetch(
+        `${API_URL}/searchTenantByName/${encodeURIComponent(name)}`
+      );
 
-  } catch (err) {
-    console.error(err);
-    alert("Search failed.");
-  }
-};
+      const response = await res.json();
+
+      console.log(response);
+
+      if (!res.ok) {
+        setTenants([]);
+        setSearched(true);
+        return;
+      }
+
+      setTenants(response.data || []);
+      setSearched(true);
+
+    } catch (err) {
+      console.error(err);
+      alert("Search failed.");
+    }
+  };
 
   return (
     <div className="payUpdatePage">
+
       <Heading />
 
-      <h1 className="waterTitle">Edit Tenant Information</h1>
+      <h1 className="waterTitle">
+        Edit Tenant Information
+      </h1>
 
       <form
         onSubmit={handleSubmit}
@@ -56,7 +60,9 @@ const handleSubmit = async (e) => {
 
         <section className="waterSection">
 
-          <h3>Search Tenant Name</h3>
+          <h3>
+            Search Tenant Name
+          </h3>
 
           <input
             className="waterInput"
@@ -76,6 +82,7 @@ const handleSubmit = async (e) => {
 
       </form>
 
+
       {searched && tenants.length === 0 && (
         <h3
           style={{
@@ -87,14 +94,15 @@ const handleSubmit = async (e) => {
         </h3>
       )}
 
-      {tenants.length > 0 && (
 
+      {tenants.length > 0 && (
         <div className="tenantResults">
 
-          <h2>Select Tenant</h2>
+          <h2>
+            Select Tenant
+          </h2>
 
           {tenants.map((tenant) => (
-
             <div
               key={tenant.id}
               className="tenantCard"
@@ -103,18 +111,22 @@ const handleSubmit = async (e) => {
               }
             >
 
-              <h3>{tenant.name}</h3>
+              <h3>
+                {tenant.name}
+              </h3>
 
-              <p>House {tenant.houseno}</p>
+              <p>
+                House {tenant.houseno}
+              </p>
 
-              <p>{tenant.phone}</p>
+              <p>
+                {tenant.phone}
+              </p>
 
             </div>
-
           ))}
 
         </div>
-
       )}
 
     </div>

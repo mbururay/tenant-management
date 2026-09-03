@@ -275,6 +275,7 @@ export const getTenantStatement = async (req, res) => {
             ORDER BY date ASC;
         `, [id]);
 
+
         let balance = 0;
         let charges = 0;
         let payments = 0;

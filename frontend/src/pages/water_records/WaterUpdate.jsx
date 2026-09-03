@@ -10,21 +10,21 @@ const WaterUpdate = () => {
   const [houses, setHouses] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
 
-  useEffect(() => {
-    fetch(`${API_URL}/water-update-list`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formatted = data.map((house) => ({
-          ...house,
-          currentReading: "",
-          usage: 0,
-          bill: 0,
-        }));
+useEffect(() => {
+  fetch(`${API_URL}/water-update-list`)
+    .then((res) => res.json())
+    .then((data) => {
+      const formatted = (data.data || []).map((house) => ({
+        ...house,
+        currentReading: "",
+        usage: 0,
+        bill: 0,
+      }));
 
-        setHouses(formatted);
-      })
-      .catch((err) => console.error(err));
-  }, [API_URL]);
+      setHouses(formatted);
+    })
+    .catch((err) => console.error(err));
+}, [API_URL]);
 
   const handleRateChange = (e) => {
     const newRate = Number(e.target.value);

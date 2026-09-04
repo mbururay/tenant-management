@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./ICorrectConfirm.css";
 import { authHeaders } from "../../api";
+import { apiFetch } from "../../api";
 
 const ICorrectConfirm = () => {
 
@@ -40,7 +41,7 @@ const ICorrectConfirm = () => {
 
         try {
 
-            const res = await fetch(
+            const res = await apiFetch(
                 `${API_URL}/createInvoiceCorrection`,
                 {
                     method: "POST",
@@ -58,6 +59,8 @@ const ICorrectConfirm = () => {
                 }
             );
             const data = await res.json();
+
+            if(!res) return;
 
             if (!res.ok) {
                 throw new Error(

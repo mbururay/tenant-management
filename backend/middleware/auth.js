@@ -4,16 +4,33 @@ const auth = (req, res, next) => {
 
     const authHeader = req.headers.authorization;
 
-
+    // No Authorization header
     if (!authHeader) {
 
         return res.status(401).json({
-            error: "Access denied"
+            error: "Authentication required"
+        });
+
+    }
+
+    // Make sure it is a Bearer token
+    if (!authHeader.startsWith("Bearer ")) {
+
+        return res.status(401).json({
+            error: "Invalid authentication format"
         });
 
     }
 
     const token = authHeader.split(" ")[1];
+
+    if (!token) {
+
+        return res.status(401).json({
+            error: "Authentication token missing"
+        });
+
+    }
 
     try {
 
@@ -28,13 +45,12 @@ const auth = (req, res, next) => {
 
         next();
 
-    }
-    catch (err) {
+    } catch (err) {
 
         console.error("JWT ERROR:", err.message);
 
         return res.status(401).json({
-            error: err.message
+            error: "Invalid or expired session"
         });
 
     }

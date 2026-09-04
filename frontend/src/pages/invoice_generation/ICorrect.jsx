@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Heading from "../../components/Heading";
 import "./ICorrect.css";
+import { apiFetch } from "../../api";
 
 const ICorrection = () => {
 
@@ -25,9 +26,11 @@ const ICorrection = () => {
 
             try {
 
-                const res = await fetch(
+                const res = await apiFetch(
                     `${API_URL}/invoice/${invoiceId}`
                 );
+
+                if(!res) return;
 
 
                 if (!res.ok) {

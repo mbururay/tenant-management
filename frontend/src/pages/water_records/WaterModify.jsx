@@ -20,27 +20,39 @@ const WaterModify = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   // LOAD DATA
-  useEffect(() => {
-    fetch(`${API_URL}/waterRecord/${id}`)
-      .then(res => res.json())
-      .then(data => {
+useEffect(() => {
+  fetch(`${API_URL}/waterRecord/${id}`)
+    .then(res => res.json())
+    .then(data => {
 
-        const record = {
-          id: data.id,
-          houseId: data.houseId || data.houseid,
-          houseNo: data.houseNo || data.houseno,
-          previousReading: data.previousReading || data.previousreading || 0,
-          currentReading: data.currentReading || data.currentreading || ""
-        };
+      console.log("WATER RECORD RESPONSE:", data);
 
-        setOriginalData(record);
-        setFormData(record);
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Unable to load water record.");
-      });
-  }, [id,API_URL]);
+      const water = data.data || data;
+
+      const record = {
+        id: water.id,
+        houseId: water.houseId ?? water.houseid,
+        houseNo: water.houseNo ?? water.houseno,
+        previousReading:
+          water.previousReading ??
+          water.previousreading ??
+          0,
+        currentReading:
+          water.currentReading ??
+          water.currentreading ??
+          ""
+      };
+
+      console.log("FORMATTED WATER RECORD:", record);
+
+      setOriginalData(record);
+      setFormData(record);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Unable to load water record.");
+    });
+}, [id, API_URL]);
 
   // FIXED INPUT HANDLER
   const handleChange = (e) => {

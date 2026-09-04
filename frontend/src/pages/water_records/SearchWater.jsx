@@ -26,7 +26,7 @@ const SearchWater = () => {
 
       const data = await res.json();
 
-      setHouses(data);
+      setHouses(data.data || []);
       setSearched(true);
     } catch (err) {
       console.error(err);

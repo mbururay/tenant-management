@@ -2,6 +2,8 @@
 // INVOICE CONTROLLER
 // ======================================================
 import pool from "../db.js";
+import PDFDocument from "pdfkit";
+import puppeteer from "puppeteer-core";
 
 // ======================================================
 // INVOICE OPERATIONS

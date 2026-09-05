@@ -14,9 +14,23 @@ import pool from "../db.js";
 export const generateInvoice = async (req, res) => {
     try {
         // Next billing month
-        const billingDate = new Date();
-        billingDate.setMonth(billingDate.getMonth() + 1);
-        billingDate.setDate(1);
+        const { billingMonth } = req.body;
+
+        console.log("BILLING MONTH RECEIVED:", billingMonth);
+
+        if (!billingMonth) {
+            return res.status(400).json({
+                error: "Billing month is required"
+            });
+        }
+
+        const [year, month] = billingMonth.split("-");
+
+        const billingDate = new Date(
+            Number(year),
+            Number(month) - 1,
+            1
+        );
 
         const tenants = await pool.query(`
             SELECT
@@ -497,8 +511,11 @@ export const getInvoiceByMonth = async (req, res) => {
             SELECT
                 i.invoiceid,
                 i.billingdate,
+
                 (
-                    i.totalAmount
+                    COALESCE(i.previousBalance, 0)
+                    +
+                    COALESCE(i.totalAmount, 0)
                     +
                     COALESCE(
                         (
@@ -509,12 +526,14 @@ export const getInvoiceByMonth = async (req, res) => {
                         0
                     )
                 ) AS totalAmount,
+
                 t.name,
                 t.houseid
+
             FROM invoiceList i
 
             JOIN tenantList t
-            ON i.tenantid = t.id
+                ON i.tenantid = t.id
 
             WHERE TO_CHAR(
                 i.billingdate,
@@ -527,14 +546,15 @@ export const getInvoiceByMonth = async (req, res) => {
         );
 
         res.json(result.rows);
+
     } catch (err) {
         console.error(err);
+
         res.status(500).json({
             error: err.message
         });
     }
 };
-
 // ======================================================
 // GET INVOICE MONTHS
 // ======================================================

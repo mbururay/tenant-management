@@ -31,7 +31,7 @@ const InvoiceList = () => {
 
         return new Date(
             Number(year),
-            Number(month) - 1
+            Number(month)-1
         ).toLocaleDateString(
             "en-GB",
             {

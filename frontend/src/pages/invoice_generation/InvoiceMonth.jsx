@@ -65,18 +65,25 @@ const InvoiceMonth = () => {
 
 
     const formatMonth = (value) => {
+    const [year, month] = value.split("-");
 
+    const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
 
-        return new Date(value + "-01")
-        .toLocaleDateString(
-            "en-GB",
-            {
-                month:"long",
-                year:"numeric"
-            }
-        );
-
-    };
+    return `${months[Number(month) - 1]} ${year}`;
+};
 
 
 
